@@ -17,12 +17,19 @@ class Object(pygame.sprite.Sprite):
         self.z = 0
         self.animation_frame = 0
         self.animation_timer = 0
+        self.flickering_timer = 0
         self.object_placed_position = None
         
         self.create_sprite()
 
     def create_sprite(self):
-        self.image = self.iso_utils.create_object_sprite((0, 150, 255), self.col, self.row)
+        # Flickering when moving the object
+        if (self.flickering_timer // 3) % 2:
+            # Lower opacity
+            self.image = self.iso_utils.create_object_sprite(self.col, self.row, 100)
+        else:
+            # Normal color
+            self.image = self.iso_utils.create_object_sprite(self.col, self.row, 255)
         
         self.rect = self.image.get_rect()
         self.update_position()
@@ -57,21 +64,21 @@ class Object(pygame.sprite.Sprite):
         new_x = max(0, min(grid_width - 1, self.grid_x + dx))
         new_y = max(0, min(grid_height - 1, self.grid_y + dy))
 
-        # Kontrola stěn a položených objektů (2 je kód pro položený objekt)
+        # Check walls and placed objects (2 is the code for a placed object)
         if game_map[new_y, new_x, 0] == 1 or game_map[new_y, new_x, 0] == 2:
             return False
         
-        # Kontrola objektů
+        # Check objects
         if objects:
             for object in objects:
                 if object.grid_x == new_x and object.grid_y == new_y:
-                    # Pokud se snažíme jít na objekt a není to objekt, který jsme právě položili
+                    # If we try to go to an object and it is not the object we just placed
                     if self.object_placed_position != (new_x, new_y):
                         return False
         
-        # Pokud se pohybujeme, zkontroluj jestli opouštíme pozici s položeným objektem
+        # If we move, check if we leave the position with the object placed
         if self.object_placed_position and (self.grid_x, self.grid_y) == self.object_placed_position:
-            # Opouštíme pozici s položeným objektem - už se na ni nemůžeme vrátit
+            # We leave the position with the object placed - we cannot return to it anymore
             self.object_placed_position = None
         
         self.grid_x = new_x
@@ -88,12 +95,21 @@ class Object(pygame.sprite.Sprite):
 
         current_c += 1
 
+        # Return to the first sprite
         if current_c == 4:
             current_c = 0
         
         self.col = current_c
 
         return True
+    
+    def flicker(self):
+        """
+        Function for object flickering.
+        """
+        self.flickering_timer += 1
+        # Update sprite for flickering
+        self.create_sprite()
 
     def animate(self, moving):
         """
@@ -111,5 +127,5 @@ class Object(pygame.sprite.Sprite):
             self.create_sprite()  # Update the sprite for the new animation frame
     
     def set_object_placed_position(self, x, y):
-        """Nastaví pozici kde hráč položil objekt"""
+        """Sets the position where an object has been placed"""
         self.object_placed_position = (x, y)

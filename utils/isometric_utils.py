@@ -1,7 +1,5 @@
-import math
 import pygame
 from .sprite_sheet import SpriteSheet
-
 
 class IsometricUtils:
     """Utility class for isometric coordinate conversions and rendering"""
@@ -11,22 +9,34 @@ class IsometricUtils:
         self.tile_height = tile_height
         self.half_tile_width = tile_width // 2
         self.half_tile_height = tile_height // 2
+        self.sprites_loaded = False
         
-        # Načti sprite sheety
-        self.load_sprite_sheets()
+        # Sprite groups
+        self.all_sprites = pygame.sprite.Group()
+        self.objects = pygame.sprite.Group()
     
-    def load_sprite_sheets(self):
-        """Načte všechny sprite sheety"""
+    def load_sprite_sheets(self, selected):
         import os
-        # Dynamická cesta - assets složka relativně k tomuto souboru
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.dirname(current_dir)
         assets_dir = os.path.join(project_root, "assets")
         spritesheets_dir = os.path.join(assets_dir, "spritesheets")
-        
-        self.object_sheet = SpriteSheet(os.path.join(spritesheets_dir, "test_block.png"))
-        self.sprites_loaded = True
-        print(f"Sprite sheet loaded successfully from: {spritesheets_dir}")
+
+        try:
+            sprite_path = os.path.join(spritesheets_dir, selected["spritesheet"])
+            self.object_sheet = SpriteSheet(sprite_path)
+            self.col = 0
+            self.row = 0
+            self.sprites_loaded = True
+
+            # Remove old object from sprite groups if exists
+            if hasattr(self, 'object') and self.object is not None:
+                self.all_sprites.remove(self.object)
+                self.objects.remove(self.object)
+            
+            print(f"[INFO] Loaded sprite: {sprite_path}")
+        except Exception as e:
+            print(f"[ERROR] Sprite loading failed: {e}")
         
     def grid_to_screen(self, grid_x, grid_y, z=0):
         """Convert grid coordinates to screen coordinates"""
@@ -124,36 +134,31 @@ class IsometricUtils:
         
         return surface
     
-    def create_object_sprite(self, base_color, c=0, r=0):
+    def create_object_sprite(self, c=0, r=0, alpha=255):
         """Create object sprite from sprite sheet"""
         if self.sprites_loaded and hasattr(self, 'object_sheet'):
-                # Calculate sprite dimensions based on spritesheet dimensions (10x10 grid)
-                total_width = self.object_sheet.sheet.get_width()
-                total_height = self.object_sheet.sheet.get_height()
-                sprite_width = total_width // 10
-                sprite_height = total_height // 10
+            # Calculate sprite dimensions based on spritesheet dimensions (10x10 grid)
+            total_width = self.object_sheet.sheet.get_width()
+            total_height = self.object_sheet.sheet.get_height()
+            sprite_width = total_width // 10
+            sprite_height = total_height // 10
                 
-                # Get sprite from position (col, row)
-                col, row = c, r
-                
-                # Use the SpriteSheet's get_sprite method with scale=4
-                sprite = self.object_sheet.get_sprite(
-                    col * sprite_width,
-                    row * sprite_height,
-                    sprite_width,
-                    sprite_height,
-                    scale=4
-                )
-                
-                return sprite
+            # Get sprite from position (col, row)
+            col, row = c, r
 
-        # Fallback to procedural generation
-        obj_width = self.tile_width // 2
-        obj_height = int(self.tile_height * 1.5)
-        surface = pygame.Surface((obj_width, obj_height), pygame.SRCALPHA)
-        object_rect = pygame.Rect(obj_width//4, obj_height//3, obj_width//2, obj_height//2)
-        pygame.draw.ellipse(surface, base_color, object_rect)
-        return surface
+            # Use the SpriteSheet's get_sprite method with scale=4
+            sprite = self.object_sheet.get_sprite(
+                col * sprite_width,
+                row * sprite_height,
+                sprite_width,
+                sprite_height,
+                scale=4
+            )
+                
+            # Set sprite opacity
+            sprite.set_alpha(alpha)
+                
+            return sprite
     
     def get_render_order(self, entities):
         """Sort entities by their render order (back to front)"""

@@ -1,8 +1,5 @@
 import numpy as np
 import pygame
-import random
-import math
-from utils.isometric_utils import IsometricUtils
 
 
 def create_game_map(grid_width, grid_height, grid_volume):
@@ -10,7 +7,7 @@ def create_game_map(grid_width, grid_height, grid_volume):
     game_map = np.zeros((grid_height, grid_width, grid_volume), dtype=int)
 
     # Create walls along the edges
-    for z in range(grid_volume):  # Stack blocks vertically for walls
+    for z in range(grid_volume):
         game_map[0, :, z] = 1  # North wall
         game_map[:, 0, z] = 1  # West wall
 
@@ -18,7 +15,7 @@ def create_game_map(grid_width, grid_height, grid_volume):
 
 
 def create_isometric_sprites(iso_utils):
-    """Vytvoří isometrické sprite objekty pro různé herní prvky"""
+    """Creates isometric sprite objects for various game elements"""
 
     spritesheet_path = "assets/spritesheets/floors_and_walls.png"
     spritesheet = pygame.image.load(spritesheet_path).convert_alpha()
@@ -44,14 +41,14 @@ def create_isometric_sprites(iso_utils):
 
     return [
         {
-            "floor": sprites[(0, 0)],
-            "wall": sprites[(0, 1)],
+            "floor": sprites[(0, 2)],
+            "wall": sprites[(0, 3)],
         }
     ]
 
 
-def create_isometric_background(screen_width, screen_height):
-    """Vytvoří isometrické pozadí"""
+def create_background(screen_width, screen_height):
+    """Creates background"""
     # Load menu background
     menu_bg = pygame.image.load("assets/backgrounds/menu.png")
     menu_bg = pygame.transform.scale(menu_bg, (screen_width, screen_height))
@@ -64,8 +61,19 @@ def create_isometric_background(screen_width, screen_height):
     
 
 def create_sounds():
-    """Vytvoří zvuky pro hru"""
+    """Creates sounds for the game"""
     return {
         "background": pygame.mixer.Sound("assets/sounds/background_melody.wav"),
-        "object_place": pygame.mixer.Sound("assets/sounds/place.wav")  # Add object placement sound
+        "object_place": pygame.mixer.Sound("assets/sounds/place.wav"),
+        "object_rotate": pygame.mixer.Sound("assets/sounds/rotate.wav"),
+        "ui_click" : pygame.mixer.Sound("assets/sounds/click.wav")
     }
+
+
+def create_graphics():
+    """Creates graphics for various UI components"""
+    # Load inventory
+    inventory = pygame.image.load("assets/graphics/inventory.png")
+    inventory = pygame.transform.scale(inventory, (544, 350))
+        
+    return [inventory]
