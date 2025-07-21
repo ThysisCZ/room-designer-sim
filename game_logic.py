@@ -1,6 +1,6 @@
 import numpy as np
 import pygame
-
+import os
 
 def create_game_map(grid_width, grid_height, grid_volume):
     """Creates a 3D game map with walls"""
@@ -14,37 +14,41 @@ def create_game_map(grid_width, grid_height, grid_volume):
     return game_map
 
 
-def create_isometric_sprites(iso_utils):
-    """Creates isometric sprite objects for various game elements"""
+def create_isometric_sprites(iso_utils, type, selected=None):
+    """Creates isometric sprite objects for floor or wall from a spritesheet."""
+    # Base directory
+    base_path = "assets/spritesheets"
 
-    spritesheet_path = "assets/spritesheets/floors_and_walls.png"
-    spritesheet = pygame.image.load(spritesheet_path).convert_alpha()
+    if type == 1:  # Floor
+        subdir = "floors"
+        key = "floor"
+        default_file = "stone_floor.png"
+    else:  # Wall
+        subdir = "walls"
+        key = "wall"
+        default_file = "stone_wall.png"
+
+    # Determine sprite file
+    if selected and isinstance(selected, dict):
+        sprite_file = selected.get("spritesheet", default_file)
+    else:
+        sprite_file = default_file
+
+    # Build full path
+    sprite_path = os.path.join(base_path, subdir, sprite_file)
+
+    # Load the image
+    spritesheet = pygame.image.load(sprite_path).convert_alpha()
 
     sprite_width = spritesheet.get_width() // 10
     sprite_height = spritesheet.get_height() // 10
 
-    sprites = {}
-    for row in range(10):
-        for col in range(10):
-            sprite = pygame.transform.scale(
-                spritesheet.subsurface(
-                    (
-                        col * sprite_width,
-                        row * sprite_height,
-                        sprite_width,
-                        sprite_height,
-                    )
-                ),
-                (sprite_width * 4, sprite_height * 4),
-            )
-            sprites[(row, col)] = sprite
+    sprite = pygame.transform.scale(
+        spritesheet.subsurface((0, 0, sprite_width, sprite_height)),
+        (sprite_width * 4, sprite_height * 4)
+    )
 
-    return [
-        {
-            "floor": sprites[(0, 2)],
-            "wall": sprites[(0, 3)],
-        }
-    ]
+    return [{key: sprite}]
 
 
 def create_background(screen_width, screen_height):
@@ -74,6 +78,6 @@ def create_graphics():
     """Creates graphics for various UI components"""
     # Load inventory
     inventory = pygame.image.load("assets/graphics/inventory.png")
-    inventory = pygame.transform.scale(inventory, (544, 350))
+    inventory = pygame.transform.scale(inventory, (540, 346))
         
     return [inventory]

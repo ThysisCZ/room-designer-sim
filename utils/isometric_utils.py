@@ -1,5 +1,6 @@
 import pygame
 from .sprite_sheet import SpriteSheet
+import os
 
 class IsometricUtils:
     """Utility class for isometric coordinate conversions and rendering"""
@@ -10,33 +11,37 @@ class IsometricUtils:
         self.half_tile_width = tile_width // 2
         self.half_tile_height = tile_height // 2
         self.sprites_loaded = False
+
+        self.ITEM_TAB = 0
+        self.FLOOR_TAB = 1
         
         # Sprite groups
         self.all_sprites = pygame.sprite.Group()
         self.objects = pygame.sprite.Group()
     
-    def load_sprite_sheets(self, selected):
-        import os
+    def load_sprite_sheets(self, selected, type):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.dirname(current_dir)
-        assets_dir = os.path.join(project_root, "assets")
-        spritesheets_dir = os.path.join(assets_dir, "spritesheets")
 
-        try:
-            sprite_path = os.path.join(spritesheets_dir, selected["spritesheet"])
-            self.object_sheet = SpriteSheet(sprite_path)
-            self.col = 0
-            self.row = 0
-            self.sprites_loaded = True
+        if type == self.ITEM_TAB:
+            spritesheets_dir = os.path.join(project_root, "assets/", "spritesheets/", "items")
+        elif type == self.FLOOR_TAB:
+            spritesheets_dir = os.path.join(project_root, "assets/", "spritesheets/", "floors")
+        else:
+            spritesheets_dir = os.path.join(project_root, "assets/", "spritesheets/", "walls")
 
-            # Remove old object from sprite groups if exists
-            if hasattr(self, 'object') and self.object is not None:
-                self.all_sprites.remove(self.object)
-                self.objects.remove(self.object)
+        spritesheets_path = os.path.join(spritesheets_dir, selected["spritesheet"])
+
+        if type == self.ITEM_TAB:
+            self.object_sheet = SpriteSheet(spritesheets_path)
+        elif type == self.FLOOR_TAB:
+            self.floor_sheet = SpriteSheet(spritesheets_path)
+        else:
+            self.wall_sheet = SpriteSheet(spritesheets_path)
             
-            print(f"[INFO] Loaded sprite: {sprite_path}")
-        except Exception as e:
-            print(f"[ERROR] Sprite loading failed: {e}")
+        self.col = 0
+        self.row = 0
+        self.sprites_loaded = True
         
     def grid_to_screen(self, grid_x, grid_y, z=0):
         """Convert grid coordinates to screen coordinates"""

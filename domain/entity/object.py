@@ -19,6 +19,9 @@ class Object(pygame.sprite.Sprite):
         self.animation_timer = 0
         self.flickering_timer = 0
         self.object_placed_position = None
+
+        self.WALL_TILE = 1
+        self.STATIC_OBJECT = 2
         
         self.create_sprite()
 
@@ -64,8 +67,8 @@ class Object(pygame.sprite.Sprite):
         new_x = max(0, min(grid_width - 1, self.grid_x + dx))
         new_y = max(0, min(grid_height - 1, self.grid_y + dy))
 
-        # Check walls and placed objects (2 is the code for a placed object)
-        if game_map[new_y, new_x, 0] == 1 or game_map[new_y, new_x, 0] == 2:
+        # Check walls and placed objects
+        if game_map[new_y, new_x, 0] == self.WALL_TILE or game_map[new_y, new_x, 0] == self.STATIC_OBJECT:
             return False
         
         # Check objects

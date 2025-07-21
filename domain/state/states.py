@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class GameState(Enum):
     MENU_SCREEN = 1
     MENU = 2

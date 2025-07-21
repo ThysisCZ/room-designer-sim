@@ -1,13 +1,6 @@
 import pygame
-from enum import Enum
 from pathlib import Path
 from utils.sprite_sheet import SpriteSheet
-
-
-class GameState(Enum):
-    MENU_SCREEN = 1
-    MENU = 2
-    PLAYING = 3
 
 class Button:
     def __init__(self, x, y, width, height, text, font, color, text_color):
@@ -47,8 +40,10 @@ class Button:
         screen.blit(text_surface, text_rect)
 
 class InventoryUI:
-    def __init__(self, items, item_size, tabs, x=50, y=400, cols=8, rows=4):
+    def __init__(self, items, floors, walls, item_size, tabs, x=50, y=400, cols=8, rows=4):
         self.items = items
+        self.floors = floors
+        self.walls = walls
         self.tabs = tabs
         self.cols = cols
         self.rows = rows
@@ -57,11 +52,18 @@ class InventoryUI:
         self.y = y
         self.page = 0
         self.selected_item = None
+        self.selected_floor = None
+        self.selected_wall = None
         self.selected_tab = 0
+        self.rect = pygame.Rect(self.x, self.y, self.cols * self.item_size, self.rows * self.item_size)
+
+        self.ITEM_TAB = 0
+        self.FLOOR_TAB = 1
+        self.WALL_TAB = 2
     
     def draw(self, screen):
-        item_start = self.page * self.cols * self.rows
-        item_end = item_start + self.cols * self.rows
+        start = self.page * self.cols * self.rows
+        end = start + self.cols * self.rows
 
         # Prepare 8x4 grid
         for row in range(8):
@@ -100,46 +102,134 @@ class InventoryUI:
             font = pygame.font.SysFont(None, 20)
             label = font.render(tab, True, (255, 255, 255))
             screen.blit(label, (x + 12 + x_offset, y + 25))
-        
-        # Add objects to the inventory
-        for idx, item in enumerate(self.items[item_start:item_end]):
-            grid_x = idx % self.cols
-            grid_y = idx // self.cols
-            x = self.x + grid_x * self.item_size
-            y = self.y + grid_y * self.item_size
 
-            # Determine the absolute path to this file
-            this_file = Path(__file__).resolve()
-            project_root = this_file.parents[0]
-            spritesheets_dir = project_root / "assets" / "spritesheets"
+            # Draw item icons
+            if self.selected_tab == self.ITEM_TAB:
+                for idx, item in enumerate(self.items[start:end]):
+                    grid_x = idx % self.cols
+                    grid_y = idx // self.cols
+                    x = self.x + grid_x * self.item_size
+                    y = self.y + grid_y * self.item_size
 
-            # Load only the first tile of the spritesheet as an icon
-            icon_path = spritesheets_dir / item["spritesheet"]
-            icon_sheet = SpriteSheet(str(icon_path))
+                    # Determine the absolute path to this file
+                    this_file = Path(__file__).resolve()
+                    project_root = this_file.parents[0]
+                    spritesheets_dir = project_root / "assets" / "spritesheets" / "items"
 
-            # Calculate tile size (10x10 grid)
-            total_width = icon_sheet.sheet.get_width()
-            total_height = icon_sheet.sheet.get_height()
-            tile_w = total_width // 10
-            tile_h = total_height // 10
+                    # Load only the first tile of the spritesheet as an icon
+                    icon_path = spritesheets_dir / item["spritesheet"]
+                    icon_sheet = SpriteSheet(str(icon_path))
 
-            # Extract the first tile
-            icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h, scale=self.item_size / tile_w)
+                    # Calculate tile size (10x10 grid)
+                    total_width = icon_sheet.sheet.get_width()
+                    total_height = icon_sheet.sheet.get_height()
+                    tile_w = total_width // 10
+                    tile_h = total_height // 10
 
-            # Draw square behind icon
-            cell_rect = pygame.Rect(x, y, self.item_size, self.item_size)
-            pygame.draw.rect(screen, (214, 162, 104), cell_rect)
+                    # Extract the first tile
+                    icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h, scale=self.item_size / tile_w)
 
-            # White border
-            pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
+                    #Draw square behind icon
+                    cell_rect = pygame.Rect(x, y, self.item_size, self.item_size)
+                    pygame.draw.rect(screen, (214, 162, 104), cell_rect)
 
-            # Show icons
-            screen.blit(icon, (x, y))
+                    # White border
+                    pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
 
-            # Yellow border
-            if self.selected_item == item:
-                pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
-        
+                    # Show icons
+                    screen.blit(icon, (x, y))
+
+                    # Yellow border
+                    if self.selected_item == item:
+                        pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
+                    
+            # Draw floor icons
+            elif self.selected_tab == self.FLOOR_TAB:
+                for idx, floor in enumerate(self.floors[start:end]):
+                    grid_x = idx % self.cols
+                    grid_y = idx // self.cols
+                    x = self.x + grid_x * self.item_size
+                    y = self.y + grid_y * self.item_size
+
+                    # Determine the absolute path to this file
+                    this_file = Path(__file__).resolve()
+                    project_root = this_file.parents[0]
+                    spritesheets_dir = project_root / "assets" / "spritesheets" / "floors"
+
+                    # Load only the first tile of the spritesheet as an icon
+                    icon_path = spritesheets_dir / floor["spritesheet"]
+                    icon_sheet = SpriteSheet(str(icon_path))
+
+                    # Calculate tile size (10x10 grid)
+                    total_width = icon_sheet.sheet.get_width()
+                    total_height = icon_sheet.sheet.get_height()
+                    tile_w = total_width // 10
+                    tile_h = total_height // 10
+
+                    # Extract the first tile
+                    icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h, scale=self.item_size / tile_w)
+
+                    #Draw square behind icon
+                    cell_rect = pygame.Rect(x, y, self.item_size, self.item_size)
+                    pygame.draw.rect(screen, (214, 162, 104), cell_rect)
+
+                    # White border
+                    pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
+
+                    # Show icons
+                    screen.blit(icon, (x, y))
+
+                    # Handle initial selection
+                    if idx == 0 and self.selected_floor is None:
+                        pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
+
+                    # Yellow border
+                    if self.selected_floor == floor:
+                        pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
+            # Draw wall icons
+            else:
+                for idx, wall in enumerate(self.walls[start:end]):
+                    grid_x = idx % self.cols
+                    grid_y = idx // self.cols
+                    x = self.x + grid_x * self.item_size
+                    y = self.y + grid_y * self.item_size
+
+                    # Determine the absolute path to this file
+                    this_file = Path(__file__).resolve()
+                    project_root = this_file.parents[0]
+                    spritesheets_dir = project_root / "assets" / "spritesheets" / "walls"
+
+                    # Load only the first tile of the spritesheet as an icon
+                    icon_path = spritesheets_dir / wall["spritesheet"]
+                    icon_sheet = SpriteSheet(str(icon_path))
+
+                    # Calculate tile size (10x10 grid)
+                    total_width = icon_sheet.sheet.get_width()
+                    total_height = icon_sheet.sheet.get_height()
+                    tile_w = total_width // 10
+                    tile_h = total_height // 10
+
+                    # Extract the first tile
+                    icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h, scale=self.item_size / tile_w)
+
+                    #Draw square behind icon
+                    cell_rect = pygame.Rect(x, y, self.item_size, self.item_size)
+                    pygame.draw.rect(screen, (214, 162, 104), cell_rect)
+
+                    # White border
+                    pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
+
+                    # Show icons
+                    screen.blit(icon, (x, y))
+
+                    # Handle initial selection
+                    if idx == 0 and self.selected_wall is None:
+                        pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
+
+                    # Yellow border
+                    if self.selected_wall == wall:
+                        pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
+
     def next_page(self):
         if (self.page + 1) * self.cols * self.rows < len(self.items):
             self.page += 1
@@ -151,31 +241,48 @@ class InventoryUI:
     def handle_click(self, mouse_pos):
         mx, my = mouse_pos
 
-        # Handle tab clicks
+        # Tab selection
         for idx, tab in enumerate(self.tabs):
             x = self.x + idx * self.item_size
-            y = self.y - self.item_size - 10
+            y = self.y - self.item_size
             rect = pygame.Rect(x, y, self.item_size, self.item_size)
 
             if rect.collidepoint(mx, my):
                 self.selected_tab = idx
-                return "tab"
+                return 'tab'
 
-        # Handle item selection
-        for idx in range(self.cols * self.rows):
-            grid_x = idx % self.cols
-            grid_y = idx // self.cols
-            x = self.x + grid_x * self.item_size
-            y = self.y + grid_y * self.item_size
+        # Cell selection in grid
+        def handle_grid_selection(grid_list, set_selected_callback):
+            for idx in range(self.cols * self.rows):
+                grid_x = idx % self.cols
+                grid_y = idx // self.cols
+                x = self.x + grid_x * self.item_size
+                y = self.y + grid_y * self.item_size
 
-            rect = pygame.Rect(x, y, self.item_size, self.item_size)
-            if rect.collidepoint(mx, my):
-                index = self.page * self.cols * self.rows + idx
-                if index < len(self.items):
-                    self.selected_item = self.items[index]
-                    return self.selected_item
+                rect = pygame.Rect(x, y, self.item_size, self.item_size)
+                
+                if rect.collidepoint(mx, my):
+                    index = self.page * self.cols * self.rows + idx
+
+                    if index < len(grid_list):
+                        set_selected_callback(index)
+                        return grid_list[index]
+            return None
         
-        return None
+        # Items
+        if self.selected_tab == self.ITEM_TAB:
+            return handle_grid_selection(
+                self.items,
+                lambda i: setattr(self, "selected_item", self.items[i] if self.selected_item != self.items[i] else None)
+            )
+        # Floors
+        elif self.selected_tab == self.FLOOR_TAB:
+            return handle_grid_selection(self.floors, lambda i: setattr(self, "selected_floor", self.floors[i]))
+        # Walls
+        else:
+            return handle_grid_selection(self.walls, lambda i: setattr(self, "selected_wall", self.walls[i]))
+
+
 
 
 
