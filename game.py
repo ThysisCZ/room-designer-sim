@@ -1,7 +1,7 @@
-import pygame
+import pygame, time, random
 
 from domain.entity.object import Object
-from ui_components import Button, InventoryUI
+from ui_components import Button, InventoryUI, MinigameUI
 from domain.state.states import GameState
 from utils.isometric_utils import IsometricUtils
 from game_logic import (create_game_map, create_isometric_sprites, create_sounds, create_background, create_graphics)
@@ -72,6 +72,8 @@ class RoomDesignerGame:
         # UI buttons for game
         self.inventory_button = Button(self.WIDTH - 220, self.HEIGHT - 700, 200, 50,
                                  "Inventory", self.font, (255, 255, 255), (255, 255, 255))
+        self.minigame_button = Button(self.WIDTH - 220, self.HEIGHT - 640, 200, 50,
+                                 "Minigames", self.font, (255, 255, 255), (255, 255, 255))
         
         # No object at start
         self.object = None
@@ -91,6 +93,13 @@ class RoomDesignerGame:
         selected_tab = self.inventory_ui.selected_tab
         self.selected_item_data = None
 
+        # Minigames
+        self.show_minigames = False
+        self.minigame_ui = MinigameUI(thumbnail_size=128, 
+                                        x=390,
+                                        y=250
+                                    )
+
         # Determine asset type based on selected tab
         if selected_tab == self.FLOOR_TAB:
             self.sprites_collection = create_isometric_sprites(self.iso_utils, self.FLOOR_TAB)
@@ -108,8 +117,9 @@ class RoomDesignerGame:
         self.init_game_world()
 
         self.inventory_border = self.ui_graphics_collection[0]
+        self.minigames_border = self.ui_graphics_collection[1]
         
-        self.sounds['background'].play(loops=-1).set_volume(0.7)
+        self.sounds['background'].play(loops=-1).set_volume(0.8)
     
     def init_game_world(self):
         """
@@ -121,6 +131,172 @@ class RoomDesignerGame:
         
         # Create game map
         self.game_map = create_game_map(self.grid_width, self.grid_height, self.grid_volume)
+    
+    def init_snake_game(self):
+        #import and initialize pygame module
+        pygame.init()
+
+        self.display_info = pygame.display.Info()
+        self.width = self.display_info.current_w
+        self.height = self.display_info.current_h
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.FULLSCREEN)
+
+        #set up screen and caption
+        pygame.display.set_caption('Snake Game')
+
+        self.sounds = create_sounds()
+        self.sounds['minigame'].play(loops=-1).set_volume(0.4)
+
+        #snake start position
+        self.snake_pos = [self.width//3 + 100, self.height//2]
+        self.snake_speed = 10
+
+        #object to set framerate
+        self.clock = pygame.time.Clock()
+
+        self.snake_body = [[self.width//3 + 100, self.height//2], [self.width//3 + 90, self.height//2 - 10]]
+
+        self.graphics_collection = create_graphics()
+        self.food_image = self.graphics_collection[2]
+
+        #area for random generation
+        self.food_pos = [random.randrange(int(self.width//3.25), (int(self.width//3.25 + 460))),
+                            random.randrange(int(self.height//6), (int(self.height//6 + 460)))
+                        ]
+
+        #boolean for food position change
+        self.food = True
+
+        self.score = 0
+        self.growth_counter = 0
+        self.segment_counter = 0
+
+        self.game_state = GameState.SNAKE
+
+        def show_score():
+            font = pygame.font.SysFont(None, 30)
+
+            score_text = font.render('Score: ' + str(self.score), True, 'white')
+            score_rect = score_text.get_rect()
+            score_rect.midtop = (self.width//3.25 + 430, self.height//6 - 23)
+            self.screen.blit(score_text, score_rect)
+
+        def game_over():
+            font = pygame.font.SysFont(None, 50)
+
+            game_over_text = font.render(
+                'GAME OVER', True, 'white')
+            game_over_rect = game_over_text.get_rect()
+            game_over_rect.midtop = (self.width/2, self.height/4)
+            self.screen.blit(game_over_text, game_over_rect)
+
+            score_text = font.render(
+                'Score: ' + str(self.score), True, 'white')
+            score_rect = score_text.get_rect()
+            score_rect.midtop = (self.width/2, self.height/3)
+            self.screen.blit(score_text, score_rect)
+
+            pygame.display.flip()
+            time.sleep(2)
+            self.restart_game()
+
+        #handle snake movements
+        dir = 'RIGHT'
+        next_dir = dir
+
+        #game loop
+        while self.game_state == GameState.SNAKE:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        #if UP is pressed, next_dir becomes UP
+                        next_dir = 'UP'
+                    if event.key == pygame.K_DOWN:
+                        next_dir = 'DOWN'
+                    if event.key == pygame.K_LEFT:
+                        next_dir = 'LEFT'
+                    if event.key == pygame.K_RIGHT:
+                        next_dir = 'RIGHT'
+            
+            #update the movements with input in next_dir
+            if next_dir == 'UP' and dir != 'DOWN':
+                #if DOWN is pressed while snake goes UP, no changes occur
+                dir = 'UP'
+            if next_dir == 'DOWN' and dir != 'UP':
+                dir = 'DOWN'
+            if next_dir == 'LEFT' and dir != 'RIGHT':
+                dir = 'LEFT'
+            if next_dir == 'RIGHT' and dir != 'LEFT':
+                dir = 'RIGHT'
+
+            #change snake's position
+            if dir == 'UP':
+                self.snake_pos[1] -= 10
+            if dir == 'DOWN':
+                self.snake_pos[1] += 10
+            if dir == 'LEFT':
+                self.snake_pos[0] -= 10
+            if dir == 'RIGHT':
+                self.snake_pos[0] += 10
+
+            #insert every coordinate the snake passes through
+            self.snake_body.insert(0, list(self.snake_pos))
+
+            snake_rect = pygame.Rect(self.snake_pos[0], self.snake_pos[1], 40, 40)
+            food_rect = pygame.Rect(self.food_pos[0], self.food_pos[1], 30, 30)
+
+            if snake_rect.colliderect(food_rect):
+                self.sounds['snake_eat'].play().set_volume(1)
+                self.score += 10
+                self.food = False
+                self.growth_counter += 7
+            #if snake doesn't meet the food
+            else:
+                if self.growth_counter > 0:
+                    self.growth_counter -= 1 
+                else:
+                    self.snake_body.pop()
+            
+            #assign a new coordinate to food position
+            if not self.food:
+                self.food_pos = [random.randrange(int(self.width//3.25), (int(self.width//3.25 + 460))),
+                            random.randrange(int(self.height//6), (int(self.height//6 + 460)))
+                        ]
+            
+            self.food = True
+            self.screen.fill('black')
+
+            #draw the snake
+            for pos in self.snake_body:
+                self.segment_counter += 1
+
+                if self.segment_counter % 2:
+                    pygame.draw.rect(self.screen, 'dark green', (pos[0], pos[1], 40, 40), 30, 5)
+                else:
+                    pygame.draw.rect(self.screen, 'green', (pos[0], pos[1], 40, 40), 30, 5)
+
+            #draw the food
+            self.screen.blit(self.food_image, (self.food_pos[0], self.food_pos[1]))
+
+            #game over conditions
+            if self.snake_pos[0] < self.width//3.25 or self.snake_pos[0] > self.width//3.25 + 460:
+                game_over()
+            if self.snake_pos[1] < self.height//6 or self.snake_pos[1] > self.height//6 + 460:
+                game_over()
+            #snake bites itself
+            for block in self.snake_body[1:]:
+                if self.snake_pos[0] == block[0] and self.snake_pos[1] == block[1]:
+                    game_over()
+            
+            #draw border
+            border_rect = pygame.Rect(self.width//3.25, self.height//6, 500, 500)
+            pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
+
+            #see score all the time on screen
+            show_score()
+
+            pygame.display.update()
+            self.clock.tick(self.snake_speed)
     
     def handle_events(self):
         for event in pygame.event.get():
@@ -146,12 +322,21 @@ class RoomDesignerGame:
                         self.running = False
                 elif self.game_state == GameState.PLAYING:
                     if self.inventory_button.handle_event(event):
+                        self.show_minigames = False
                         if self.show_inventory == True:
                             self.sounds['ui_click'].play().set_volume(1.0)
                             self.show_inventory = False
                         else:
                             self.sounds['ui_click'].play().set_volume(1.0)
                             self.show_inventory = True
+                    elif self.minigame_button.handle_event(event):
+                        self.show_inventory = False
+                        if self.show_minigames == True:
+                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.show_minigames = False
+                        else:
+                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.show_minigames = True
                     elif self.show_inventory:
                         selected = self.inventory_ui.handle_click(pygame.mouse.get_pos())
 
@@ -195,15 +380,20 @@ class RoomDesignerGame:
                                 self.sprites["wall"] = create_isometric_sprites(
                                     self.iso_utils, self.WALL_TAB, self.inventory_ui.selected_wall
                                 )[0]["wall"]
-                        
+
                         # Close inventory
                         elif not inner_click:
                             self.sounds['ui_click'].play().set_volume(1.0)
                             self.show_inventory = False
                     
                     # Handle ghost object placement
-                    if not self.show_inventory and self.selected_item_data and self.object is None:
+                    elif self.selected_item_data and self.object is None and not self.show_minigames:
                         mx, my = pygame.mouse.get_pos()
+
+                        def get_floor_surface(px, py, cx, cy, w, h):
+                            dx = abs(px - cx)
+                            dy = abs(py - cy)
+                            return (dx / (w / 2) + dy / (h / 2)) <= 1
                         
                         # Prepare clickable floor
                         for y in range(self.grid_height):
@@ -217,8 +407,14 @@ class RoomDesignerGame:
                                     floor_rect.x = screen_x - self.iso_utils.half_tile_width
                                     floor_rect.y = screen_y - self.iso_utils.half_tile_height + 15
 
-                                    # Handle floor tile click
-                                    if floor_rect.collidepoint(mx, my):
+                                    tile_width = self.iso_utils.tile_width
+                                    tile_height = self.iso_utils.tile_height
+
+                                    center_x = screen_x
+                                    center_y = screen_y + 20
+
+                                    # Handle floor click
+                                    if get_floor_surface(mx, my, center_x, center_y, tile_width, tile_height):
                                         # Remove duplicate sprites
                                         if self.object:
                                             self.objects.remove(self.object)
@@ -227,14 +423,32 @@ class RoomDesignerGame:
                                         # Create ghost object again
                                         self.object = Object(x=x, y=y, c=0, r=0, iso_utils=self.iso_utils)
                                         self.objects.add(self.object)
-                                        self.all_sprites.add(self.object)
-                                        
+                                        self.all_sprites.add(self.object) 
+                    elif self.show_minigames:
+                        selected = self.minigame_ui.handle_click(pygame.mouse.get_pos())
+
+                        # Prevent minigames selection from closing
+                        inner_click = self.minigame_ui.rect.collidepoint(pygame.mouse.get_pos())
+
+                        # Minigame selection
+                        if selected:
+                            self.sounds['ui_click'].play().set_volume(1.0)
+
+                            # Stop previous background music
+                            self.sounds['background'].stop()
+
+                            self.init_snake_game()
+
+                        if not inner_click:
+                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.show_minigames = False
             elif event.type == pygame.MOUSEMOTION:
                 if self.game_state == GameState.MENU_SCREEN:
                     self.play_button.handle_event(event)  # Handle hover effects
                     self.quit_button.handle_event(event)
                 elif self.game_state == GameState.PLAYING:
                     self.inventory_button.handle_event(event)
+                    self.minigame_button.handle_event(event)
     
     def update(self):
         if self.game_state == GameState.PLAYING:
@@ -308,6 +522,8 @@ class RoomDesignerGame:
             self.draw_game()
             if self.show_inventory:
                 self.inventory_ui.draw(self.screen)
+            if self.show_minigames:
+                self.minigame_ui.draw(self.screen)
 
         pygame.display.flip()
 
@@ -372,6 +588,7 @@ class RoomDesignerGame:
         self.screen.blit(self.bg_surface, (0, 0))
         
         self.inventory_button.draw(self.screen)
+        self.minigame_button.draw(self.screen)
         
         render_list = []
         
@@ -430,6 +647,8 @@ class RoomDesignerGame:
         
         if self.show_inventory:
             self.screen.blit(self.inventory_border, (376, 172))
+        elif self.show_minigames:
+            self.screen.blit(self.minigames_border, (376, 172))
     
     def clear_sprites(self):
         """Deletes all sprite groups"""
@@ -438,6 +657,12 @@ class RoomDesignerGame:
 
     def restart_game(self):
         """Restarts game"""
+        self.sounds['minigame'].stop()
+
+        # Only refresh main theme song if not switching from menu
+        if not self.game_state == GameState.MENU_SCREEN:
+            self.sounds['background'].play(loops=-1).set_volume(0.8)
+        
         self.clear_sprites()
         self.init_game_world()
         self.game_state = GameState.PLAYING

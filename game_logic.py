@@ -67,10 +67,12 @@ def create_background(screen_width, screen_height):
 def create_sounds():
     """Creates sounds for the game"""
     return {
-        "background": pygame.mixer.Sound("assets/sounds/background_melody.wav"),
+        "background": pygame.mixer.Sound("assets/sounds/main_theme.wav"),
+        "minigame": pygame.mixer.Sound("assets/sounds/minigame.wav"),
         "object_place": pygame.mixer.Sound("assets/sounds/place.wav"),
         "object_rotate": pygame.mixer.Sound("assets/sounds/rotate.wav"),
-        "ui_click" : pygame.mixer.Sound("assets/sounds/click.wav")
+        "ui_click" : pygame.mixer.Sound("assets/sounds/click.wav"),
+        "snake_eat" : pygame.mixer.Sound("assets/sounds/snake_eat.wav")
     }
 
 
@@ -79,5 +81,13 @@ def create_graphics():
     # Load inventory
     inventory = pygame.image.load("assets/graphics/inventory.png")
     inventory = pygame.transform.scale(inventory, (540, 346))
+
+    minigames = pygame.image.load("assets/graphics/minigames.png")
+    minigames = pygame.transform.scale(minigames, (540, 346))
+
+    apple = pygame.image.load("assets/graphics/apple.png")
+
+    snake_thumbnail = pygame.image.load("assets/graphics/snake_thumbnail.png")
+    snake_thumbnail = pygame.transform.scale(snake_thumbnail, (115, 115))
         
-    return [inventory]
+    return [inventory, minigames, apple, snake_thumbnail]

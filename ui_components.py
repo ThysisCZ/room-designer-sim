@@ -1,6 +1,8 @@
 import pygame
 from pathlib import Path
+
 from utils.sprite_sheet import SpriteSheet
+from game_logic import create_graphics
 
 class Button:
     def __init__(self, x, y, width, height, text, font, color, text_color):
@@ -66,10 +68,10 @@ class InventoryUI:
         end = start + self.cols * self.rows
 
         # Prepare 8x4 grid
-        for row in range(8):
-            for col in range(4):
-                grid_x = row
-                grid_y = col
+        for col in range(8):
+            for row in range(4):
+                grid_x = col
+                grid_y = row
                 x = self.x + grid_x * self.item_size
                 y = self.y + grid_y * self.item_size
 
@@ -104,7 +106,7 @@ class InventoryUI:
             screen.blit(label, (x + 12 + x_offset, y + 25))
 
             # Draw item icons
-            if self.selected_tab == self.ITEM_TAB:
+            if self.selected_tab == self.ITEM_TAB:   
                 for idx, item in enumerate(self.items[start:end]):
                     grid_x = idx % self.cols
                     grid_y = idx // self.cols
@@ -142,6 +144,22 @@ class InventoryUI:
                     # Yellow border
                     if self.selected_item == item:
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
+
+                # Show info
+                info = [
+                    ("INFO:"),
+                    ("Click on the floor to start placing"),
+                    ("Use arrow keys to adjust position"),
+                    ("Click on the same icon again to deselect")
+                ]
+
+                big_font = pygame.font.SysFont(None, 24)
+                y_offset = y + self.item_size * 5.7
+
+                for row in info:
+                    info_text = big_font.render(f"{row}", True, (255, 255, 255))
+                    screen.blit(info_text, (x - self.item_size * 6.55, y_offset))
+                    y_offset += 20
                     
             # Draw floor icons
             elif self.selected_tab == self.FLOOR_TAB:
@@ -282,7 +300,70 @@ class InventoryUI:
         else:
             return handle_grid_selection(self.walls, lambda i: setattr(self, "selected_wall", self.walls[i]))
 
+class MinigameUI:
+    def __init__(self, thumbnail_size, x=50, y=400, cols=4, rows=2):
+        self.thumbnail_size = thumbnail_size
+        self.x = x
+        self.y = y
+        self.cols = cols
+        self.rows = rows
+        self.rect = pygame.Rect(self.x, self.y, self.cols * self.thumbnail_size, self.rows * self.thumbnail_size)
+        self.minigames = ["Snake"]
+        self.selected_minigame = None
+        self.SNAKE = 0
+        self.graphics_collection = create_graphics()
+        self.snake_thumbnail = self.graphics_collection[3]
+    
+    def draw(self, screen):
+        # Prepare 4x2 grid
+        for col in range(4):
+            for row in range(2):
+                grid_x = col
+                grid_y = row
+                x = self.x + grid_x * self.thumbnail_size
+                y = self.y + grid_y * self.thumbnail_size
 
+                # Draw cells
+                cell_rect = pygame.Rect(x, y, self.thumbnail_size, self.thumbnail_size)
+                pygame.draw.rect(screen, (214, 162, 104), cell_rect)
+
+                # White border
+                pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
+        
+        # Prepare minigame thumbnails
+        for idx, minigame in enumerate(self.minigames):
+            grid_x = idx % self.cols
+            grid_y = idx // self.cols
+            x = self.x + grid_x * self.thumbnail_size
+            y = self.y + grid_y * self.thumbnail_size
+
+            minigame_rect = pygame.Rect(x, y, self.thumbnail_size, self.thumbnail_size)
+            pygame.draw.rect(screen, (0, 0, 0), minigame_rect)
+            pygame.draw.rect(screen, (255, 255, 255), minigame_rect, 1)
+
+            # Snake thumbnail
+            screen.blit(self.snake_thumbnail, (x + 1, y + 2))
+
+            # Draw minigame name text
+            font = pygame.font.SysFont(None, 20)
+            label = font.render(minigame, True, (255, 255, 255))
+            screen.blit(label, (x + 44, y + 105))
+    
+    def handle_click(self, mouse_pos):
+        mx, my = mouse_pos
+
+        # Minigame selection
+        for idx, minigame in enumerate(self.minigames):
+            grid_x = idx % self.cols
+            grid_y = idx // self.cols
+            x = self.x + grid_x * self.thumbnail_size
+            y = self.y + grid_y * self.thumbnail_size
+
+            rect = pygame.Rect(x, y, self.thumbnail_size, self.thumbnail_size)
+
+            if rect.collidepoint(mx, my):
+                self.selected_tab = idx
+                return 'minigame'
 
 
 
