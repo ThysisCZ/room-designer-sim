@@ -1,7 +1,7 @@
 from enum import Enum
 
 class GameState(Enum):
-    MENU_SCREEN = 1
-    MENU = 2
-    PLAYING = 3
-    SNAKE = 4
+    MENU = 0
+    PLAYING = 1
+    SNAKE = 2
+    CATCH_THE_FRUIT = 3

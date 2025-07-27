@@ -37,6 +37,11 @@ class RoomDesignerGame:
         self.ITEM_TAB = 0
         self.FLOOR_TAB = 1
         self.WALL_TAB = 2
+
+        # Set up minigame types
+        self.SNAKE = 0
+        self.CATCH_THE_FRUIT = 1
+        self.SPACE_INVADERS = 2
         
         # Isometric setup - adjust tile size based on screen resolution
         self.base_tile_width = 64
@@ -47,8 +52,7 @@ class RoomDesignerGame:
         self.camera_offset_x = self.WIDTH // 2 # Center room horizontally
         self.camera_offset_y = self.HEIGHT * 0.37 # Center room vertically
         
-        self.game_state = GameState.MENU_SCREEN
-        self.menu_screen_clicked = False
+        self.game_state = GameState.MENU
 
         self.font = pygame.font.Font(None, 36)
         self.big_font = pygame.font.Font(None, 72)
@@ -133,83 +137,81 @@ class RoomDesignerGame:
         self.game_map = create_game_map(self.grid_width, self.grid_height, self.grid_volume)
     
     def init_snake_game(self):
-        #import and initialize pygame module
-        pygame.init()
-
-        self.display_info = pygame.display.Info()
-        self.width = self.display_info.current_w
-        self.height = self.display_info.current_h
-        self.screen = pygame.display.set_mode((self.width, self.height), pygame.FULLSCREEN)
-
-        #set up screen and caption
-        pygame.display.set_caption('Snake Game')
-
+        self.game_state = GameState.SNAKE
         self.sounds = create_sounds()
         self.sounds['minigame'].play(loops=-1).set_volume(0.4)
 
-        #snake start position
-        self.snake_pos = [self.width//3 + 100, self.height//2]
+        self.area_size = 500
+
+        # Snake start position
+        self.snake_pos = [self.WIDTH//3 + 100, self.HEIGHT//2]
         self.snake_speed = 10
 
-        #object to set framerate
+        # Set framerate
         self.clock = pygame.time.Clock()
 
-        self.snake_body = [[self.width//3 + 100, self.height//2], [self.width//3 + 90, self.height//2 - 10]]
+        self.snake_body = [[self.WIDTH//3 + 100, self.HEIGHT//2], [self.WIDTH//3 + 90, self.HEIGHT//2]]
+        self.snake_size = 40
 
         self.graphics_collection = create_graphics()
         self.food_image = self.graphics_collection[2]
 
-        #area for random generation
-        self.food_pos = [random.randrange(int(self.width//3.25), (int(self.width//3.25 + 460))),
-                            random.randrange(int(self.height//6), (int(self.height//6 + 460)))
+        # Area for random generation
+        self.food_pos = [random.randrange(int(self.WIDTH//3.25), (int(self.HEIGHT//3.25) + self.area_size - self.snake_size)),
+                            random.randrange(int(self.WIDTH//6), (int(self.HEIGHT//6) + self.area_size - self.snake_size))
                         ]
+        
+        self.food_size = 30
 
-        #boolean for food position change
+        # Food position change
         self.food = True
 
         self.score = 0
         self.growth_counter = 0
-        self.segment_counter = 0
-
-        self.game_state = GameState.SNAKE
+        self.block_counter = 0
 
         def show_score():
             font = pygame.font.SysFont(None, 30)
 
             score_text = font.render('Score: ' + str(self.score), True, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.width//3.25 + 430, self.height//6 - 23)
+            score_rect.midtop = (self.WIDTH//3.25 + 430, self.HEIGHT//6 - 23)
             self.screen.blit(score_text, score_rect)
 
         def game_over():
+            # Keep border and score on the screen
+            border_rect = pygame.Rect(self.WIDTH//3.25, self.HEIGHT//6, self.area_size, self.area_size)
+            pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
+            show_score()
+
             font = pygame.font.SysFont(None, 50)
 
             game_over_text = font.render(
                 'GAME OVER', True, 'white')
             game_over_rect = game_over_text.get_rect()
-            game_over_rect.midtop = (self.width/2, self.height/4)
+            game_over_rect.midtop = (self.WIDTH/2, self.HEIGHT/4)
             self.screen.blit(game_over_text, game_over_rect)
 
             score_text = font.render(
                 'Score: ' + str(self.score), True, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.width/2, self.height/3)
+            score_rect.midtop = (self.WIDTH/2, self.HEIGHT/3)
             self.screen.blit(score_text, score_rect)
 
             pygame.display.flip()
             time.sleep(2)
             self.restart_game()
 
-        #handle snake movements
+        # Handle snake movements
         dir = 'RIGHT'
         next_dir = dir
 
-        #game loop
+        # Game loop
         while self.game_state == GameState.SNAKE:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        #if UP is pressed, next_dir becomes UP
+                        # If UP is pressed, next_dir becomes UP
                         next_dir = 'UP'
                     if event.key == pygame.K_DOWN:
                         next_dir = 'DOWN'
@@ -217,10 +219,13 @@ class RoomDesignerGame:
                         next_dir = 'LEFT'
                     if event.key == pygame.K_RIGHT:
                         next_dir = 'RIGHT'
+                    # Quit
+                    if event.key == pygame.K_ESCAPE:
+                        self.restart_game()
             
-            #update the movements with input in next_dir
+            # Update the movements with input in next_dir
             if next_dir == 'UP' and dir != 'DOWN':
-                #if DOWN is pressed while snake goes UP, no changes occur
+                # If DOWN is pressed while snake goes UP, no changes occur
                 dir = 'UP'
             if next_dir == 'DOWN' and dir != 'UP':
                 dir = 'DOWN'
@@ -229,7 +234,7 @@ class RoomDesignerGame:
             if next_dir == 'RIGHT' and dir != 'LEFT':
                 dir = 'RIGHT'
 
-            #change snake's position
+            # Change snake's position
             if dir == 'UP':
                 self.snake_pos[1] -= 10
             if dir == 'DOWN':
@@ -239,64 +244,272 @@ class RoomDesignerGame:
             if dir == 'RIGHT':
                 self.snake_pos[0] += 10
 
-            #insert every coordinate the snake passes through
+            # Insert every coordinate the snake passes through
             self.snake_body.insert(0, list(self.snake_pos))
 
-            snake_rect = pygame.Rect(self.snake_pos[0], self.snake_pos[1], 40, 40)
-            food_rect = pygame.Rect(self.food_pos[0], self.food_pos[1], 30, 30)
+            snake_rect = pygame.Rect(self.snake_pos[0], self.snake_pos[1], self.snake_size, self.snake_size)
+            food_rect = pygame.Rect(self.food_pos[0], self.food_pos[1], self.food_size, self.food_size)
 
             if snake_rect.colliderect(food_rect):
-                self.sounds['snake_eat'].play().set_volume(1)
+                self.sounds['score'].play().set_volume(1)
                 self.score += 10
                 self.food = False
                 self.growth_counter += 7
-            #if snake doesn't meet the food
+            # If snake doesn't meet the food
             else:
                 if self.growth_counter > 0:
                     self.growth_counter -= 1 
                 else:
                     self.snake_body.pop()
             
-            #assign a new coordinate to food position
+            # Assign a new coordinate to food position
             if not self.food:
-                self.food_pos = [random.randrange(int(self.width//3.25), (int(self.width//3.25 + 460))),
-                            random.randrange(int(self.height//6), (int(self.height//6 + 460)))
+                self.food_pos = [random.randrange(int(self.WIDTH//3.25), (int(self.HEIGHT//3.25) + self.area_size - self.snake_size)),
+                            random.randrange(int(self.WIDTH//6), (int(self.HEIGHT//6) + self.area_size - self.snake_size))
                         ]
             
             self.food = True
             self.screen.fill('black')
 
-            #draw the snake
+            # Draw the snake
             for pos in self.snake_body:
-                self.segment_counter += 1
+                self.block_counter += 1
 
-                if self.segment_counter % 2:
-                    pygame.draw.rect(self.screen, 'dark green', (pos[0], pos[1], 40, 40), 30, 5)
+                if self.block_counter % 2 == 0:
+                    pygame.draw.rect(self.screen, 'dark green', (pos[0], pos[1], self.snake_size, self.snake_size), 30, 5)
                 else:
-                    pygame.draw.rect(self.screen, 'green', (pos[0], pos[1], 40, 40), 30, 5)
+                    pygame.draw.rect(self.screen, 'green', (pos[0], pos[1], self.snake_size, self.snake_size), 30, 5)
 
-            #draw the food
+            # Draw the food
             self.screen.blit(self.food_image, (self.food_pos[0], self.food_pos[1]))
 
-            #game over conditions
-            if self.snake_pos[0] < self.width//3.25 or self.snake_pos[0] > self.width//3.25 + 460:
+            # Game over conditions
+            if self.snake_pos[0] < self.WIDTH//3.25 or self.snake_pos[0] > self.WIDTH//3.25 + self.area_size - self.snake_size:
                 game_over()
-            if self.snake_pos[1] < self.height//6 or self.snake_pos[1] > self.height//6 + 460:
+            elif self.snake_pos[1] < self.HEIGHT//6 or self.snake_pos[1] > self.HEIGHT//6 + self.area_size - self.snake_size:
                 game_over()
-            #snake bites itself
+            # Snake bites itself
             for block in self.snake_body[1:]:
                 if self.snake_pos[0] == block[0] and self.snake_pos[1] == block[1]:
                     game_over()
             
-            #draw border
-            border_rect = pygame.Rect(self.width//3.25, self.height//6, 500, 500)
+            # Draw border
+            border_rect = pygame.Rect(self.WIDTH//3.25, self.HEIGHT//6, self.area_size, self.area_size)
             pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
 
-            #see score all the time on screen
+            # See score all the time on screen
             show_score()
 
             pygame.display.update()
             self.clock.tick(self.snake_speed)
+        
+    def init_catch_the_fruit(self):
+        self.game_state = GameState.CATCH_THE_FRUIT
+        self.sounds = create_sounds()
+        self.sounds['minigame'].play(loops=-1).set_volume(0.4)
+
+        self.basket_size = 80
+
+        self.border_offset = 3
+
+        # Basket start position
+        self.basket_pos = [self.WIDTH//2 - self.basket_size//2, self.HEIGHT - self.basket_size - self.border_offset]
+
+        self.basket_speed = 50
+
+        self.graphics_collection = create_graphics()
+
+        self.basket_image = self.graphics_collection[4]
+
+        # Set framerate
+        self.clock = pygame.time.Clock()
+        self.minigame_FPS = 60
+
+        self.food_image = None
+
+        self.food_size = 50
+
+        # Area for random generation
+        self.food_pos = [0, 0]
+        
+        # List of food positions
+        self.foods = []
+
+        self.food_speed = 3
+
+        self.food_count = 1
+
+        self.score = 0
+        self.timer = 0
+
+        background_rect = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
+        pygame.draw.rect(self.screen, (0, 0, 0), background_rect)
+
+        self.score_font = pygame.font.SysFont(None, 30)
+        self.info_font = pygame.font.SysFont(None, 24)
+
+        def show_score():
+            font = pygame.font.SysFont(None, 30)
+
+            score_text = font.render('Score: ' + str(self.score), False, 'white')
+            score_rect = score_text.get_rect()
+            score_rect.midtop = (self.WIDTH - self.basket_size, self.border_offset)
+            self.screen.blit(score_text, score_rect)
+        
+        def show_info():
+            info = [
+                    ("INFO:"),
+                    ("Hold left SHIFT to dash")
+                ]
+
+            font = pygame.font.SysFont(None, 24)
+            y_offset = self.HEIGHT - 45
+
+            for row in info:
+                info_text = font.render(f"{row}", False, (255, 255, 255))
+                self.screen.blit(info_text, (15, y_offset))
+                y_offset += 20
+
+        # Game loop
+        while self.game_state == GameState.CATCH_THE_FRUIT:
+            # Clear the screen each frame to prevent trails
+            self.screen.fill('black')
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    # Quit
+                    if event.key == pygame.K_ESCAPE:
+                        self.restart_game()
+
+            self.timer += 1
+            
+            # Handle movement
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.basket_pos[0] -= self.basket_speed // 10
+                # Basket dash
+                if self.basket_speed < 275:
+                    if keys[pygame.K_LSHIFT]:
+                        self.basket_speed += 45
+            if keys[pygame.K_RIGHT]:
+                self.basket_pos[0] += self.basket_speed // 10
+                if self.basket_speed < 275:
+                    if keys[pygame.K_LSHIFT]:
+                        self.basket_speed += 45
+            
+            # Border detection
+            if self.basket_pos[0] < self.WIDTH//5 + self.border_offset:
+                self.basket_pos[0] = self.WIDTH//5 + self.border_offset
+            elif self.basket_pos[0] > self.WIDTH - self.WIDTH//5 - self.basket_size - self.border_offset:
+                self.basket_pos[0] = self.WIDTH - self.WIDTH//5 - self.basket_size - self.border_offset
+            
+            # Reset basket speed
+            if self.basket_speed == 275 and not keys[pygame.K_LSHIFT]:
+                self.basket_speed = 50
+
+            basket_rect = pygame.Rect(self.basket_pos[0], self.basket_pos[1], self.basket_size, self.basket_size//6)
+            food_rect = pygame.Rect(self.food_pos[0], self.food_pos[1], self.food_size, self.food_size)
+
+            if basket_rect.colliderect(food_rect):
+                self.sounds['score'].play().set_volume(1)
+                self.score += 10
+            
+            # Generate new fruit
+            def generate_food():
+                # Random position
+                new_food_pos = [random.randrange(self.WIDTH//5, self.WIDTH - self.WIDTH//5 - self.food_size), 0]
+                
+                # Random image
+                random_food_image = random.randint(1, 5)
+                
+                if random_food_image == 1:
+                    new_food_image = pygame.transform.scale(self.graphics_collection[2], (50, 50))
+                elif random_food_image == 2:
+                    new_food_image = pygame.transform.scale(self.graphics_collection[5], (50, 50))
+                elif random_food_image == 3:
+                    new_food_image = pygame.transform.scale(self.graphics_collection[6], (50, 50))
+                elif random_food_image == 4:
+                    new_food_image = pygame.transform.scale(self.graphics_collection[7], (50, 50))
+                else:
+                    new_food_image = pygame.transform.scale(self.graphics_collection[8], (50, 50))
+                
+                self.foods.append({"pos": new_food_pos, "image": new_food_image})
+                self.food_count += 1
+
+            #Change food spawn frequency
+            if self.food_speed == 3:
+                if self.timer % 120 == 0:
+                    generate_food()
+            elif self.food_speed == 6:
+                if self.timer % 60 == 0:
+                    generate_food()
+            elif self.food_speed == 8:
+                if self.timer % 30 == 0:
+                    generate_food()
+
+            # Draw the basket
+            self.screen.blit(self.basket_image, (self.basket_pos[0], self.basket_pos[1]))
+
+            # Draw the food
+            for food in self.foods[:]:
+                food_pos = food["pos"]
+                food_image = food["image"]
+
+                food_rect = pygame.Rect(food_pos[0], food_pos[1], self.food_size, self.food_size)
+
+                if basket_rect.colliderect(food_rect):
+                    self.sounds['score'].play().set_volume(1)
+                    self.score += 10
+                    self.foods.remove(food)
+
+                if food_pos[1] > self.HEIGHT:
+                    self.foods.remove(food)
+
+                # Falling
+                self.screen.blit(food_image, (food_pos[0], food_pos[1]))
+
+                if self.food_count >= 15 and self.food_count < 30:
+                    self.food_speed = 6
+                elif self.food_count >= 30:
+                    self.food_speed = 8
+                
+                food_pos[1] += self.food_speed
+
+                # Game over
+                if food_pos[1] > self.HEIGHT:
+                    border_rect = pygame.Rect(self.WIDTH//5, 0, self.WIDTH - 2 * (self.WIDTH//5), self.HEIGHT)
+                    pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
+
+                    show_score()
+                    show_info()
+
+                    font = pygame.font.SysFont(None, 50)
+
+                    game_over_text = font.render(
+                        'GAME OVER', True, 'white')
+                    game_over_rect = game_over_text.get_rect()
+                    game_over_rect.midtop = (self.WIDTH/2, self.HEIGHT/4)
+                    self.screen.blit(game_over_text, game_over_rect)
+
+                    score_text = font.render(
+                        'Score: ' + str(self.score), True, 'white')
+                    score_rect = score_text.get_rect()
+                    score_rect.midtop = (self.WIDTH/2, self.HEIGHT/3)
+                    self.screen.blit(score_text, score_rect)
+
+                    pygame.display.flip()
+                    time.sleep(2)
+                    self.restart_game()
+                
+            # Draw border
+            border_rect = pygame.Rect(self.WIDTH//5, 0, self.WIDTH - 2 * (self.WIDTH//5), self.HEIGHT)
+            pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
+
+            show_score()
+            show_info()
+
+            pygame.display.update()
+            self.clock.tick(self.minigame_FPS)
     
     def handle_events(self):
         for event in pygame.event.get():
@@ -314,7 +527,7 @@ class RoomDesignerGame:
                             self.object.animate(True)  # Trigger animation for one frame
                             self.sounds['object_rotate'].play().set_volume(0.6)
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if self.game_state == GameState.MENU_SCREEN:
+                if self.game_state == GameState.MENU:
                     if self.play_button.handle_event(event):
                         self.sounds['ui_click'].play().set_volume(1.0)
                         self.restart_game()
@@ -433,17 +646,21 @@ class RoomDesignerGame:
                         # Minigame selection
                         if selected:
                             self.sounds['ui_click'].play().set_volume(1.0)
+                            selected_minigame = self.minigame_ui.selected_minigame
 
                             # Stop previous background music
                             self.sounds['background'].stop()
 
-                            self.init_snake_game()
+                            if selected_minigame == self.SNAKE:
+                                self.init_snake_game()
+                            elif selected_minigame == self.CATCH_THE_FRUIT:
+                                self.init_catch_the_fruit()
 
                         if not inner_click:
                             self.sounds['ui_click'].play().set_volume(1.0)
                             self.show_minigames = False
             elif event.type == pygame.MOUSEMOTION:
-                if self.game_state == GameState.MENU_SCREEN:
+                if self.game_state == GameState.MENU:
                     self.play_button.handle_event(event)  # Handle hover effects
                     self.quit_button.handle_event(event)
                 elif self.game_state == GameState.PLAYING:
@@ -514,10 +731,8 @@ class RoomDesignerGame:
         """Function drawing screen content according to the state of the game"""
         self.screen.fill((0, 0, 0))
         
-        if self.game_state == GameState.MENU_SCREEN:
+        if self.game_state == GameState.MENU:
             self.draw_menu_screen()
-        elif self.game_state == GameState.MENU:
-            self.draw_menu()
         elif self.game_state == GameState.PLAYING:
             self.draw_game()
             if self.show_inventory:
@@ -660,7 +875,7 @@ class RoomDesignerGame:
         self.sounds['minigame'].stop()
 
         # Only refresh main theme song if not switching from menu
-        if not self.game_state == GameState.MENU_SCREEN:
+        if not self.game_state == GameState.MENU:
             self.sounds['background'].play(loops=-1).set_volume(0.8)
         
         self.clear_sprites()

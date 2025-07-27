@@ -72,13 +72,12 @@ def create_sounds():
         "object_place": pygame.mixer.Sound("assets/sounds/place.wav"),
         "object_rotate": pygame.mixer.Sound("assets/sounds/rotate.wav"),
         "ui_click" : pygame.mixer.Sound("assets/sounds/click.wav"),
-        "snake_eat" : pygame.mixer.Sound("assets/sounds/snake_eat.wav")
+        "score" : pygame.mixer.Sound("assets/sounds/score.wav")
     }
 
 
 def create_graphics():
     """Creates graphics for various UI components"""
-    # Load inventory
     inventory = pygame.image.load("assets/graphics/inventory.png")
     inventory = pygame.transform.scale(inventory, (540, 346))
 
@@ -89,5 +88,17 @@ def create_graphics():
 
     snake_thumbnail = pygame.image.load("assets/graphics/snake_thumbnail.png")
     snake_thumbnail = pygame.transform.scale(snake_thumbnail, (115, 115))
+
+    basket = pygame.image.load("assets/graphics/basket.png")
+    basket = pygame.transform.scale(basket, (80, 80))
+
+    orange = pygame.image.load("assets/graphics/orange.png")
+    banana = pygame.image.load("assets/graphics/banana.png")
+    dragon_fruit = pygame.image.load("assets/graphics/dragon_fruit.png")
+    avocado = pygame.image.load("assets/graphics/avocado.png")
+
+    fruit_thumbnail = pygame.image.load("assets/graphics/fruit_thumbnail.png")
+    fruit_thumbnail = pygame.transform.scale(fruit_thumbnail, (100, 100))
         
-    return [inventory, minigames, apple, snake_thumbnail]
+    return [inventory, minigames, apple, snake_thumbnail, basket,
+            orange, banana, dragon_fruit, avocado, fruit_thumbnail]

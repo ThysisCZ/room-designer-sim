@@ -308,11 +308,11 @@ class MinigameUI:
         self.cols = cols
         self.rows = rows
         self.rect = pygame.Rect(self.x, self.y, self.cols * self.thumbnail_size, self.rows * self.thumbnail_size)
-        self.minigames = ["Snake"]
+        self.minigames = ["Snake", "Catch the Fruit"]
         self.selected_minigame = None
-        self.SNAKE = 0
         self.graphics_collection = create_graphics()
         self.snake_thumbnail = self.graphics_collection[3]
+        self.fruit_thumbnail = self.graphics_collection[9]
     
     def draw(self, screen):
         # Prepare 4x2 grid
@@ -341,13 +341,20 @@ class MinigameUI:
             pygame.draw.rect(screen, (0, 0, 0), minigame_rect)
             pygame.draw.rect(screen, (255, 255, 255), minigame_rect, 1)
 
-            # Snake thumbnail
-            screen.blit(self.snake_thumbnail, (x + 1, y + 2))
+            if idx == 0:
+                # Draw thumbnail
+                screen.blit(self.snake_thumbnail, (x + 1, y + 2))
 
-            # Draw minigame name text
-            font = pygame.font.SysFont(None, 20)
-            label = font.render(minigame, True, (255, 255, 255))
-            screen.blit(label, (x + 44, y + 105))
+                # Draw minigame name text
+                font = pygame.font.SysFont(None, 20)
+                label = font.render(minigame, True, (255, 255, 255))
+                screen.blit(label, (x + 44, y + 105))
+            elif idx == 1:
+                screen.blit(self.fruit_thumbnail, (x + 1, y + 2))
+
+                font = pygame.font.SysFont(None, 20)
+                label = font.render(minigame, True, (255, 255, 255))
+                screen.blit(label, (x + 15, y + 105))
     
     def handle_click(self, mouse_pos):
         mx, my = mouse_pos
@@ -362,7 +369,7 @@ class MinigameUI:
             rect = pygame.Rect(x, y, self.thumbnail_size, self.thumbnail_size)
 
             if rect.collidepoint(mx, my):
-                self.selected_tab = idx
+                self.selected_minigame = idx
                 return 'minigame'
 
 
