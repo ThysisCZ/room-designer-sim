@@ -5,3 +5,4 @@ class GameState(Enum):
     PLAYING = 1
     SNAKE = 2
     CATCH_THE_FRUIT = 3
+    BULLET_HELL = 4

@@ -308,11 +308,12 @@ class MinigameUI:
         self.cols = cols
         self.rows = rows
         self.rect = pygame.Rect(self.x, self.y, self.cols * self.thumbnail_size, self.rows * self.thumbnail_size)
-        self.minigames = ["Snake", "Catch the Fruit"]
+        self.minigames = ["Snake", "Catch the Fruit", "Bullet Hell"]
         self.selected_minigame = None
         self.graphics_collection = create_graphics()
         self.snake_thumbnail = self.graphics_collection[3]
         self.fruit_thumbnail = self.graphics_collection[9]
+        self.bullet_thumbnail = self.graphics_collection[20]
     
     def draw(self, screen):
         # Prepare 4x2 grid
@@ -355,6 +356,12 @@ class MinigameUI:
                 font = pygame.font.SysFont(None, 20)
                 label = font.render(minigame, True, (255, 255, 255))
                 screen.blit(label, (x + 15, y + 105))
+            else:
+                screen.blit(self.bullet_thumbnail, (x + 1, y + 2))
+
+                font = pygame.font.SysFont(None, 20)
+                label = font.render(minigame, True, (255, 255, 255))
+                screen.blit(label, (x + 30, y + 105))
     
     def handle_click(self, mouse_pos):
         mx, my = mouse_pos

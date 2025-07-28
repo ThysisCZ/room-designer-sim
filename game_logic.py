@@ -72,7 +72,8 @@ def create_sounds():
         "object_place": pygame.mixer.Sound("assets/sounds/place.wav"),
         "object_rotate": pygame.mixer.Sound("assets/sounds/rotate.wav"),
         "ui_click" : pygame.mixer.Sound("assets/sounds/click.wav"),
-        "score" : pygame.mixer.Sound("assets/sounds/score.wav")
+        "score" : pygame.mixer.Sound("assets/sounds/score.wav"),
+        "bullets" : pygame.mixer.Sound("assets/sounds/bullets.wav")
     }
 
 
@@ -99,6 +100,28 @@ def create_graphics():
 
     fruit_thumbnail = pygame.image.load("assets/graphics/fruit_thumbnail.png")
     fruit_thumbnail = pygame.transform.scale(fruit_thumbnail, (100, 100))
+
+    ship = pygame.image.load("assets/graphics/spaceship.png")
+    ship = pygame.transform.scale(ship, (80, 80))
+
+    red_ship = pygame.image.load("assets/graphics/red_evil_spaceship.png")
+    orange_ship = pygame.image.load("assets/graphics/orange_evil_spaceship.png")
+    yellow_ship = pygame.image.load("assets/graphics/yellow_evil_spaceship.png")
+    purple_ship = pygame.image.load("assets/graphics/purple_evil_spaceship.png")
+    green_ship = pygame.image.load("assets/graphics/green_evil_spaceship.png")
+
+    dark_blue_bullet = pygame.image.load("assets/graphics/dark_blue_bullet.png")
+    light_blue_bullet = pygame.image.load("assets/graphics/light_blue_bullet.png")
+    dark_red_bullet = pygame.image.load("assets/graphics/dark_red_bullet.png")
+    light_red_bullet = pygame.image.load("assets/graphics/light_red_bullet.png")
+
+    bullet_thumbnail = pygame.image.load("assets/graphics/bullet_thumbnail.png")
+    bullet_thumbnail = pygame.transform.scale(bullet_thumbnail, (100, 100))
+
         
     return [inventory, minigames, apple, snake_thumbnail, basket,
-            orange, banana, dragon_fruit, avocado, fruit_thumbnail]
+            orange, banana, dragon_fruit, avocado, fruit_thumbnail,
+            ship, red_ship, orange_ship, yellow_ship, purple_ship,
+            green_ship, dark_blue_bullet, light_blue_bullet,
+            dark_red_bullet, light_red_bullet, bullet_thumbnail
+        ]

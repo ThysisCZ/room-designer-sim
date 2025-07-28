@@ -41,7 +41,7 @@ class RoomDesignerGame:
         # Set up minigame types
         self.SNAKE = 0
         self.CATCH_THE_FRUIT = 1
-        self.SPACE_INVADERS = 2
+        self.BULLET_HELL = 2
         
         # Isometric setup - adjust tile size based on screen resolution
         self.base_tile_width = 64
@@ -382,20 +382,20 @@ class RoomDesignerGame:
                         self.restart_game()
 
             self.timer += 1
-            
+
+            def basket_dash():
+                if self.basket_speed < 275:
+                    if keys[pygame.K_LSHIFT]:
+                        self.basket_speed += 45
+                        
             # Handle movement
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
                 self.basket_pos[0] -= self.basket_speed // 10
-                # Basket dash
-                if self.basket_speed < 275:
-                    if keys[pygame.K_LSHIFT]:
-                        self.basket_speed += 45
+                basket_dash()
             if keys[pygame.K_RIGHT]:
                 self.basket_pos[0] += self.basket_speed // 10
-                if self.basket_speed < 275:
-                    if keys[pygame.K_LSHIFT]:
-                        self.basket_speed += 45
+                basket_dash()
             
             # Border detection
             if self.basket_pos[0] < self.WIDTH//5 + self.border_offset:
@@ -500,6 +500,359 @@ class RoomDesignerGame:
                     pygame.display.flip()
                     time.sleep(2)
                     self.restart_game()
+            
+            # Draw border
+            border_rect = pygame.Rect(self.WIDTH//5, 0, self.WIDTH - 2 * (self.WIDTH//5), self.HEIGHT)
+            pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
+
+            show_score()
+            show_info()
+
+            pygame.display.update()
+            self.clock.tick(self.minigame_FPS)
+    
+    def init_bullet_hell(self):
+        self.game_state = GameState.BULLET_HELL
+        self.sounds = create_sounds()
+        self.sounds['minigame'].play(loops=-1).set_volume(0.4)
+
+        self.basket_size = 80
+
+        self.border_offset = 3
+
+        # Basket start position
+        self.basket_pos = [self.WIDTH//2 - self.basket_size//2, self.HEIGHT - self.basket_size]
+
+        self.basket_speed = 100
+
+        self.graphics_collection = create_graphics()
+
+        self.basket_image = self.graphics_collection[10]
+
+        self.hitbox_size = 15
+
+        self.hitbox_pos = [self.basket_pos[0] + self.basket_size//2, self.basket_pos[1] + self.basket_size//2]
+
+        self.basket_bullet_pos = [0, 0]
+
+        self.basket_bullets = []
+
+        self.bullet_size = 15
+
+        self.bullet_speed = 9
+
+        # Set framerate
+        self.clock = pygame.time.Clock()
+        self.minigame_FPS = 60
+
+        self.food_image = None
+
+        self.food_size = 80
+
+        # Area for random generation
+        self.food_pos = [0, 0]
+        
+        # List of food positions
+        self.foods = []
+
+        self.food_speed = 6
+
+        self.food_count = 1
+
+        self.enemy_bullet_pos = [0, 0]
+
+        self.enemy_bullets = []
+
+        self.sounds['score'].set_volume(1)
+        self.sounds['bullets'].set_volume(0.3)
+
+        self.score = 0
+        self.timer = 0
+
+        background_rect = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
+        pygame.draw.rect(self.screen, (0, 0, 0), background_rect)
+
+        self.score_font = pygame.font.SysFont(None, 30)
+        self.info_font = pygame.font.SysFont(None, 24)
+
+        def show_score():
+            font = pygame.font.SysFont(None, 30)
+
+            score_text = font.render('Score: ' + str(self.score), False, 'white')
+            score_rect = score_text.get_rect()
+            score_rect.midtop = (self.WIDTH - self.basket_size, self.border_offset)
+            self.screen.blit(score_text, score_rect)
+        
+        def show_info():
+            info = [
+                    ("INFO:"),
+                    ("Hold Y/Z key to shoot"),
+                    ("Hold left SHIFT to focus")
+                ]
+
+            font = pygame.font.SysFont(None, 24)
+            y_offset = self.HEIGHT - 65
+
+            for row in info:
+                info_text = font.render(f"{row}", False, (255, 255, 255))
+                self.screen.blit(info_text, (15, y_offset))
+                y_offset += 20
+
+        # Game loop
+        while self.game_state == GameState.BULLET_HELL:
+            # Clear the screen each frame to prevent trails
+            self.screen.fill('black')
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    # Quit
+                    if event.key == pygame.K_ESCAPE:
+                        self.restart_game()
+
+            self.timer += 1
+
+            def basket_dash():
+                if self.basket_speed > 50:
+                    if keys[pygame.K_LSHIFT]:
+                        self.basket_speed -= 50
+            
+            # Handle movement
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.basket_pos[0] -= self.basket_speed // 10
+                basket_dash()
+            if keys[pygame.K_RIGHT]:
+                self.basket_pos[0] += self.basket_speed // 10
+                basket_dash()
+            if keys[pygame.K_DOWN]:
+                self.basket_pos[1] += self.basket_speed // 10
+                basket_dash()
+            if keys[pygame.K_UP]:
+                self.basket_pos[1] -= self.basket_speed // 10
+                basket_dash()
+            
+            # Border detection
+            if self.basket_pos[0] < self.WIDTH//5 + self.border_offset:
+                self.basket_pos[0] = self.WIDTH//5 + self.border_offset
+            elif self.basket_pos[0] > self.WIDTH - self.WIDTH//5 - self.basket_size - self.border_offset:
+                self.basket_pos[0] = self.WIDTH - self.WIDTH//5 - self.basket_size - self.border_offset
+            elif self.basket_pos[1] < 0:
+                self.basket_pos[1] = 0
+            elif self.basket_pos[1] > self.HEIGHT - self.basket_size:
+                self.basket_pos[1] = self.HEIGHT - self.basket_size
+            
+            # Handle position conflicts
+            if (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]) and keys[pygame.K_UP]:
+                if self.basket_pos[1] < 0:
+                    self.basket_pos[1] = 0
+            elif (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]) and keys[pygame.K_DOWN]:
+                if self.basket_pos[1] > self.HEIGHT - self.basket_size:
+                    self.basket_pos[1] = self.HEIGHT - self.basket_size
+            
+            # Reset basket speed
+            if self.basket_speed == 50 and not keys[pygame.K_LSHIFT]:
+                self.basket_speed = 100
+
+            hitbox_rect = pygame.Rect(self.basket_pos[0] + self.basket_size//2, self.basket_pos[1] + self.basket_size//2,
+                                      self.hitbox_size, self.hitbox_size)
+            food_rect = pygame.Rect(self.food_pos[0], self.food_pos[1], self.food_size, self.food_size)
+            
+            # Generate new basket bullet
+            def generate_basket_bullet():
+                # Random position
+                new_bullet_pos = [random.randrange(self.basket_pos[0], self.basket_pos[0] + self.basket_size),
+                                  self.basket_pos[1]
+                                ]
+                
+                # Random image
+                random_bullet_image = random.randint(1, 5)
+                
+                if random_bullet_image == 1:
+                    new_bullet_image = pygame.transform.scale(self.graphics_collection[16], (self.bullet_size, self.bullet_size))
+                else:
+                    new_bullet_image = pygame.transform.scale(self.graphics_collection[17], (self.bullet_size, self.bullet_size))
+                
+                self.basket_bullets.append({"pos": new_bullet_pos, "image": new_bullet_image})
+
+            # Shoot bullets
+            if keys[pygame.K_y] or keys[pygame.K_z]:
+                self.sounds['bullets'].play(loops=-1)
+                if self.timer % 3 == 0:
+                    generate_basket_bullet()
+            elif not keys[pygame.K_y] or not keys[pygame.K_z]:
+                self.sounds['bullets'].stop()
+
+            # Draw basket bullets
+            for bullet in self.basket_bullets[:]:
+                bullet_pos = bullet["pos"]
+                bullet_image = bullet["image"]
+
+                # Falling
+                self.screen.blit(bullet_image, (bullet_pos[0], bullet_pos[1]))
+                
+                bullet_pos[1] -= self.bullet_speed
+            
+            # Generate new fruit
+            def generate_food():
+                # Random position
+                new_food_pos = [random.randrange(self.WIDTH//5, self.WIDTH - self.WIDTH//5 - self.food_size), 0]
+                
+                # Random image
+                random_food_image = random.randint(1, 5)
+                
+                if random_food_image == 1:
+                    new_food_image = pygame.transform.scale(self.graphics_collection[11], (self.food_size, self.food_size))
+                elif random_food_image == 2:
+                    new_food_image = pygame.transform.scale(self.graphics_collection[12], (self.food_size, self.food_size))
+                elif random_food_image == 3:
+                    new_food_image = pygame.transform.scale(self.graphics_collection[13], (self.food_size, self.food_size))
+                elif random_food_image == 4:
+                    new_food_image = pygame.transform.scale(self.graphics_collection[14], (self.food_size, self.food_size))
+                else:
+                    new_food_image = pygame.transform.scale(self.graphics_collection[15], (self.food_size, self.food_size))
+                
+                self.foods.append({"pos": new_food_pos, 
+                                   "image": new_food_image, 
+                                   "last_shot": self.timer})
+                self.food_count += 1
+            
+            # Spawn enemy bullets periodically
+            for food in self.foods:
+                if self.timer - food["last_shot"] >= 30:
+                    food_x, food_y = food["pos"]
+                    bullet_x = random.randint(food_x, food_x + self.food_size)
+                    bullet_y = food_y + self.food_size
+
+                    # Create bullet image
+                    random_bullet_image = random.randint(1, 2)
+
+                    if random_bullet_image == 1:
+                        bullet_image = pygame.transform.scale(self.graphics_collection[18], (self.bullet_size, self.bullet_size))
+                    else:
+                        bullet_image = pygame.transform.scale(self.graphics_collection[19], (self.bullet_size, self.bullet_size))
+
+                    # Append bullet
+                    self.enemy_bullets.append({
+                        "pos": [bullet_x, bullet_y],
+                        "image": bullet_image
+                    })
+
+                    food["last_shot"] = self.timer  # Reset shot timer
+
+            #Change food spawn frequency
+            if self.food_count <= 15:
+                if self.timer % 30 == 0:
+                    generate_food()
+            elif self.food_count > 15 and self.food_count <= 30:
+                if self.timer % 15 == 0:
+                    generate_food()
+            elif self.food_count > 30:
+                if self.timer % 7 == 0:
+                    generate_food()
+
+            # Draw the basket and hitbox
+            self.screen.blit(self.basket_image, (self.basket_pos[0], self.basket_pos[1]))
+            pygame.draw.circle(self.screen, 'black',
+                               (self.basket_pos[0] + self.basket_size//2,
+                                self.basket_pos[1] + self.basket_size//2), 12)
+            pygame.draw.circle(self.screen, 'white',
+                               (self.basket_pos[0] + self.basket_size//2,
+                                self.basket_pos[1] + self.basket_size//2), 7.5)
+
+            def game_over():
+                border_rect = pygame.Rect(self.WIDTH//5, 0, self.WIDTH - 2 * (self.WIDTH//5), self.HEIGHT)
+                pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
+
+                show_score()
+                show_info()
+
+                font = pygame.font.SysFont(None, 50)
+
+                game_over_text = font.render(
+                    'GAME OVER', True, 'white')
+                game_over_rect = game_over_text.get_rect()
+                game_over_rect.midtop = (self.WIDTH/2, self.HEIGHT/4)
+                self.screen.blit(game_over_text, game_over_rect)
+
+                score_text = font.render(
+                    'Score: ' + str(self.score), True, 'white')
+                score_rect = score_text.get_rect()
+                score_rect.midtop = (self.WIDTH/2, self.HEIGHT/3)
+                self.screen.blit(score_text, score_rect)
+
+                pygame.display.flip()
+                time.sleep(2)
+                self.restart_game()
+
+            basket_bullets_to_remove = []
+            foods_to_remove = []
+
+            # Handle enemy-bullet collisions
+            for bullet in self.basket_bullets:
+                bullet_pos = bullet["pos"]
+                bullet_rect = pygame.Rect(bullet_pos[0], bullet_pos[1], self.bullet_size, self.bullet_size)
+
+                for food in self.foods:
+                    food_pos = food["pos"]
+                    food_rect = pygame.Rect(food_pos[0], food_pos[1], self.food_size, self.food_size)
+
+                    if bullet_rect.colliderect(food_rect):
+                        if food_pos[1] > 3 * self.basket_size:
+                            self.sounds['bullets'].stop()
+                            self.sounds['score'].play()
+                            self.score += 10
+                            basket_bullets_to_remove.append(bullet)
+                            foods_to_remove.append(food)
+                            break  # One bullet hits one food only
+                
+                # Clean up unused player bullets
+                if bullet["pos"][1] < 0:
+                    self.basket_bullets.remove(bullet)
+                
+            # Clean up player bullets and enemies
+            for bullet in basket_bullets_to_remove:
+                if bullet in self.basket_bullets:
+                    self.basket_bullets.remove(bullet)
+
+            for food in foods_to_remove:
+                if food in self.foods:
+                    self.foods.remove(food)
+
+            # Draw enemy bullets
+            for bullet in self.enemy_bullets[:]:
+                bullet_pos = bullet["pos"]
+                bullet_image = bullet["image"]
+
+                self.screen.blit(bullet_image, (bullet_pos[0], bullet_pos[1]))
+                bullet_pos[1] += self.bullet_speed
+
+                # Clean up enemy bullets
+                if bullet_pos[1] > self.HEIGHT:
+                    self.enemy_bullets.remove(bullet)
+
+            # Handle basket-bullet collisions
+            for bullet in self.enemy_bullets:
+                bullet_pos = bullet["pos"]
+                bullet_rect = pygame.Rect(bullet_pos[0], bullet_pos[1], self.bullet_size, self.bullet_size)
+
+                if hitbox_rect.colliderect(bullet_rect):
+                    self.sounds['bullets'].stop()
+                    game_over()
+
+            # Draw the food and handle collisions
+            for food in self.foods[:]:
+                food_pos = food["pos"]
+                food_image = food["image"]
+
+                food_rect = pygame.Rect(food_pos[0], food_pos[1], self.food_size, self.food_size)
+
+                if hitbox_rect.colliderect(food_rect):
+                    self.sounds['bullets'].stop()
+                    game_over()
+
+                # Falling
+                self.screen.blit(food_image, (food_pos[0], food_pos[1]))
+                food_pos[1] += self.food_speed
                 
             # Draw border
             border_rect = pygame.Rect(self.WIDTH//5, 0, self.WIDTH - 2 * (self.WIDTH//5), self.HEIGHT)
@@ -655,6 +1008,8 @@ class RoomDesignerGame:
                                 self.init_snake_game()
                             elif selected_minigame == self.CATCH_THE_FRUIT:
                                 self.init_catch_the_fruit()
+                            else:
+                                self.init_bullet_hell()
 
                         if not inner_click:
                             self.sounds['ui_click'].play().set_volume(1.0)
