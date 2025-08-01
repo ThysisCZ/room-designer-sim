@@ -73,7 +73,8 @@ def create_sounds():
         "object_rotate": pygame.mixer.Sound("assets/sounds/rotate.wav"),
         "ui_click" : pygame.mixer.Sound("assets/sounds/click.wav"),
         "score" : pygame.mixer.Sound("assets/sounds/score.wav"),
-        "bullets" : pygame.mixer.Sound("assets/sounds/bullets.wav")
+        "bullets" : pygame.mixer.Sound("assets/sounds/bullets.wav"),
+        "coin" : pygame.mixer.Sound("assets/sounds/coin.wav")
     }
 
 
@@ -118,10 +119,13 @@ def create_graphics():
     bullet_thumbnail = pygame.image.load("assets/graphics/bullet_thumbnail.png")
     bullet_thumbnail = pygame.transform.scale(bullet_thumbnail, (100, 100))
 
+    game_coin = pygame.image.load("assets/graphics/game_coin.png")
+
         
     return [inventory, minigames, apple, snake_thumbnail, basket,
             orange, banana, dragon_fruit, avocado, fruit_thumbnail,
             ship, red_ship, orange_ship, yellow_ship, purple_ship,
             green_ship, dark_blue_bullet, light_blue_bullet,
-            dark_red_bullet, light_red_bullet, bullet_thumbnail
+            dark_red_bullet, light_red_bullet, bullet_thumbnail,
+            game_coin
         ]

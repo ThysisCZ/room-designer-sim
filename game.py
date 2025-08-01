@@ -141,6 +141,8 @@ class RoomDesignerGame:
         self.sounds = create_sounds()
         self.sounds['minigame'].play(loops=-1).set_volume(0.4)
 
+        pygame.mouse.set_visible(False)
+
         self.area_size = 500
 
         # Snake start position
@@ -163,10 +165,27 @@ class RoomDesignerGame:
         
         self.food_size = 30
 
-        # Food position change
-        self.food = True
+        self.food_eaten = False
+
+        self.coin_image = pygame.transform.scale(self.graphics_collection[21], (30, 30))
+
+        self.coin_pos = [random.randrange(int(self.WIDTH//3.25), (int(self.HEIGHT//3.25) + self.area_size - self.snake_size)),
+                            random.randrange(int(self.WIDTH//6), (int(self.HEIGHT//6) + self.area_size - self.snake_size))
+                        ]
+        
+        self.coin_size = 30
+
+        self.coin_picked = False
+
+        self.coin_spawn_rate = None
+
+        self.coin_pause = False
 
         self.score = 0
+        self.coins = 0
+        self.score_offset = 0
+        self.coins_offset = 0
+
         self.growth_counter = 0
         self.block_counter = 0
 
@@ -175,8 +194,16 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), True, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.WIDTH//3.25 + 430, self.HEIGHT//6 - 23)
+            score_rect.midtop = (self.WIDTH//3.25 + 455 - self.score_offset, self.HEIGHT//6 - 23)
             self.screen.blit(score_text, score_rect)
+        
+        def show_coins():
+            font = pygame.font.SysFont(None, 30)
+
+            coin_text = font.render('Gamecoins: ' + str(self.coins), True, 'white')
+            coin_rect = coin_text.get_rect()
+            coin_rect.midtop = (self.WIDTH//3.25 + 70 + self.coins_offset, self.HEIGHT//6 - 23)
+            self.screen.blit(coin_text, coin_rect)
 
         def game_over():
             # Keep border and score on the screen
@@ -249,26 +276,59 @@ class RoomDesignerGame:
 
             snake_rect = pygame.Rect(self.snake_pos[0], self.snake_pos[1], self.snake_size, self.snake_size)
             food_rect = pygame.Rect(self.food_pos[0], self.food_pos[1], self.food_size, self.food_size)
+            coin_rect = pygame.Rect(self.coin_pos[0], self.coin_pos[1], self.coin_size, self.coin_size)
 
             if snake_rect.colliderect(food_rect):
                 self.sounds['score'].play().set_volume(1)
                 self.score += 10
-                self.food = False
+                self.food_eaten = True
                 self.growth_counter += 7
-            # If snake doesn't meet the food
+
+                if self.score == 10 or self.score == 100 or self.score == 1000 or self.score == 10000:
+                    self.score_offset += 6
+            elif snake_rect.colliderect(coin_rect):
+                self.sounds['coin'].play().set_volume(0.2)
+                self.coins += 1
+                self.coin_picked = True
+
+                if self.coins == 10 or self.coins == 100 or self.coins == 1000:
+                    self.coins_offset += 5
+            # If snake doesn't meet food or coin
             else:
                 if self.growth_counter > 0:
                     self.growth_counter -= 1 
                 else:
                     self.snake_body.pop()
-            
-            # Assign a new coordinate to food position
-            if not self.food:
+
+            self.coin_spawn_rate = random.randint(1, 12)
+
+            # Assign a new coordinate to food/coin position
+            if self.food_eaten:
                 self.food_pos = [random.randrange(int(self.WIDTH//3.25), (int(self.HEIGHT//3.25) + self.area_size - self.snake_size)),
                             random.randrange(int(self.WIDTH//6), (int(self.HEIGHT//6) + self.area_size - self.snake_size))
                         ]
+                
+                # Randomly spawn new coin when food is eaten
+                if self.coin_pause and self.coin_spawn_rate <= 3:
+                    self.coin_pos = [random.randrange(int(self.WIDTH//3.25), (int(self.HEIGHT//3.25) + self.area_size - self.snake_size)),
+                        random.randrange(int(self.WIDTH//6), (int(self.HEIGHT//6) + self.area_size - self.snake_size))
+                    ]
+
+                    self.coin_pause = False
+            elif self.coin_picked:
+                if self.coin_spawn_rate <= 3:
+                    self.coin_pos = [random.randrange(int(self.WIDTH//3.25), (int(self.HEIGHT//3.25) + self.area_size - self.snake_size)),
+                        random.randrange(int(self.WIDTH//6), (int(self.HEIGHT//6) + self.area_size - self.snake_size))
+                    ]
+
+                    self.coin_pause = False
+                else:
+                    self.coin_pos = [-self.coin_size, 0]
+
+                    self.coin_pause = True
             
-            self.food = True
+            self.food_eaten = False
+            self.coin_picked = False
             self.screen.fill('black')
 
             # Draw the snake
@@ -280,8 +340,8 @@ class RoomDesignerGame:
                 else:
                     pygame.draw.rect(self.screen, 'green', (pos[0], pos[1], self.snake_size, self.snake_size), 30, 5)
 
-            # Draw the food
             self.screen.blit(self.food_image, (self.food_pos[0], self.food_pos[1]))
+            self.screen.blit(self.coin_image, (self.coin_pos[0], self.coin_pos[1]))
 
             # Game over conditions
             if self.snake_pos[0] < self.WIDTH//3.25 or self.snake_pos[0] > self.WIDTH//3.25 + self.area_size - self.snake_size:
@@ -293,12 +353,11 @@ class RoomDesignerGame:
                 if self.snake_pos[0] == block[0] and self.snake_pos[1] == block[1]:
                     game_over()
             
-            # Draw border
             border_rect = pygame.Rect(self.WIDTH//3.25, self.HEIGHT//6, self.area_size, self.area_size)
             pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
 
-            # See score all the time on screen
             show_score()
+            show_coins()
 
             pygame.display.update()
             self.clock.tick(self.snake_speed)
@@ -307,6 +366,8 @@ class RoomDesignerGame:
         self.game_state = GameState.CATCH_THE_FRUIT
         self.sounds = create_sounds()
         self.sounds['minigame'].play(loops=-1).set_volume(0.4)
+
+        pygame.mouse.set_visible(False)
 
         self.basket_size = 80
 
@@ -339,7 +400,18 @@ class RoomDesignerGame:
 
         self.food_count = 1
 
+        self.coin_image = pygame.transform.scale(self.graphics_collection[21], (50, 50))
+
+        self.coin_size = 50
+
+        self.coin_pos = [0, 0]
+
+        self.coins = []
+
         self.score = 0
+        self.coin_count = 0
+        self.score_offset = 0
+        self.coins_offset = 0
         self.timer = 0
 
         background_rect = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
@@ -353,8 +425,16 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), False, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.WIDTH - self.basket_size, self.border_offset)
+            score_rect.midtop = (self.WIDTH - 7 * self.basket_size//4 - 8 + self.score_offset, self.border_offset)
             self.screen.blit(score_text, score_rect)
+
+        def show_coins():
+            font = pygame.font.SysFont(None, 30)
+
+            coin_text = font.render('Gamecoins: ' + str(self.coin_count), False, 'white')
+            coin_rect = coin_text.get_rect()
+            coin_rect.midtop = (self.WIDTH - 3 * self.basket_size//2 + self.coins_offset, 30)
+            self.screen.blit(coin_text, coin_rect)
         
         def show_info():
             info = [
@@ -436,7 +516,7 @@ class RoomDesignerGame:
                 self.foods.append({"pos": new_food_pos, "image": new_food_image})
                 self.food_count += 1
 
-            #Change food spawn frequency
+            # Change food spawn frequency
             if self.food_speed == 3:
                 if self.timer % 120 == 0:
                     generate_food()
@@ -462,6 +542,9 @@ class RoomDesignerGame:
                     self.score += 10
                     self.foods.remove(food)
 
+                    if self.score == 10 or self.score == 100 or self.score == 1000 or self.score == 10000:
+                        self.score_offset += 6
+
                 if food_pos[1] > self.HEIGHT:
                     self.foods.remove(food)
 
@@ -481,6 +564,7 @@ class RoomDesignerGame:
                     pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
 
                     show_score()
+                    show_coins()
                     show_info()
 
                     font = pygame.font.SysFont(None, 50)
@@ -501,11 +585,54 @@ class RoomDesignerGame:
                     time.sleep(2)
                     self.restart_game()
             
+            # Generate new coin
+            def generate_coin():
+                # Random position
+                new_coin_pos = [random.randrange(self.WIDTH//5, self.WIDTH - self.WIDTH//5 - self.food_size),
+                                -2 * self.basket_size
+                            ]
+                
+                self.coins.append({"pos": new_coin_pos})
+
+            # Change coin spawn frequency
+            if self.food_speed == 3:
+                if self.timer % 960 == 0:
+                    generate_coin()
+            elif self.food_speed == 6:
+                if self.timer % 480 == 0:
+                    generate_coin()
+            elif self.food_speed == 8:
+                if self.timer % 240 == 0:
+                    generate_coin()
+
+            # Draw the coins
+            for coin in self.coins[:]:
+                coin_pos = coin["pos"]
+
+                coin_rect = pygame.Rect(coin_pos[0], coin_pos[1], self.coin_size, self.coin_size)
+
+                if basket_rect.colliderect(coin_rect):
+                    self.sounds['coin'].play().set_volume(0.2)
+                    self.coin_count += 1
+                    self.coins.remove(coin)
+
+                    if self.coin_count == 10 or self.coin_count == 100 or self.coin_count == 1000:
+                        self.coins_offset += 6
+
+                if coin_pos[1] > self.HEIGHT:
+                    self.coins.remove(coin)
+
+                # Falling
+                self.screen.blit(self.coin_image, (coin_pos[0], coin_pos[1]))
+                
+                coin_pos[1] += self.food_speed
+            
             # Draw border
             border_rect = pygame.Rect(self.WIDTH//5, 0, self.WIDTH - 2 * (self.WIDTH//5), self.HEIGHT)
             pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
 
             show_score()
+            show_coins()
             show_info()
 
             pygame.display.update()
@@ -516,26 +643,28 @@ class RoomDesignerGame:
         self.sounds = create_sounds()
         self.sounds['minigame'].play(loops=-1).set_volume(0.4)
 
-        self.basket_size = 80
+        pygame.mouse.set_visible(False)
+
+        self.player_size = 80
 
         self.border_offset = 3
 
-        # Basket start position
-        self.basket_pos = [self.WIDTH//2 - self.basket_size//2, self.HEIGHT - self.basket_size]
+        # Player start position
+        self.player_pos = [self.WIDTH//2 - self.player_size//2, self.HEIGHT - self.player_size]
 
-        self.basket_speed = 100
+        self.player_speed = 100
 
         self.graphics_collection = create_graphics()
 
-        self.basket_image = self.graphics_collection[10]
+        self.player_image = self.graphics_collection[10]
 
         self.hitbox_size = 15
 
-        self.hitbox_pos = [self.basket_pos[0] + self.basket_size//2, self.basket_pos[1] + self.basket_size//2]
+        self.hitbox_pos = [self.player_pos[0] + self.player_size//2, self.player_pos[1] + self.player_size//2]
 
-        self.basket_bullet_pos = [0, 0]
+        self.player_bullet_pos = [0, 0]
 
-        self.basket_bullets = []
+        self.player_bullets = []
 
         self.bullet_size = 15
 
@@ -545,28 +674,42 @@ class RoomDesignerGame:
         self.clock = pygame.time.Clock()
         self.minigame_FPS = 60
 
-        self.food_image = None
+        self.enemy_image = None
 
-        self.food_size = 80
+        self.enemy_size = 80
 
         # Area for random generation
-        self.food_pos = [0, 0]
+        self.enemy_pos = [0, 0]
         
-        # List of food positions
-        self.foods = []
+        # List of enemy positions
+        self.enemies = []
 
-        self.food_speed = 6
+        self.enemy_speed = 6
 
-        self.food_count = 1
+        self.enemy_count = 1
 
         self.enemy_bullet_pos = [0, 0]
 
         self.enemy_bullets = []
 
-        self.sounds['score'].set_volume(1)
-        self.sounds['bullets'].set_volume(0.3)
+        self.coin_image = pygame.transform.scale(self.graphics_collection[21], (50, 50))
+
+        self.coin_size = 50
+
+        self.coin_pos = [0, 0]
+
+        self.coins = []
 
         self.score = 0
+
+        self.sounds['score'].set_volume(1)
+        self.sounds['bullets'].set_volume(0.3)
+        self.sounds['coin'].set_volume(0.2)
+
+        self.score = 0
+        self.coin_count = 0
+        self.score_offset = 0
+        self.coins_offset = 0
         self.timer = 0
 
         background_rect = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
@@ -580,8 +723,16 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), False, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.WIDTH - self.basket_size, self.border_offset)
+            score_rect.midtop = (self.WIDTH - 7 * self.player_size//4 - 8 + self.score_offset, self.border_offset)
             self.screen.blit(score_text, score_rect)
+
+        def show_coins():
+            font = pygame.font.SysFont(None, 30)
+
+            coin_text = font.render('Gamecoins: ' + str(self.coin_count), False, 'white')
+            coin_rect = coin_text.get_rect()
+            coin_rect.midtop = (self.WIDTH - 3 * self.player_size//2 + self.coins_offset, 30)
+            self.screen.blit(coin_text, coin_rect)
         
         def show_info():
             info = [
@@ -611,57 +762,57 @@ class RoomDesignerGame:
 
             self.timer += 1
 
-            def basket_dash():
-                if self.basket_speed > 50:
+            def player_focus():
+                if self.player_speed > 50:
                     if keys[pygame.K_LSHIFT]:
-                        self.basket_speed -= 50
+                        self.player_speed -= 50
             
             # Handle movement
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
-                self.basket_pos[0] -= self.basket_speed // 10
-                basket_dash()
+                self.player_pos[0] -= self.player_speed // 10
+                player_focus()
             if keys[pygame.K_RIGHT]:
-                self.basket_pos[0] += self.basket_speed // 10
-                basket_dash()
+                self.player_pos[0] += self.player_speed // 10
+                player_focus()
             if keys[pygame.K_DOWN]:
-                self.basket_pos[1] += self.basket_speed // 10
-                basket_dash()
+                self.player_pos[1] += self.player_speed // 10
+                player_focus()
             if keys[pygame.K_UP]:
-                self.basket_pos[1] -= self.basket_speed // 10
-                basket_dash()
+                self.player_pos[1] -= self.player_speed // 10
+                player_focus()
             
             # Border detection
-            if self.basket_pos[0] < self.WIDTH//5 + self.border_offset:
-                self.basket_pos[0] = self.WIDTH//5 + self.border_offset
-            elif self.basket_pos[0] > self.WIDTH - self.WIDTH//5 - self.basket_size - self.border_offset:
-                self.basket_pos[0] = self.WIDTH - self.WIDTH//5 - self.basket_size - self.border_offset
-            elif self.basket_pos[1] < 0:
-                self.basket_pos[1] = 0
-            elif self.basket_pos[1] > self.HEIGHT - self.basket_size:
-                self.basket_pos[1] = self.HEIGHT - self.basket_size
+            if self.player_pos[0] < self.WIDTH//5 + self.border_offset:
+                self.player_pos[0] = self.WIDTH//5 + self.border_offset
+            elif self.player_pos[0] > self.WIDTH - self.WIDTH//5 - self.player_size - self.border_offset:
+                self.player_pos[0] = self.WIDTH - self.WIDTH//5 - self.player_size - self.border_offset
+            elif self.player_pos[1] < 0:
+                self.player_pos[1] = 0
+            elif self.player_pos[1] > self.HEIGHT - self.player_size:
+                self.player_pos[1] = self.HEIGHT - self.player_size
             
             # Handle position conflicts
             if (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]) and keys[pygame.K_UP]:
-                if self.basket_pos[1] < 0:
-                    self.basket_pos[1] = 0
+                if self.player_pos[1] < 0:
+                    self.player_pos[1] = 0
             elif (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]) and keys[pygame.K_DOWN]:
-                if self.basket_pos[1] > self.HEIGHT - self.basket_size:
-                    self.basket_pos[1] = self.HEIGHT - self.basket_size
+                if self.player_pos[1] > self.HEIGHT - self.player_size:
+                    self.player_pos[1] = self.HEIGHT - self.player_size
             
-            # Reset basket speed
-            if self.basket_speed == 50 and not keys[pygame.K_LSHIFT]:
-                self.basket_speed = 100
+            # Reset player speed
+            if self.player_speed == 50 and not keys[pygame.K_LSHIFT]:
+                self.player_speed = 100
 
-            hitbox_rect = pygame.Rect(self.basket_pos[0] + self.basket_size//2, self.basket_pos[1] + self.basket_size//2,
+            hitbox_rect = pygame.Rect(self.player_pos[0] + self.player_size//2, self.player_pos[1] + self.player_size//2,
                                       self.hitbox_size, self.hitbox_size)
-            food_rect = pygame.Rect(self.food_pos[0], self.food_pos[1], self.food_size, self.food_size)
+            enemy_rect = pygame.Rect(self.enemy_pos[0], self.enemy_pos[1], self.enemy_size, self.enemy_size)
             
-            # Generate new basket bullet
-            def generate_basket_bullet():
+            # Generate new player bullet
+            def generate_player_bullet():
                 # Random position
-                new_bullet_pos = [random.randrange(self.basket_pos[0], self.basket_pos[0] + self.basket_size),
-                                  self.basket_pos[1]
+                new_bullet_pos = [random.randrange(self.player_pos[0], self.player_pos[0] + self.player_size),
+                                  self.player_pos[1]
                                 ]
                 
                 # Random image
@@ -672,18 +823,18 @@ class RoomDesignerGame:
                 else:
                     new_bullet_image = pygame.transform.scale(self.graphics_collection[17], (self.bullet_size, self.bullet_size))
                 
-                self.basket_bullets.append({"pos": new_bullet_pos, "image": new_bullet_image})
+                self.player_bullets.append({"pos": new_bullet_pos, "image": new_bullet_image})
 
             # Shoot bullets
             if keys[pygame.K_y] or keys[pygame.K_z]:
                 self.sounds['bullets'].play(loops=-1)
                 if self.timer % 3 == 0:
-                    generate_basket_bullet()
+                    generate_player_bullet()
             elif not keys[pygame.K_y] or not keys[pygame.K_z]:
                 self.sounds['bullets'].stop()
 
-            # Draw basket bullets
-            for bullet in self.basket_bullets[:]:
+            # Draw player bullets
+            for bullet in self.player_bullets[:]:
                 bullet_pos = bullet["pos"]
                 bullet_image = bullet["image"]
 
@@ -692,36 +843,38 @@ class RoomDesignerGame:
                 
                 bullet_pos[1] -= self.bullet_speed
             
-            # Generate new fruit
-            def generate_food():
+            player_rect = pygame.Rect(self.player_pos[0], self.player_pos[1], self.player_size, self.player_size//6)
+            
+            # Generate new enemy
+            def generate_enemy():
                 # Random position
-                new_food_pos = [random.randrange(self.WIDTH//5, self.WIDTH - self.WIDTH//5 - self.food_size), 0]
+                new_enemy_pos = [random.randrange(self.WIDTH//5, self.WIDTH - self.WIDTH//5 - self.enemy_size), 0]
                 
                 # Random image
-                random_food_image = random.randint(1, 5)
+                random_enemy_image = random.randint(1, 5)
                 
-                if random_food_image == 1:
-                    new_food_image = pygame.transform.scale(self.graphics_collection[11], (self.food_size, self.food_size))
-                elif random_food_image == 2:
-                    new_food_image = pygame.transform.scale(self.graphics_collection[12], (self.food_size, self.food_size))
-                elif random_food_image == 3:
-                    new_food_image = pygame.transform.scale(self.graphics_collection[13], (self.food_size, self.food_size))
-                elif random_food_image == 4:
-                    new_food_image = pygame.transform.scale(self.graphics_collection[14], (self.food_size, self.food_size))
+                if random_enemy_image == 1:
+                    new_enemy_image = pygame.transform.scale(self.graphics_collection[11], (self.enemy_size, self.enemy_size))
+                elif random_enemy_image == 2:
+                    new_enemy_image = pygame.transform.scale(self.graphics_collection[12], (self.enemy_size, self.enemy_size))
+                elif random_enemy_image == 3:
+                    new_enemy_image = pygame.transform.scale(self.graphics_collection[13], (self.enemy_size, self.enemy_size))
+                elif random_enemy_image == 4:
+                    new_enemy_image = pygame.transform.scale(self.graphics_collection[14], (self.enemy_size, self.enemy_size))
                 else:
-                    new_food_image = pygame.transform.scale(self.graphics_collection[15], (self.food_size, self.food_size))
+                    new_enemy_image = pygame.transform.scale(self.graphics_collection[15], (self.enemy_size, self.enemy_size))
                 
-                self.foods.append({"pos": new_food_pos, 
-                                   "image": new_food_image, 
+                self.enemies.append({"pos": new_enemy_pos, 
+                                   "image": new_enemy_image, 
                                    "last_shot": self.timer})
-                self.food_count += 1
+                self.enemy_count += 1
             
             # Spawn enemy bullets periodically
-            for food in self.foods:
-                if self.timer - food["last_shot"] >= 30:
-                    food_x, food_y = food["pos"]
-                    bullet_x = random.randint(food_x, food_x + self.food_size)
-                    bullet_y = food_y + self.food_size
+            for enemy in self.enemies:
+                if self.timer - enemy["last_shot"] >= 30:
+                    enemy_x, enemy_y = enemy["pos"]
+                    bullet_x = random.randint(enemy_x, enemy_x + self.enemy_size)
+                    bullet_y = enemy_y + self.enemy_size
 
                     # Create bullet image
                     random_bullet_image = random.randint(1, 2)
@@ -737,33 +890,68 @@ class RoomDesignerGame:
                         "image": bullet_image
                     })
 
-                    food["last_shot"] = self.timer  # Reset shot timer
+                    enemy["last_shot"] = self.timer  # Reset shot timer
 
-            #Change food spawn frequency
-            if self.food_count <= 15:
+            #Change enemy spawn frequency
+            if self.enemy_count <= 15:
                 if self.timer % 30 == 0:
-                    generate_food()
-            elif self.food_count > 15 and self.food_count <= 30:
+                    generate_enemy()
+            elif self.enemy_count > 15 and self.enemy_count <= 30:
                 if self.timer % 15 == 0:
-                    generate_food()
-            elif self.food_count > 30:
+                    generate_enemy()
+            elif self.enemy_count > 30:
                 if self.timer % 7 == 0:
-                    generate_food()
+                    generate_enemy()
 
-            # Draw the basket and hitbox
-            self.screen.blit(self.basket_image, (self.basket_pos[0], self.basket_pos[1]))
+            # Draw the player and hitbox
+            self.screen.blit(self.player_image, (self.player_pos[0], self.player_pos[1]))
             pygame.draw.circle(self.screen, 'black',
-                               (self.basket_pos[0] + self.basket_size//2,
-                                self.basket_pos[1] + self.basket_size//2), 12)
+                               (self.player_pos[0] + self.player_size//2,
+                                self.player_pos[1] + self.player_size//2), 12)
             pygame.draw.circle(self.screen, 'white',
-                               (self.basket_pos[0] + self.basket_size//2,
-                                self.basket_pos[1] + self.basket_size//2), 7.5)
+                               (self.player_pos[0] + self.player_size//2,
+                                self.player_pos[1] + self.player_size//2), 7.5)
+            
+            # Generate new coin
+            def generate_coin():
+                # Random position
+                new_coin_pos = [random.randrange(self.WIDTH//5, self.WIDTH - self.WIDTH//5 - self.coin_size), 0]
+                
+                self.coins.append({"pos": new_coin_pos})
+
+            # Coin spawn frequency
+            if self.timer % 480 == 0:
+                generate_coin()
+
+            # Draw the coins
+            for coin in self.coins[:]:
+                coin_pos = coin["pos"]
+
+                coin_rect = pygame.Rect(coin_pos[0], coin_pos[1], self.coin_size, self.coin_size)
+
+                if player_rect.colliderect(coin_rect):
+                    self.sounds['bullets'].stop()
+                    self.sounds['coin'].play()
+                    self.coin_count += 1
+                    self.coins.remove(coin)
+
+                    if self.coin_count == 10 or self.coin_count == 100 or self.coin_count == 1000:
+                        self.coins_offset += 6
+
+                if coin_pos[1] > self.HEIGHT:
+                    self.coins.remove(coin)
+
+                # Falling
+                self.screen.blit(self.coin_image, (coin_pos[0], coin_pos[1]))
+                
+                coin_pos[1] += self.enemy_speed
 
             def game_over():
                 border_rect = pygame.Rect(self.WIDTH//5, 0, self.WIDTH - 2 * (self.WIDTH//5), self.HEIGHT)
                 pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
 
                 show_score()
+                show_coins()
                 show_info()
 
                 font = pygame.font.SysFont(None, 50)
@@ -784,39 +972,42 @@ class RoomDesignerGame:
                 time.sleep(2)
                 self.restart_game()
 
-            basket_bullets_to_remove = []
-            foods_to_remove = []
+            player_bullets_to_remove = []
+            enemies_to_remove = []
 
             # Handle enemy-bullet collisions
-            for bullet in self.basket_bullets:
+            for bullet in self.player_bullets:
                 bullet_pos = bullet["pos"]
                 bullet_rect = pygame.Rect(bullet_pos[0], bullet_pos[1], self.bullet_size, self.bullet_size)
 
-                for food in self.foods:
-                    food_pos = food["pos"]
-                    food_rect = pygame.Rect(food_pos[0], food_pos[1], self.food_size, self.food_size)
+                for enemy in self.enemies:
+                    enemy_pos = enemy["pos"]
+                    enemy_rect = pygame.Rect(enemy_pos[0], enemy_pos[1], self.enemy_size, self.enemy_size)
 
-                    if bullet_rect.colliderect(food_rect):
-                        if food_pos[1] > 3 * self.basket_size:
+                    if bullet_rect.colliderect(enemy_rect):
+                        if enemy_pos[1] > 3 * self.player_size:
                             self.sounds['bullets'].stop()
                             self.sounds['score'].play()
                             self.score += 10
-                            basket_bullets_to_remove.append(bullet)
-                            foods_to_remove.append(food)
-                            break  # One bullet hits one food only
+                            player_bullets_to_remove.append(bullet)
+                            enemies_to_remove.append(enemy)
+                            
+                            if self.score == 10 or self.score == 100 or self.score == 1000 or self.score == 10000:
+                                self.score_offset += 6
+                            break  # One bullet hits one enemy only
                 
                 # Clean up unused player bullets
                 if bullet["pos"][1] < 0:
-                    self.basket_bullets.remove(bullet)
+                    self.player_bullets.remove(bullet)
                 
             # Clean up player bullets and enemies
-            for bullet in basket_bullets_to_remove:
-                if bullet in self.basket_bullets:
-                    self.basket_bullets.remove(bullet)
+            for bullet in player_bullets_to_remove:
+                if bullet in self.player_bullets:
+                    self.player_bullets.remove(bullet)
 
-            for food in foods_to_remove:
-                if food in self.foods:
-                    self.foods.remove(food)
+            for enemy in enemies_to_remove:
+                if enemy in self.enemies:
+                    self.enemies.remove(enemy)
 
             # Draw enemy bullets
             for bullet in self.enemy_bullets[:]:
@@ -830,7 +1021,7 @@ class RoomDesignerGame:
                 if bullet_pos[1] > self.HEIGHT:
                     self.enemy_bullets.remove(bullet)
 
-            # Handle basket-bullet collisions
+            # Handle player-bullet collisions
             for bullet in self.enemy_bullets:
                 bullet_pos = bullet["pos"]
                 bullet_rect = pygame.Rect(bullet_pos[0], bullet_pos[1], self.bullet_size, self.bullet_size)
@@ -839,26 +1030,27 @@ class RoomDesignerGame:
                     self.sounds['bullets'].stop()
                     game_over()
 
-            # Draw the food and handle collisions
-            for food in self.foods[:]:
-                food_pos = food["pos"]
-                food_image = food["image"]
+            # Draw enemies and handle collisions
+            for enemy in self.enemies[:]:
+                enemy_pos = enemy["pos"]
+                enemy_image = enemy["image"]
 
-                food_rect = pygame.Rect(food_pos[0], food_pos[1], self.food_size, self.food_size)
+                enemy_rect = pygame.Rect(enemy_pos[0], enemy_pos[1], self.enemy_size, self.enemy_size)
 
-                if hitbox_rect.colliderect(food_rect):
+                if hitbox_rect.colliderect(enemy_rect):
                     self.sounds['bullets'].stop()
                     game_over()
 
                 # Falling
-                self.screen.blit(food_image, (food_pos[0], food_pos[1]))
-                food_pos[1] += self.food_speed
+                self.screen.blit(enemy_image, (enemy_pos[0], enemy_pos[1]))
+                enemy_pos[1] += self.enemy_speed
                 
             # Draw border
             border_rect = pygame.Rect(self.WIDTH//5, 0, self.WIDTH - 2 * (self.WIDTH//5), self.HEIGHT)
             pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
 
             show_score()
+            show_coins()
             show_info()
 
             pygame.display.update()
@@ -1232,6 +1424,8 @@ class RoomDesignerGame:
         # Only refresh main theme song if not switching from menu
         if not self.game_state == GameState.MENU:
             self.sounds['background'].play(loops=-1).set_volume(0.8)
+
+        pygame.mouse.set_visible(True)
         
         self.clear_sprites()
         self.init_game_world()
