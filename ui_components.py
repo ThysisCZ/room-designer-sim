@@ -3,6 +3,7 @@ from pathlib import Path
 
 from utils.sprite_sheet import SpriteSheet
 from game_logic import create_graphics
+import storage.inventory_abl as inventory_abl
 
 class Button:
     def __init__(self, x, y, width, height, text, font, color, text_color):
@@ -42,7 +43,8 @@ class Button:
         screen.blit(text_surface, text_rect)
 
 class InventoryUI:
-    def __init__(self, items, floors, walls, item_size, tabs, x=50, y=400, cols=8, rows=4):
+    def __init__(self, items, floors, walls, item_size, tabs, x, y, cols, rows,
+                 selected_item=None, selected_floor=None, selected_wall=None, selected_tab=0):
         self.items = items
         self.floors = floors
         self.walls = walls
@@ -53,10 +55,10 @@ class InventoryUI:
         self.x = x
         self.y = y
         self.page = 0
-        self.selected_item = None
-        self.selected_floor = None
-        self.selected_wall = None
-        self.selected_tab = 0
+        self.selected_item = selected_item
+        self.selected_floor = selected_floor
+        self.selected_wall = selected_wall
+        self.selected_tab = selected_tab
         self.rect = pygame.Rect(self.x, self.y, self.cols * self.item_size, self.rows * self.item_size)
 
         self.ITEM_TAB = 0
@@ -68,8 +70,8 @@ class InventoryUI:
         end = start + self.cols * self.rows
 
         # Prepare 8x4 grid
-        for col in range(8):
-            for row in range(4):
+        for col in range(self.cols):
+            for row in range(self.rows):
                 grid_x = col
                 grid_y = row
                 x = self.x + grid_x * self.item_size
@@ -144,22 +146,6 @@ class InventoryUI:
                     # Yellow border
                     if self.selected_item == item:
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
-
-                # Show info
-                info = [
-                    ("INFO:"),
-                    ("Click on the floor to start placing"),
-                    ("Use arrow keys to adjust position"),
-                    ("Click on the same icon again to deselect")
-                ]
-
-                big_font = pygame.font.SysFont(None, 24)
-                y_offset = y + self.item_size * 5.7
-
-                for row in info:
-                    info_text = big_font.render(f"{row}", True, (255, 255, 255))
-                    screen.blit(info_text, (x - self.item_size * 6.55, y_offset))
-                    y_offset += 20
                     
             # Draw floor icons
             elif self.selected_tab == self.FLOOR_TAB:
@@ -290,8 +276,10 @@ class InventoryUI:
         # Items
         if self.selected_tab == self.ITEM_TAB:
             return handle_grid_selection(
-                self.items,
-                lambda i: setattr(self, "selected_item", self.items[i] if self.selected_item != self.items[i] else None)
+                    self.items,
+                    lambda i: setattr(self, "selected_item",
+                    self.items[i] if self.selected_item != self.items[i] else None
+                )
             )
         # Floors
         elif self.selected_tab == self.FLOOR_TAB:
@@ -301,7 +289,7 @@ class InventoryUI:
             return handle_grid_selection(self.walls, lambda i: setattr(self, "selected_wall", self.walls[i]))
 
 class MinigameUI:
-    def __init__(self, thumbnail_size, x=50, y=400, cols=4, rows=2):
+    def __init__(self, thumbnail_size, x, y, cols, rows):
         self.thumbnail_size = thumbnail_size
         self.x = x
         self.y = y
@@ -317,8 +305,8 @@ class MinigameUI:
     
     def draw(self, screen):
         # Prepare 4x2 grid
-        for col in range(4):
-            for row in range(2):
+        for col in range(self.cols):
+            for row in range(self.rows):
                 grid_x = col
                 grid_y = row
                 x = self.x + grid_x * self.thumbnail_size
@@ -342,7 +330,7 @@ class MinigameUI:
             pygame.draw.rect(screen, (0, 0, 0), minigame_rect)
             pygame.draw.rect(screen, (255, 255, 255), minigame_rect, 1)
 
-            if idx == 0:
+            if minigame == 'Snake':
                 # Draw thumbnail
                 screen.blit(self.snake_thumbnail, (x + 1, y + 2))
 
@@ -350,7 +338,7 @@ class MinigameUI:
                 font = pygame.font.SysFont(None, 20)
                 label = font.render(minigame, True, (255, 255, 255))
                 screen.blit(label, (x + 44, y + 105))
-            elif idx == 1:
+            elif minigame == 'Catch the Fruit':
                 screen.blit(self.fruit_thumbnail, (x + 1, y + 2))
 
                 font = pygame.font.SysFont(None, 20)
@@ -378,6 +366,150 @@ class MinigameUI:
             if rect.collidepoint(mx, my):
                 self.selected_minigame = idx
                 return 'minigame'
+
+class ShopUI:
+    def __init__(self, assets, thumbnail_size, x, y, cols, rows, total_balance):
+        self.assets = assets
+        self.thumbnail_size = thumbnail_size
+        self.x = x
+        self.y = y
+        self.cols = cols
+        self.rows = rows
+        self.selected_asset = None
+        self.hovered_asset = None
+        self.rect = pygame.Rect(self.x, self.y, self.cols * self.thumbnail_size, self.rows * self.thumbnail_size)
+        self.total_balance = total_balance
+    
+    def draw(self, screen):
+        start = 0
+        end = start + self.cols * self.rows
+
+        # Prepare 2x4 grid
+        for col in range(self.cols):
+            for row in range(self.rows):
+                grid_x = col
+                grid_y = row
+                x = self.x + grid_x * self.thumbnail_size
+                y = self.y + grid_y * self.thumbnail_size
+
+                # Draw cells
+                cell_rect = pygame.Rect(x, y, self.thumbnail_size, self.thumbnail_size)
+                pygame.draw.rect(screen, (214, 162, 104), cell_rect)
+
+                # White border
+                pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
+        
+        # Draw asset icons
+        for idx, asset in enumerate(self.assets[start:end]):
+                grid_x = idx % self.cols
+                grid_y = idx // self.cols
+                x = self.x + grid_x * self.thumbnail_size
+                y = self.y + grid_y * self.thumbnail_size
+
+                # Determine the absolute path to this file
+                this_file = Path(__file__).resolve()
+                project_root = this_file.parents[0]
+                spritesheets_dir = project_root / "assets" / "spritesheets" / "assets"
+
+                # Load only the first tile of the spritesheet as an icon
+                icon_path = spritesheets_dir / asset["spritesheet"]
+                icon_sheet = SpriteSheet(str(icon_path))
+
+                # Calculate tile size (10x10 grid)
+                total_width = icon_sheet.sheet.get_width()
+                total_height = icon_sheet.sheet.get_height()
+                tile_w = total_width // 10
+                tile_h = total_height // 10
+
+                # Resize and center the icon
+                icon_resize = 1.5
+                icon_margin = self.thumbnail_size // 6
+
+                # Extract the first tile
+                icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h,
+                                             scale=self.thumbnail_size / tile_w / icon_resize)
+
+                #Draw square behind icon
+                cell_rect = pygame.Rect(x, y, self.thumbnail_size, self.thumbnail_size)
+                pygame.draw.rect(screen, (214, 162, 104), cell_rect)
+
+                # White border
+                pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
+
+                # Show icons
+                screen.blit(icon, (x + icon_margin, y + icon_margin))
+
+                # Yellow border
+                if self.selected_asset == asset:
+                    pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
+    
+    def handle_click(self, mouse_pos):
+        mx, my = mouse_pos
+
+        # Asset selection
+        def handle_grid_selection(grid_list, set_selected_callback):
+            for idx in range(self.cols * self.rows):
+                grid_x = idx % self.cols
+                grid_y = idx // self.cols
+                x = self.x + grid_x * self.thumbnail_size
+                y = self.y + grid_y * self.thumbnail_size
+
+                rect = pygame.Rect(x, y, self.thumbnail_size, self.thumbnail_size)
+                
+                if rect.collidepoint(mx, my):
+                    index = idx
+
+                    if index < len(grid_list):
+                        set_selected_callback(index)
+                        return grid_list[index]
+            return None
+        
+        return handle_grid_selection(
+                    self.assets,
+                    lambda i: setattr(self, "selected_asset",
+                    self.assets[i] if self.selected_asset != self.assets[i] else None
+                )
+            )
+    
+    def handle_hover(self, mouse_pos):
+        mx, my = mouse_pos
+        self.hovered_asset = None
+
+        for idx, asset in enumerate(self.assets):
+            grid_x = idx % self.cols
+            grid_y = idx // self.cols
+            x = self.x + grid_x * self.thumbnail_size
+            y = self.y + grid_y * self.thumbnail_size
+            rect = pygame.Rect(x, y, self.thumbnail_size, self.thumbnail_size)
+
+            if rect.collidepoint(mx, my):
+                self.hovered_asset = asset
+                return asset
+    
+    def attempt_purchase(self):
+        if self.selected_asset is None:
+            return False, "No asset selected."
+
+        asset = self.selected_asset
+        price = asset.get("price", 0)
+
+        if self.total_balance < price:
+            return False, "Not enough funds."
+
+        # Subtract price from balance
+        self.total_balance -= price
+
+        # Load full inventory from file
+        inventory = inventory_abl.load_inventory()
+
+        # Append asset to correct category
+        asset_type = asset.get("type")
+        if asset_type in inventory:
+            inventory[asset_type].append(asset)
+            inventory_abl.save_inventory(inventory)
+            return True, f"Purchased {asset['name']} for {price} gamecoins!"
+        else:
+            return False, "Unknown asset type."
 
 
 

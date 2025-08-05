@@ -7,7 +7,7 @@ class Object(pygame.sprite.Sprite):
 
     object represents anything that is controlled by the player
     """
-    def __init__(self, x, y, c, r, iso_utils):
+    def __init__(self, x, y, c, r, iso_utils, asset=None, obj_id=None):
         super().__init__()
         self.iso_utils = iso_utils
         self.grid_x = x
@@ -19,6 +19,8 @@ class Object(pygame.sprite.Sprite):
         self.animation_timer = 0
         self.flickering_timer = 0
         self.object_placed_position = None
+        self.asset = asset
+        self.obj_id = obj_id or (asset['id'] if asset else None)
 
         self.WALL_TILE = 1
         self.STATIC_OBJECT = 2
@@ -29,10 +31,10 @@ class Object(pygame.sprite.Sprite):
         # Flickering when moving the object
         if (self.flickering_timer // 3) % 2:
             # Lower opacity
-            self.image = self.iso_utils.create_object_sprite(self.col, self.row, 100)
+            self.image = self.iso_utils.create_object_sprite(self.col, self.row, 100, self.obj_id)
         else:
             # Normal color
-            self.image = self.iso_utils.create_object_sprite(self.col, self.row, 255)
+            self.image = self.iso_utils.create_object_sprite(self.col, self.row, 255, self.obj_id)
         
         self.rect = self.image.get_rect()
         self.update_position()

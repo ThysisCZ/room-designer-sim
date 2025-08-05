@@ -1,11 +1,13 @@
-import pygame, time, random
+import pygame, time, random, json, os
 
 from domain.entity.object import Object
-from ui_components import Button, InventoryUI, MinigameUI
+from ui_components import Button, InventoryUI, MinigameUI, ShopUI
 from domain.state.states import GameState
 from utils.isometric_utils import IsometricUtils
 from game_logic import (create_game_map, create_isometric_sprites, create_sounds, create_background, create_graphics)
-from storage.inventory_data import (inventory_items, inventory_floors, inventory_walls)
+import storage.inventory_abl as inventory_abl
+from storage.shop_data import shop_assets
+import storage.selection_abl as selection_abl
 
 class RoomDesignerGame:
     """
@@ -78,36 +80,71 @@ class RoomDesignerGame:
                                  "Inventory", self.font, (255, 255, 255), (255, 255, 255))
         self.minigame_button = Button(self.WIDTH - 220, self.HEIGHT - 640, 200, 50,
                                  "Minigames", self.font, (255, 255, 255), (255, 255, 255))
+        self.shop_button = Button(self.WIDTH - 220, self.HEIGHT - 580, 200, 50,
+                                 "Shop", self.font, (255, 255, 255), (255, 255, 255))
+        self.buy_button = Button(20, self.HEIGHT - 640, 200, 50,
+                                 "Buy", self.font, (255, 255, 255), (255, 255, 255))
+        
+        self.show_buy_button = False
         
         # No object at start
         self.object = None
+
+        self.total_balance = self.load_stats_data()
+        self.balance_offset = 0
         
         # Inventory
         self.show_inventory = False
-        tabs = ["Items", "Floors", "Walls"]
-        self.inventory_ui = InventoryUI(inventory_items,
-                                        inventory_floors, 
-                                        inventory_walls, 
-                                        item_size=64, 
-                                        tabs=tabs, 
-                                        x=390, 
-                                        y=250
-                                    )
+        inventory = inventory_abl.load_inventory()
 
-        selected_tab = self.inventory_ui.selected_tab
         self.selected_item_data = None
+        self.selected_tab = 0
+        
+        selected_assets = selection_abl.load_selected_assets()
+        self.selected_floor_data = selected_assets['floor']
+        self.selected_wall_data = selected_assets['wall']
+
+        self.inventory_ui = InventoryUI(inventory['item'],
+                                        inventory['floor'], 
+                                        inventory['wall'], 
+                                        item_size=64, 
+                                        tabs=["Items", "Floors", "Walls"], 
+                                        x=385, 
+                                        y=250,
+                                        cols=8,
+                                        rows=4,
+                                        selected_item=self.selected_item_data,
+                                        selected_floor=self.selected_floor_data,
+                                        selected_wall=self.selected_wall_data,
+                                        selected_tab=self.selected_tab
+                                    )
 
         # Minigames
         self.show_minigames = False
         self.minigame_ui = MinigameUI(thumbnail_size=128, 
-                                        x=390,
-                                        y=250
+                                        x=385,
+                                        y=250,
+                                        cols=4,
+                                        rows=2
                                     )
+        
+        # Shop
+        self.show_shop = False
+        self.shop_ui = ShopUI(shop_assets,
+                              thumbnail_size=128, 
+                              x=517,
+                              y=105,
+                              cols=2,
+                              rows=4,
+                              total_balance=self.total_balance
+                            )
+        
+        self.hovered_asset = None
 
         # Determine asset type based on selected tab
-        if selected_tab == self.FLOOR_TAB:
+        if self.selected_tab == self.FLOOR_TAB:
             self.sprites_collection = create_isometric_sprites(self.iso_utils, self.FLOOR_TAB)
-        elif selected_tab == self.WALL_TAB:
+        elif self.selected_tab == self.WALL_TAB:
             self.sprites_collection = create_isometric_sprites(self.iso_utils, self.WALL_TAB)
         else:
             # Default floor and wall
@@ -122,8 +159,11 @@ class RoomDesignerGame:
 
         self.inventory_border = self.ui_graphics_collection[0]
         self.minigames_border = self.ui_graphics_collection[1]
+        self.balance_border = self.ui_graphics_collection[22]
         
         self.sounds['background'].play(loops=-1).set_volume(0.8)
+        self.sounds['object_rotate'].set_volume(0.6)
+        self.sounds['ui_click'].set_volume(0.5)
     
     def init_game_world(self):
         """
@@ -140,6 +180,8 @@ class RoomDesignerGame:
         self.game_state = GameState.SNAKE
         self.sounds = create_sounds()
         self.sounds['minigame'].play(loops=-1).set_volume(0.4)
+        self.sounds['score'].set_volume(1)
+        self.sounds['coin'].set_volume(0.2)
 
         pygame.mouse.set_visible(False)
 
@@ -194,7 +236,7 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), True, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.WIDTH//3.25 + 455 - self.score_offset, self.HEIGHT//6 - 23)
+            score_rect.midtop = (self.WIDTH//3.25 + 455 - self.score_offset, self.HEIGHT//6 - 30)
             self.screen.blit(score_text, score_rect)
         
         def show_coins():
@@ -202,7 +244,7 @@ class RoomDesignerGame:
 
             coin_text = font.render('Gamecoins: ' + str(self.coins), True, 'white')
             coin_rect = coin_text.get_rect()
-            coin_rect.midtop = (self.WIDTH//3.25 + 70 + self.coins_offset, self.HEIGHT//6 - 23)
+            coin_rect.midtop = (self.WIDTH//3.25 + 70 + self.coins_offset, self.HEIGHT//6 - 30)
             self.screen.blit(coin_text, coin_rect)
 
         def game_over():
@@ -225,9 +267,13 @@ class RoomDesignerGame:
             score_rect.midtop = (self.WIDTH/2, self.HEIGHT/3)
             self.screen.blit(score_text, score_rect)
 
+            self.total_balance += self.coins
+            self.save_stats_data(self.total_balance)
+
             pygame.display.flip()
             time.sleep(2)
             self.restart_game()
+            self.sounds['ui_click'].set_volume(0.5)
 
         # Handle snake movements
         dir = 'RIGHT'
@@ -278,8 +324,16 @@ class RoomDesignerGame:
             food_rect = pygame.Rect(self.food_pos[0], self.food_pos[1], self.food_size, self.food_size)
             coin_rect = pygame.Rect(self.coin_pos[0], self.coin_pos[1], self.coin_size, self.coin_size)
 
+            # Prevent snake from growing
+            def stop_growth():
+                if self.growth_counter > 0:
+                    self.growth_counter -= 1 
+                else:
+                    self.snake_body.pop()
+
+            # Handle food and coin collisions
             if snake_rect.colliderect(food_rect):
-                self.sounds['score'].play().set_volume(1)
+                self.sounds['score'].play()
                 self.score += 10
                 self.food_eaten = True
                 self.growth_counter += 7
@@ -287,18 +341,16 @@ class RoomDesignerGame:
                 if self.score == 10 or self.score == 100 or self.score == 1000 or self.score == 10000:
                     self.score_offset += 6
             elif snake_rect.colliderect(coin_rect):
-                self.sounds['coin'].play().set_volume(0.2)
+                self.sounds['coin'].play()
                 self.coins += 1
                 self.coin_picked = True
 
                 if self.coins == 10 or self.coins == 100 or self.coins == 1000:
-                    self.coins_offset += 5
-            # If snake doesn't meet food or coin
+                    self.coins_offset += 6
+                
+                stop_growth()
             else:
-                if self.growth_counter > 0:
-                    self.growth_counter -= 1 
-                else:
-                    self.snake_body.pop()
+                stop_growth()
 
             self.coin_spawn_rate = random.randint(1, 12)
 
@@ -366,6 +418,8 @@ class RoomDesignerGame:
         self.game_state = GameState.CATCH_THE_FRUIT
         self.sounds = create_sounds()
         self.sounds['minigame'].play(loops=-1).set_volume(0.4)
+        self.sounds['score'].set_volume(1)
+        self.sounds['coin'].set_volume(0.2)
 
         pygame.mouse.set_visible(False)
 
@@ -425,7 +479,7 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), False, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.WIDTH - 7 * self.basket_size//4 - 8 + self.score_offset, self.border_offset)
+            score_rect.midtop = (self.WIDTH - 7 * self.basket_size//4 - 58 + self.score_offset, self.border_offset + 10)
             self.screen.blit(score_text, score_rect)
 
         def show_coins():
@@ -433,7 +487,7 @@ class RoomDesignerGame:
 
             coin_text = font.render('Gamecoins: ' + str(self.coin_count), False, 'white')
             coin_rect = coin_text.get_rect()
-            coin_rect.midtop = (self.WIDTH - 3 * self.basket_size//2 + self.coins_offset, 30)
+            coin_rect.midtop = (self.WIDTH - 3 * self.basket_size//2 - 50 + self.coins_offset, 40)
             self.screen.blit(coin_text, coin_rect)
         
         def show_info():
@@ -443,11 +497,11 @@ class RoomDesignerGame:
                 ]
 
             font = pygame.font.SysFont(None, 24)
-            y_offset = self.HEIGHT - 45
+            y_offset = self.HEIGHT - 55
 
             for row in info:
                 info_text = font.render(f"{row}", False, (255, 255, 255))
-                self.screen.blit(info_text, (15, y_offset))
+                self.screen.blit(info_text, (20, y_offset))
                 y_offset += 20
 
         # Game loop
@@ -491,7 +545,7 @@ class RoomDesignerGame:
             food_rect = pygame.Rect(self.food_pos[0], self.food_pos[1], self.food_size, self.food_size)
 
             if basket_rect.colliderect(food_rect):
-                self.sounds['score'].play().set_volume(1)
+                self.sounds['score'].play()
                 self.score += 10
             
             # Generate new fruit
@@ -538,7 +592,7 @@ class RoomDesignerGame:
                 food_rect = pygame.Rect(food_pos[0], food_pos[1], self.food_size, self.food_size)
 
                 if basket_rect.colliderect(food_rect):
-                    self.sounds['score'].play().set_volume(1)
+                    self.sounds['score'].play()
                     self.score += 10
                     self.foods.remove(food)
 
@@ -581,9 +635,13 @@ class RoomDesignerGame:
                     score_rect.midtop = (self.WIDTH/2, self.HEIGHT/3)
                     self.screen.blit(score_text, score_rect)
 
+                    self.total_balance += self.coin_count
+                    self.save_stats_data(self.total_balance)
+
                     pygame.display.flip()
                     time.sleep(2)
                     self.restart_game()
+                    self.sounds['ui_click'].set_volume(0.5)
             
             # Generate new coin
             def generate_coin():
@@ -612,7 +670,7 @@ class RoomDesignerGame:
                 coin_rect = pygame.Rect(coin_pos[0], coin_pos[1], self.coin_size, self.coin_size)
 
                 if basket_rect.colliderect(coin_rect):
-                    self.sounds['coin'].play().set_volume(0.2)
+                    self.sounds['coin'].play()
                     self.coin_count += 1
                     self.coins.remove(coin)
 
@@ -642,6 +700,9 @@ class RoomDesignerGame:
         self.game_state = GameState.BULLET_HELL
         self.sounds = create_sounds()
         self.sounds['minigame'].play(loops=-1).set_volume(0.4)
+        self.sounds['score'].set_volume(1)
+        self.sounds['bullets'].set_volume(0.3)
+        self.sounds['coin'].set_volume(0.2)
 
         pygame.mouse.set_visible(False)
 
@@ -702,10 +763,6 @@ class RoomDesignerGame:
 
         self.score = 0
 
-        self.sounds['score'].set_volume(1)
-        self.sounds['bullets'].set_volume(0.3)
-        self.sounds['coin'].set_volume(0.2)
-
         self.score = 0
         self.coin_count = 0
         self.score_offset = 0
@@ -723,7 +780,7 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), False, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.WIDTH - 7 * self.player_size//4 - 8 + self.score_offset, self.border_offset)
+            score_rect.midtop = (self.WIDTH - 7 * self.player_size//4 - 58 + self.score_offset, self.border_offset + 10)
             self.screen.blit(score_text, score_rect)
 
         def show_coins():
@@ -731,7 +788,7 @@ class RoomDesignerGame:
 
             coin_text = font.render('Gamecoins: ' + str(self.coin_count), False, 'white')
             coin_rect = coin_text.get_rect()
-            coin_rect.midtop = (self.WIDTH - 3 * self.player_size//2 + self.coins_offset, 30)
+            coin_rect.midtop = (self.WIDTH - 3 * self.player_size//2 - 50 + self.coins_offset, 40)
             self.screen.blit(coin_text, coin_rect)
         
         def show_info():
@@ -742,11 +799,11 @@ class RoomDesignerGame:
                 ]
 
             font = pygame.font.SysFont(None, 24)
-            y_offset = self.HEIGHT - 65
+            y_offset = self.HEIGHT - 70
 
             for row in info:
                 info_text = font.render(f"{row}", False, (255, 255, 255))
-                self.screen.blit(info_text, (15, y_offset))
+                self.screen.blit(info_text, (20, y_offset))
                 y_offset += 20
 
         # Game loop
@@ -968,9 +1025,13 @@ class RoomDesignerGame:
                 score_rect.midtop = (self.WIDTH/2, self.HEIGHT/3)
                 self.screen.blit(score_text, score_rect)
 
+                self.total_balance += self.coin_count
+                self.save_stats_data(self.total_balance)
+
                 pygame.display.flip()
                 time.sleep(2)
                 self.restart_game()
+                self.sounds['ui_click'].set_volume(0.5)
 
             player_bullets_to_remove = []
             enemies_to_remove = []
@@ -1062,6 +1123,10 @@ class RoomDesignerGame:
                 self.running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    selection_abl.save_selected_assets(
+                            self.selected_floor_data,
+                            self.selected_wall_data
+                        )
                     self.running = False
                 if self.game_state == GameState.PLAYING:
                     if event.key == pygame.K_RETURN:
@@ -1070,31 +1135,45 @@ class RoomDesignerGame:
                         if self.object:
                             self.object.rotate()
                             self.object.animate(True)  # Trigger animation for one frame
-                            self.sounds['object_rotate'].play().set_volume(0.6)
+                            self.sounds['object_rotate'].play()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.game_state == GameState.MENU:
                     if self.play_button.handle_event(event):
-                        self.sounds['ui_click'].play().set_volume(1.0)
+                        self.sounds['ui_click'].play()
                         self.restart_game()
                     elif self.quit_button.handle_event(event):
                         self.running = False
                 elif self.game_state == GameState.PLAYING:
                     if self.inventory_button.handle_event(event):
                         self.show_minigames = False
+                        self.show_shop = False
+                        self.show_buy_button = False
                         if self.show_inventory == True:
-                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.sounds['ui_click'].play()
                             self.show_inventory = False
                         else:
-                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.sounds['ui_click'].play()
                             self.show_inventory = True
                     elif self.minigame_button.handle_event(event):
                         self.show_inventory = False
+                        self.show_shop = False
+                        self.show_buy_button = False
                         if self.show_minigames == True:
-                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.sounds['ui_click'].play()
                             self.show_minigames = False
                         else:
-                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.sounds['ui_click'].play()
                             self.show_minigames = True
+                    elif self.shop_button.handle_event(event):
+                        self.show_inventory = False
+                        self.show_minigames = False
+                        if self.show_shop == True:
+                            self.sounds['ui_click'].play()
+                            self.show_shop = False
+                        else:
+                            self.sounds['ui_click'].play()
+                            self.show_shop = True
+                            self.show_buy_button = self.shop_ui.selected_asset is not None
                     elif self.show_inventory:
                         selected = self.inventory_ui.handle_click(pygame.mouse.get_pos())
 
@@ -1103,7 +1182,7 @@ class RoomDesignerGame:
                         
                         # Tab selection
                         if selected:
-                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.sounds['ui_click'].play()
                             selected_tab = self.inventory_ui.selected_tab
 
                             # Item selection
@@ -1129,19 +1208,23 @@ class RoomDesignerGame:
 
                             # Floor selection
                             elif selected_tab == self.FLOOR_TAB:
+                                self.selected_floor_data = self.inventory_ui.selected_floor
+
                                 self.sprites["floor"] = create_isometric_sprites(
                                     self.iso_utils, self.FLOOR_TAB, self.inventory_ui.selected_floor
                                 )[0]["floor"]
 
                             # Wall selection
                             else:
+                                self.selected_wall_data = self.inventory_ui.selected_wall
+
                                 self.sprites["wall"] = create_isometric_sprites(
                                     self.iso_utils, self.WALL_TAB, self.inventory_ui.selected_wall
                                 )[0]["wall"]
 
                         # Close inventory
                         elif not inner_click:
-                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.sounds['ui_click'].play()
                             self.show_inventory = False
                     
                     # Handle ghost object placement
@@ -1179,18 +1262,17 @@ class RoomDesignerGame:
                                             self.all_sprites.remove(self.object)
 
                                         # Create ghost object again
-                                        self.object = Object(x=x, y=y, c=0, r=0, iso_utils=self.iso_utils)
+                                        self.object = Object(x=x, y=y, c=0, r=0, iso_utils=self.iso_utils, asset=self.selected_item_data)
                                         self.objects.add(self.object)
                                         self.all_sprites.add(self.object) 
                     elif self.show_minigames:
                         selected = self.minigame_ui.handle_click(pygame.mouse.get_pos())
 
-                        # Prevent minigames selection from closing
                         inner_click = self.minigame_ui.rect.collidepoint(pygame.mouse.get_pos())
 
                         # Minigame selection
                         if selected:
-                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.sounds['ui_click'].play()
                             selected_minigame = self.minigame_ui.selected_minigame
 
                             # Stop previous background music
@@ -1204,8 +1286,33 @@ class RoomDesignerGame:
                                 self.init_bullet_hell()
 
                         if not inner_click:
-                            self.sounds['ui_click'].play().set_volume(1.0)
+                            self.sounds['ui_click'].play()
                             self.show_minigames = False
+                    elif self.show_shop:
+                        selected = self.shop_ui.handle_click(pygame.mouse.get_pos())
+
+                        if selected:
+                            self.sounds['ui_click'].play()
+
+                            # Show or hide buy button
+                            self.show_buy_button = self.shop_ui.selected_asset is not None
+                        
+                        inner_click = self.shop_ui.rect.collidepoint(pygame.mouse.get_pos())
+
+                        if not inner_click and not self.buy_button.handle_event(event):
+                            self.sounds['ui_click'].play()
+                            self.show_shop = False
+                            self.show_buy_button = False
+                        # Handle buy button click
+                        elif self.show_buy_button and self.buy_button.handle_event(event):
+                            self.sounds['ui_click'].play()
+
+                            success = self.shop_ui.attempt_purchase()
+
+                            if success:
+                                self.total_balance = self.shop_ui.total_balance
+                                self.reload_inventory()
+                                self.save_stats_data(self.total_balance)
             elif event.type == pygame.MOUSEMOTION:
                 if self.game_state == GameState.MENU:
                     self.play_button.handle_event(event)  # Handle hover effects
@@ -1213,6 +1320,11 @@ class RoomDesignerGame:
                 elif self.game_state == GameState.PLAYING:
                     self.inventory_button.handle_event(event)
                     self.minigame_button.handle_event(event)
+                    self.shop_button.handle_event(event)
+                    self.buy_button.handle_event(event)
+
+                    if self.show_shop:
+                        self.hovered_asset = self.shop_ui.handle_hover(pygame.mouse.get_pos())
     
     def update(self):
         if self.game_state == GameState.PLAYING:
@@ -1264,15 +1376,132 @@ class RoomDesignerGame:
             # Make sure the place is not occupied
             if self.game_map[current_y, current_x, 0] == self.EMPTY_SPACE:
                 # Create a static copy of the object at the current position
-                static_object = Object(current_x, current_y, current_c, current_r, self.iso_utils)
+                static_object = Object(current_x, current_y, current_c, current_r,
+                                       self.iso_utils, asset=self.selected_item_data
+                                    )
                 static_object.create_sprite()
                 self.all_sprites.add(static_object)
                 
-                self.sounds['object_place'].play().set_volume(1.0)
+                self.sounds['object_place'].play()
 
                 # Mark the position in the game map as occupied
                 self.game_map[current_y, current_x, 0] = self.STATIC_OBJECT
                 self.object.set_object_placed_position(current_x, current_y)
+                    
+                self.save_placed_object(
+                    self.object.asset['id'],
+                    current_x,
+                    current_y,
+                    current_c,
+                    current_r
+                )
+    
+    def reload_inventory(self):
+        inventory = inventory_abl.load_inventory()
+        self.inventory_ui = InventoryUI(
+            inventory["item"],
+            inventory["floor"],
+            inventory["wall"],
+            item_size=64, 
+            tabs=["Items", "Floors", "Walls"], 
+            x=385, 
+            y=250,
+            cols=8,
+            rows=4,
+            selected_item=self.selected_item_data,
+            selected_floor=self.selected_floor_data,
+            selected_wall=self.selected_wall_data,
+            selected_tab=self.selected_tab
+        )
+
+        # Restore current floor/wall sprites
+        if self.selected_floor_data:
+            self.sprites["floor"] = create_isometric_sprites(
+                self.iso_utils, self.FLOOR_TAB, self.selected_floor_data
+            )[0]["floor"]
+
+        if self.selected_wall_data:
+            self.sprites["wall"] = create_isometric_sprites(
+                self.iso_utils, self.WALL_TAB, self.selected_wall_data
+            )[0]["wall"]
+    
+    def load_stats_data(self):
+            file_path = os.path.join('storage', 'stats_data.json')
+
+            try:
+                with open(file_path, 'r') as f:
+                    data = json.load(f)
+                    return data.get('total_balance', 0)
+            except FileNotFoundError:
+                return 0
+    
+    def save_stats_data(self, balance):
+        file_path = os.path.join('storage', 'stats_data.json')
+
+        with open(file_path, 'w') as f:
+            json.dump({"total_balance": balance}, f)
+    
+    def save_placed_object(self, obj_id, grid_x, grid_y, col, row):
+        file_path = os.path.join('storage', 'tile_data.json')
+
+        # Load existing placed objects
+        try:
+            with open(file_path, 'r') as f:
+                placed_objects = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            placed_objects = []
+
+        data = {
+            "grid_x": grid_x,
+            "grid_y": grid_y,
+            "col": col,
+            "row": row,
+            "id": obj_id
+        }
+
+        # Add the new object
+        placed_objects.append(data)
+
+        # Save back to file
+        with open(file_path, 'w') as f:
+            json.dump(placed_objects, f, indent=4)
+    
+    def load_placed_objects(self):
+        file_path = os.path.join("storage", "tile_data.json")
+
+        try:
+            with open(file_path, 'r') as f:
+                placed_objects = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            placed_objects = []
+
+        for obj in placed_objects:
+            grid_x = obj["grid_x"]
+            grid_y = obj["grid_y"]
+            col = obj["col"]
+            row = obj["row"]
+            obj_id = obj["id"]
+
+            # Update map
+            self.game_map[grid_y, grid_x, 0] = self.STATIC_OBJECT
+
+            # Recreate the static object
+            static_object = Object(grid_x, grid_y, col, row, self.iso_utils, obj_id=obj_id,
+                                        asset=self.selected_item_data
+                                    )
+            static_object.create_sprite()
+            self.all_sprites.add(static_object)
+
+    def apply_selected_assets(self):
+        if self.selected_floor_data:
+            self.sprites["floor"] = create_isometric_sprites(
+                self.iso_utils, self.FLOOR_TAB, self.selected_floor_data
+            )[0]["floor"]
+
+        if self.selected_wall_data:
+            self.sprites["wall"] = create_isometric_sprites(
+                self.iso_utils, self.WALL_TAB, self.selected_wall_data
+            )[0]["wall"]
     
     def draw(self):
         """Function drawing screen content according to the state of the game"""
@@ -1284,8 +1513,45 @@ class RoomDesignerGame:
             self.draw_game()
             if self.show_inventory:
                 self.inventory_ui.draw(self.screen)
-            if self.show_minigames:
+            elif self.show_minigames:
                 self.minigame_ui.draw(self.screen)
+            elif self.show_shop:
+                self.shop_ui.draw(self.screen)
+
+                # Asset hover
+                if self.hovered_asset:
+                    mx, my = pygame.mouse.get_pos()
+                    font = pygame.font.SysFont(None, 24)
+                    
+                    name = font.render(self.hovered_asset['name'], True, (255, 255, 0))  
+                    name_rect = name.get_rect()
+                    name_rect.topleft = (mx + 20, my - 10)
+
+                    description = font.render(self.hovered_asset['description'], True, (255, 255, 255))  
+                    description_rect = description.get_rect()
+                    description_rect.topleft = (mx + 20, my - 10 + name_rect.height)
+
+                    price = font.render(str(self.hovered_asset['price']), True, (0, 255, 88))  
+                    price_rect = price.get_rect()
+                    price_rect.topleft = (mx + 20, my - 10 + name_rect.height + description_rect.height)
+
+                    currency = font.render(" GMC", True, (0, 255, 88))  
+                    currency_rect = currency.get_rect()
+                    currency_rect.topleft = (mx + 20 + price_rect.width, my - 10 + name_rect.height + description_rect.height)
+
+                    # Draw background behind text
+                    bg_rect = pygame.Rect(name_rect.x - 6, name_rect.y - 6, description_rect.width + 12,
+                                          name_rect.height + description_rect.height + price_rect.height + 10)
+                    bg_rect_center = pygame.Rect(name_rect.x - 6, name_rect.y - 6, description_rect.width + 12,
+                                          name_rect.height + description_rect.height)
+                    pygame.draw.rect(self.screen, (255, 70, 0), bg_rect, 29, 5)
+                    pygame.draw.rect(self.screen, (255, 70, 0), bg_rect_center, 15, 5)
+                    pygame.draw.rect(self.screen, (255, 120, 0), bg_rect, 3, 5)
+
+                    self.screen.blit(name, name_rect)
+                    self.screen.blit(description, description_rect)
+                    self.screen.blit(price, price_rect)
+                    self.screen.blit(currency, currency_rect)
 
         pygame.display.flip()
 
@@ -1351,6 +1617,29 @@ class RoomDesignerGame:
         
         self.inventory_button.draw(self.screen)
         self.minigame_button.draw(self.screen)
+        self.shop_button.draw(self.screen)
+
+        if self.show_buy_button == True:
+            self.buy_button.draw(self.screen)
+
+        self.screen.blit(self.balance_border, (20, 20))
+
+        font = pygame.font.SysFont(None, 30)
+
+        balance_text = font.render(str(self.total_balance), True, 'white')
+        balance_rect = balance_text.get_rect()
+
+        if self.total_balance >= 10 and self.total_balance < 100:
+            self.balance_offset = 6
+        elif self.total_balance >= 100 and self.total_balance < 1000:
+            self.balance_offset = 12
+        elif self.total_balance >= 1000 and self.total_balance < 10000:
+            self.balance_offset = 18
+        elif self.total_balance >= 10000:
+            self.balance_offset = 24
+
+        balance_rect.midtop = (70 + self.balance_offset, 31)
+        self.screen.blit(balance_text, balance_rect)
         
         render_list = []
         
@@ -1408,9 +1697,28 @@ class RoomDesignerGame:
                 self.screen.blit(self.sprites[sprite_type], rect)
         
         if self.show_inventory:
-            self.screen.blit(self.inventory_border, (376, 172))
+            self.screen.blit(self.inventory_border, (371, 172))
+            
+            selected_tab = self.inventory_ui.selected_tab
+            
+            # Show info
+            if selected_tab == self.ITEM_TAB:
+                info = [
+                    ("INFO:"),
+                    ("Click on the floor to start placing"),
+                    ("Use arrow keys to adjust position"),
+                    ("Click on the same icon again to deselect")
+                ]
+
+                font = pygame.font.SysFont(None, 24)
+                y_offset = self.HEIGHT - 95
+
+                for row in info:
+                    info_text = font.render(f"{row}", True, (255, 255, 255))
+                    self.screen.blit(info_text, (20, y_offset))
+                    y_offset += 20
         elif self.show_minigames:
-            self.screen.blit(self.minigames_border, (376, 172))
+            self.screen.blit(self.minigames_border, (371, 172))
     
     def clear_sprites(self):
         """Deletes all sprite groups"""
@@ -1429,6 +1737,8 @@ class RoomDesignerGame:
         
         self.clear_sprites()
         self.init_game_world()
+        self.load_placed_objects()
+        self.apply_selected_assets()
         self.game_state = GameState.PLAYING
 
     def run(self):

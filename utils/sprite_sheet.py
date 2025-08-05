@@ -13,7 +13,7 @@ class SpriteSheet:
             self.sheet = pygame.Surface((32, 32))
             self.sheet.fill((255, 0, 255))  # Magenta as error
     
-    def get_sprite(self, x, y, width, height, scale=1):
+    def get_sprite(self, x, y, width, height, scale):
         """Extracts a sprite from sheet at a given position"""
         sprite = pygame.Surface((width, height), pygame.SRCALPHA)
         sprite.blit(self.sheet, (0, 0), (x, y, width, height))

@@ -121,11 +121,14 @@ def create_graphics():
 
     game_coin = pygame.image.load("assets/graphics/game_coin.png")
 
+    total_balance = pygame.image.load("assets/graphics/total_balance.png")
+    total_balance = pygame.transform.scale(total_balance, (152, 40))
+
         
     return [inventory, minigames, apple, snake_thumbnail, basket,
             orange, banana, dragon_fruit, avocado, fruit_thumbnail,
             ship, red_ship, orange_ship, yellow_ship, purple_ship,
             green_ship, dark_blue_bullet, light_blue_bullet,
             dark_red_bullet, light_red_bullet, bullet_thumbnail,
-            game_coin
+            game_coin, total_balance
         ]

@@ -14,6 +14,7 @@ class IsometricUtils:
 
         self.ITEM_TAB = 0
         self.FLOOR_TAB = 1
+        self.WALL_TAB = 2
         
         # Sprite groups
         self.all_sprites = pygame.sprite.Group()
@@ -139,31 +140,47 @@ class IsometricUtils:
         
         return surface
     
-    def create_object_sprite(self, c=0, r=0, alpha=255):
-        """Create object sprite from sprite sheet"""
-        if self.sprites_loaded and hasattr(self, 'object_sheet'):
-            # Calculate sprite dimensions based on spritesheet dimensions (10x10 grid)
-            total_width = self.object_sheet.sheet.get_width()
-            total_height = self.object_sheet.sheet.get_height()
-            sprite_width = total_width // 10
-            sprite_height = total_height // 10
-                
-            # Get sprite from position (col, row)
-            col, row = c, r
+    def _load_object_spritesheet_by_id(self, object_id):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(current_dir)
 
-            # Use the SpriteSheet's get_sprite method with scale=4
-            sprite = self.object_sheet.get_sprite(
-                col * sprite_width,
-                row * sprite_height,
-                sprite_width,
-                sprite_height,
-                scale=4
-            )
-                
-            # Set sprite opacity
-            sprite.set_alpha(alpha)
-                
-            return sprite
+        spritesheets_dir = os.path.join(project_root, "assets/", "spritesheets/", "items")
+        spritesheets_path = os.path.join(spritesheets_dir, f"{object_id}.png")
+
+        if os.path.exists(spritesheets_path):
+            self.object_sheet = SpriteSheet(spritesheets_path)
+            self.sprites_loaded = True
+    
+    def create_object_sprite(self, c=0, r=0, alpha=255, object_id=None):
+        """Create object sprite from sprite sheet"""
+        col, row = c, r
+
+        # Load sprite sheet if not already loaded
+        if not self.sprites_loaded and object_id:
+            self._load_object_spritesheet_by_id(object_id)
+
+        if not hasattr(self, 'object_sheet'):
+            raise RuntimeError("Object spritesheet not loaded or missing.")
+
+        # Calculate sprite dimensions (assuming 10x10 grid)
+        total_width = self.object_sheet.sheet.get_width()
+        total_height = self.object_sheet.sheet.get_height()
+        sprite_width = total_width // 10
+        sprite_height = total_height // 10
+
+        # Get sprite from position (col, row)
+        sprite = self.object_sheet.get_sprite(
+            col * sprite_width,
+            row * sprite_height,
+            sprite_width,
+            sprite_height,
+            scale=4
+        )
+
+        # Set opacity
+        sprite.set_alpha(alpha)
+
+        return sprite
     
     def get_render_order(self, entities):
         """Sort entities by their render order (back to front)"""
