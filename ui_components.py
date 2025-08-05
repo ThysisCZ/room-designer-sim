@@ -146,6 +146,13 @@ class InventoryUI:
                     # Yellow border
                     if self.selected_item == item:
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
+
+                    # Show count
+                    font = pygame.font.SysFont(None, 36)
+                    label = font.render(str(item['count']), True, (255, 255, 255))
+                    
+                    if item['count'] != 1:
+                        screen.blit(label, (x + self.item_size - 13, y + self.item_size - 20))
                     
             # Draw floor icons
             elif self.selected_tab == self.FLOOR_TAB:
@@ -487,29 +494,41 @@ class ShopUI:
                 return asset
     
     def attempt_purchase(self):
-        if self.selected_asset is None:
-            return False, "No asset selected."
-
         asset = self.selected_asset
         price = asset.get("price", 0)
 
         if self.total_balance < price:
-            return False, "Not enough funds."
+            return False
 
-        # Subtract price from balance
         self.total_balance -= price
 
-        # Load full inventory from file
         inventory = inventory_abl.load_inventory()
-
-        # Append asset to correct category
         asset_type = asset.get("type")
-        if asset_type in inventory:
+
+        # Disallow re-buying floors/walls
+        if asset_type in ['floor', 'wall']:
+            for existing in inventory[asset_type]:
+                if existing.get("id") == asset.get("id"):
+                    self.total_balance += price
+                    return False
             inventory[asset_type].append(asset)
-            inventory_abl.save_inventory(inventory)
-            return True, f"Purchased {asset['name']} for {price} gamecoins!"
-        else:
-            return False, "Unknown asset type."
+
+        elif asset_type == "item":
+            found = False
+            for existing in inventory["item"]:
+                if existing.get("id") == asset.get("id"):
+                    existing["count"] = existing.get("count", 1) + 1
+                    found = True
+                    break
+
+            if not found:
+                # Copy asset and add count field
+                asset_copy = asset.copy()
+                asset_copy["count"] = 1
+                inventory["item"].append(asset_copy)
+
+        inventory_abl.save_inventory(inventory)
+        return True
 
 
 

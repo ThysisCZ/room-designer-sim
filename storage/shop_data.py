@@ -5,7 +5,8 @@ shop_assets = [
         "spritesheet": "minimalist_table.png",
         "type": "item",
         "description": "Simple and cheap table that is good enough for visitors.",
-        "price": 150
+        "price": 150,
+        "count": 0
     },
     {
         "id": "minimalist_floor",
