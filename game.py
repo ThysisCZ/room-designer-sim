@@ -84,14 +84,16 @@ class RoomDesignerGame:
                                  "Shop", self.font, (255, 255, 255), (255, 255, 255))
         self.buy_button = Button(20, self.HEIGHT - 640, 200, 50,
                                  "Buy", self.font, (255, 255, 255), (255, 255, 255))
+        self.sell_button = Button(20, self.HEIGHT - 640, 200, 50,
+                                 "Sell", self.font, (255, 255, 255), (255, 255, 255))
         
         self.show_buy_button = False
+        self.show_sell_button = False
         
         # No object at start
         self.object = None
 
         self.total_balance = self.load_stats_data()
-        self.balance_offset = 0
         
         # Inventory
         self.show_inventory = False
@@ -116,7 +118,8 @@ class RoomDesignerGame:
                                         selected_item=self.selected_item_data,
                                         selected_floor=self.selected_floor_data,
                                         selected_wall=self.selected_wall_data,
-                                        selected_tab=self.selected_tab
+                                        selected_tab=self.selected_tab,
+                                        total_balance=self.total_balance
                                     )
 
         # Minigames
@@ -225,8 +228,6 @@ class RoomDesignerGame:
 
         self.score = 0
         self.coins = 0
-        self.score_offset = 0
-        self.coins_offset = 0
 
         self.growth_counter = 0
         self.block_counter = 0
@@ -236,7 +237,7 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), True, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.WIDTH//3.25 + 455 - self.score_offset, self.HEIGHT//6 - 30)
+            score_rect.bottomright = (self.WIDTH - self.WIDTH//3.25, self.HEIGHT//6 - 10)
             self.screen.blit(score_text, score_rect)
         
         def show_coins():
@@ -244,7 +245,7 @@ class RoomDesignerGame:
 
             coin_text = font.render('Gamecoins: ' + str(self.coins), True, 'white')
             coin_rect = coin_text.get_rect()
-            coin_rect.midtop = (self.WIDTH//3.25 + 70 + self.coins_offset, self.HEIGHT//6 - 30)
+            coin_rect.bottomleft = (self.WIDTH//3.25, self.HEIGHT//6 - 10)
             self.screen.blit(coin_text, coin_rect)
 
         def game_over():
@@ -266,6 +267,9 @@ class RoomDesignerGame:
             score_rect = score_text.get_rect()
             score_rect.midtop = (self.WIDTH/2, self.HEIGHT/3)
             self.screen.blit(score_text, score_rect)
+
+            show_score()
+            show_coins()
 
             self.total_balance += self.coins
             self.save_stats_data(self.total_balance)
@@ -337,16 +341,10 @@ class RoomDesignerGame:
                 self.score += 10
                 self.food_eaten = True
                 self.growth_counter += 7
-
-                if self.score == 10 or self.score == 100 or self.score == 1000 or self.score == 10000:
-                    self.score_offset += 6
             elif snake_rect.colliderect(coin_rect):
                 self.sounds['coin'].play()
                 self.coins += 1
                 self.coin_picked = True
-
-                if self.coins == 10 or self.coins == 100 or self.coins == 1000:
-                    self.coins_offset += 6
                 
                 stop_growth()
             else:
@@ -464,8 +462,6 @@ class RoomDesignerGame:
 
         self.score = 0
         self.coin_count = 0
-        self.score_offset = 0
-        self.coins_offset = 0
         self.timer = 0
 
         background_rect = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
@@ -479,7 +475,7 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), False, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.WIDTH - 7 * self.basket_size//4 - 58 + self.score_offset, self.border_offset + 10)
+            score_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 40)
             self.screen.blit(score_text, score_rect)
 
         def show_coins():
@@ -487,7 +483,7 @@ class RoomDesignerGame:
 
             coin_text = font.render('Gamecoins: ' + str(self.coin_count), False, 'white')
             coin_rect = coin_text.get_rect()
-            coin_rect.midtop = (self.WIDTH - 3 * self.basket_size//2 - 50 + self.coins_offset, 40)
+            coin_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 60)
             self.screen.blit(coin_text, coin_rect)
         
         def show_info():
@@ -596,9 +592,6 @@ class RoomDesignerGame:
                     self.score += 10
                     self.foods.remove(food)
 
-                    if self.score == 10 or self.score == 100 or self.score == 1000 or self.score == 10000:
-                        self.score_offset += 6
-
                 if food_pos[1] > self.HEIGHT:
                     self.foods.remove(food)
 
@@ -673,9 +666,6 @@ class RoomDesignerGame:
                     self.sounds['coin'].play()
                     self.coin_count += 1
                     self.coins.remove(coin)
-
-                    if self.coin_count == 10 or self.coin_count == 100 or self.coin_count == 1000:
-                        self.coins_offset += 6
 
                 if coin_pos[1] > self.HEIGHT:
                     self.coins.remove(coin)
@@ -765,8 +755,6 @@ class RoomDesignerGame:
 
         self.score = 0
         self.coin_count = 0
-        self.score_offset = 0
-        self.coins_offset = 0
         self.timer = 0
 
         background_rect = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
@@ -780,7 +768,7 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), False, 'white')
             score_rect = score_text.get_rect()
-            score_rect.midtop = (self.WIDTH - 7 * self.player_size//4 - 58 + self.score_offset, self.border_offset + 10)
+            score_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 40)
             self.screen.blit(score_text, score_rect)
 
         def show_coins():
@@ -788,7 +776,7 @@ class RoomDesignerGame:
 
             coin_text = font.render('Gamecoins: ' + str(self.coin_count), False, 'white')
             coin_rect = coin_text.get_rect()
-            coin_rect.midtop = (self.WIDTH - 3 * self.player_size//2 - 50 + self.coins_offset, 40)
+            coin_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 60)
             self.screen.blit(coin_text, coin_rect)
         
         def show_info():
@@ -992,9 +980,6 @@ class RoomDesignerGame:
                     self.coin_count += 1
                     self.coins.remove(coin)
 
-                    if self.coin_count == 10 or self.coin_count == 100 or self.coin_count == 1000:
-                        self.coins_offset += 6
-
                 if coin_pos[1] > self.HEIGHT:
                     self.coins.remove(coin)
 
@@ -1052,9 +1037,6 @@ class RoomDesignerGame:
                             self.score += 10
                             player_bullets_to_remove.append(bullet)
                             enemies_to_remove.append(enemy)
-                            
-                            if self.score == 10 or self.score == 100 or self.score == 1000 or self.score == 10000:
-                                self.score_offset += 6
                             break  # One bullet hits one enemy only
                 
                 # Clean up unused player bullets
@@ -1148,26 +1130,51 @@ class RoomDesignerGame:
                         self.show_minigames = False
                         self.show_shop = False
                         self.show_buy_button = False
-                        if self.show_inventory == True:
+
+                        if self.show_inventory:
                             self.sounds['ui_click'].play()
                             self.show_inventory = False
                         else:
                             self.sounds['ui_click'].play()
                             self.show_inventory = True
+
+                            selected_tab = self.inventory_ui.selected_tab
+                            
+                            # Handle sell button display
+                            if selected_tab == self.ITEM_TAB:
+                                self.show_sell_button = self.inventory_ui.selected_item is not None
+                            elif selected_tab == self.FLOOR_TAB:
+                                self.show_sell_button = self.inventory_ui.selected_floor is not None
+                            else:
+                                self.show_sell_button = self.inventory_ui.selected_wall is not None
                     elif self.minigame_button.handle_event(event):
                         self.show_inventory = False
                         self.show_shop = False
                         self.show_buy_button = False
-                        if self.show_minigames == True:
+                        self.show_sell_button = False
+                        
+                        if self.show_minigames:
                             self.sounds['ui_click'].play()
                             self.show_minigames = False
                         else:
                             self.sounds['ui_click'].play()
                             self.show_minigames = True
                     elif self.shop_button.handle_event(event):
+                        # Cancel inventory selection to enable shop selection
+                        self.inventory_ui.selected_item = None
+                        self.selected_item_data = None
+                        
+                        # Remove ghost object
+                        if self.object:
+                            self.objects.remove(self.object)
+                            self.all_sprites.remove(self.object)
+                            self.object = None
+
                         self.show_inventory = False
                         self.show_minigames = False
-                        if self.show_shop == True:
+                        self.show_sell_button = False
+
+                        if self.show_shop:
                             self.sounds['ui_click'].play()
                             self.show_shop = False
                         else:
@@ -1206,6 +1213,8 @@ class RoomDesignerGame:
                                             self.all_sprites.remove(self.object)
                                             self.object = None
 
+                                self.show_sell_button = self.inventory_ui.selected_item is not None
+
                             # Floor selection
                             elif selected_tab == self.FLOOR_TAB:
                                 self.selected_floor_data = self.inventory_ui.selected_floor
@@ -1213,6 +1222,8 @@ class RoomDesignerGame:
                                 self.sprites["floor"] = create_isometric_sprites(
                                     self.iso_utils, self.FLOOR_TAB, self.inventory_ui.selected_floor
                                 )[0]["floor"]
+
+                                self.show_sell_button = self.inventory_ui.selected_floor is not None
 
                             # Wall selection
                             else:
@@ -1222,10 +1233,73 @@ class RoomDesignerGame:
                                     self.iso_utils, self.WALL_TAB, self.inventory_ui.selected_wall
                                 )[0]["wall"]
 
+                                self.show_sell_button = self.inventory_ui.selected_wall is not None
+
                         # Close inventory
-                        elif not inner_click:
+                        elif not inner_click and not self.sell_button.handle_event(event):
                             self.sounds['ui_click'].play()
                             self.show_inventory = False
+                            self.show_sell_button = False
+                        # Handle sell button click
+                        elif self.show_sell_button and self.sell_button.handle_event(event):
+                            selected_tab = self.inventory_ui.selected_tab
+
+                            if selected_tab == self.ITEM_TAB:
+                                self.sounds['ui_click'].play()
+
+                                success = self.inventory_ui.attempt_item_sale()
+
+                                if success:
+                                    self.total_balance = self.inventory_ui.total_balance
+                                    
+                                    if not self.inventory_ui.selected_item:
+                                        self.selected_item_data = None
+
+                                        # Remove ghost object
+                                        if self.object:
+                                            self.objects.remove(self.object)
+                                            self.all_sprites.remove(self.object)
+                                            self.object = None
+
+                                    self.reload_inventory()
+                                    self.save_stats_data(self.total_balance)
+                            
+                            elif selected_tab == self.FLOOR_TAB:
+                                self.sounds['ui_click'].play()
+
+                                success = self.inventory_ui.attempt_floor_sale()
+
+                                if success:
+                                    self.total_balance = self.inventory_ui.total_balance
+
+                                    if not self.inventory_ui.selected_floor:
+                                        self.selected_floor_data = self.inventory_ui.floors[0]
+
+                                        self.sprites['floor'] = create_isometric_sprites(
+                                            self.iso_utils, self.FLOOR_TAB, self.selected_floor_data
+                                        )[0]['floor']
+
+                                    self.reload_inventory()
+                                    self.save_stats_data(self.total_balance)
+                                    self.inventory_ui.selected_tab = self.FLOOR_TAB
+                            else:
+                                self.sounds['ui_click'].play()
+
+                                success = self.inventory_ui.attempt_wall_sale()
+
+                                if success:
+                                    self.total_balance = self.inventory_ui.total_balance
+
+                                    if not self.inventory_ui.selected_wall:
+                                        self.selected_wall_data = self.inventory_ui.walls[0]
+
+                                        self.sprites['wall'] = create_isometric_sprites(
+                                            self.iso_utils, self.WALL_TAB, self.selected_wall_data
+                                        )[0]['wall']
+
+                                    self.reload_inventory()
+                                    self.save_stats_data(self.total_balance)
+                                    self.inventory_ui.selected_tab = self.WALL_TAB
                     
                     # Handle ghost object placement
                     elif self.selected_item_data and self.object is None and not self.show_minigames:
@@ -1322,6 +1396,7 @@ class RoomDesignerGame:
                     self.minigame_button.handle_event(event)
                     self.shop_button.handle_event(event)
                     self.buy_button.handle_event(event)
+                    self.sell_button.handle_event(event)
 
                     if self.show_shop:
                         self.hovered_asset = self.shop_ui.handle_hover(pygame.mouse.get_pos())
@@ -1395,13 +1470,38 @@ class RoomDesignerGame:
                     current_c,
                     current_r
                 )
+
+                # Load inventory and subtract count
+                inventory = inventory_abl.load_inventory()
+
+                for existing in inventory['item']:
+                    if existing.get('id') == static_object.obj_id:
+                        if existing['count'] > 1:
+                            existing['count'] = existing.get('count', 1) - 1
+                            break
+                        # Remove item from inventory
+                        elif existing['count'] == 1:
+                            inventory['item'].remove(existing)
+                            
+                            # Cancel inventory selection
+                            self.inventory_ui.selected_item = None
+                            self.selected_item_data = None
+                        
+                            # Remove ghost object
+                            if self.object:
+                                self.objects.remove(self.object)
+                                self.all_sprites.remove(self.object)
+                                self.object = None
+
+                inventory_abl.save_inventory(inventory)
+                self.reload_inventory()
     
     def reload_inventory(self):
         inventory = inventory_abl.load_inventory()
         self.inventory_ui = InventoryUI(
-            inventory["item"],
-            inventory["floor"],
-            inventory["wall"],
+            inventory['item'],
+            inventory['floor'],
+            inventory['wall'],
             item_size=64, 
             tabs=["Items", "Floors", "Walls"], 
             x=385, 
@@ -1411,19 +1511,20 @@ class RoomDesignerGame:
             selected_item=self.selected_item_data,
             selected_floor=self.selected_floor_data,
             selected_wall=self.selected_wall_data,
-            selected_tab=self.selected_tab
+            selected_tab=self.selected_tab,
+            total_balance=self.total_balance
         )
 
         # Restore current floor/wall sprites
         if self.selected_floor_data:
-            self.sprites["floor"] = create_isometric_sprites(
+            self.sprites['floor'] = create_isometric_sprites(
                 self.iso_utils, self.FLOOR_TAB, self.selected_floor_data
-            )[0]["floor"]
+            )[0]['floor']
 
         if self.selected_wall_data:
-            self.sprites["wall"] = create_isometric_sprites(
+            self.sprites['wall'] = create_isometric_sprites(
                 self.iso_utils, self.WALL_TAB, self.selected_wall_data
-            )[0]["wall"]
+            )[0]['wall']
     
     def load_stats_data(self):
             file_path = os.path.join('storage', 'stats_data.json')
@@ -1467,7 +1568,7 @@ class RoomDesignerGame:
             json.dump(placed_objects, f, indent=4)
     
     def load_placed_objects(self):
-        file_path = os.path.join("storage", "tile_data.json")
+        file_path = os.path.join('storage', 'tile_data.json')
 
         try:
             with open(file_path, 'r') as f:
@@ -1494,14 +1595,14 @@ class RoomDesignerGame:
 
     def apply_selected_assets(self):
         if self.selected_floor_data:
-            self.sprites["floor"] = create_isometric_sprites(
+            self.sprites['floor'] = create_isometric_sprites(
                 self.iso_utils, self.FLOOR_TAB, self.selected_floor_data
-            )[0]["floor"]
+            )[0]['floor']
 
         if self.selected_wall_data:
-            self.sprites["wall"] = create_isometric_sprites(
+            self.sprites['wall'] = create_isometric_sprites(
                 self.iso_utils, self.WALL_TAB, self.selected_wall_data
-            )[0]["wall"]
+            )[0]['wall']
     
     def draw(self):
         """Function drawing screen content according to the state of the game"""
@@ -1621,6 +1722,8 @@ class RoomDesignerGame:
 
         if self.show_buy_button == True:
             self.buy_button.draw(self.screen)
+        elif self.show_sell_button == True:
+            self.sell_button.draw(self.screen)
 
         self.screen.blit(self.balance_border, (20, 20))
 
@@ -1628,17 +1731,7 @@ class RoomDesignerGame:
 
         balance_text = font.render(str(self.total_balance), True, 'white')
         balance_rect = balance_text.get_rect()
-
-        if self.total_balance >= 10 and self.total_balance < 100:
-            self.balance_offset = 6
-        elif self.total_balance >= 100 and self.total_balance < 1000:
-            self.balance_offset = 12
-        elif self.total_balance >= 1000 and self.total_balance < 10000:
-            self.balance_offset = 18
-        elif self.total_balance >= 10000:
-            self.balance_offset = 24
-
-        balance_rect.midtop = (70 + self.balance_offset, 31)
+        balance_rect.bottomleft = (65, 51)
         self.screen.blit(balance_text, balance_rect)
         
         render_list = []

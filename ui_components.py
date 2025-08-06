@@ -43,7 +43,7 @@ class Button:
         screen.blit(text_surface, text_rect)
 
 class InventoryUI:
-    def __init__(self, items, floors, walls, item_size, tabs, x, y, cols, rows,
+    def __init__(self, items, floors, walls, item_size, tabs, x, y, cols, rows, total_balance,
                  selected_item=None, selected_floor=None, selected_wall=None, selected_tab=0):
         self.items = items
         self.floors = floors
@@ -60,6 +60,7 @@ class InventoryUI:
         self.selected_wall = selected_wall
         self.selected_tab = selected_tab
         self.rect = pygame.Rect(self.x, self.y, self.cols * self.item_size, self.rows * self.item_size)
+        self.total_balance = total_balance
 
         self.ITEM_TAB = 0
         self.FLOOR_TAB = 1
@@ -149,10 +150,12 @@ class InventoryUI:
 
                     # Show count
                     font = pygame.font.SysFont(None, 36)
-                    label = font.render(str(item['count']), True, (255, 255, 255))
+                    count_str = str(item['count'])
+                    label = font.render(count_str, True, (255, 255, 255))
+                    label_rect = label.get_rect(bottomright=(x + self.item_size, y + self.item_size + 3))
                     
                     if item['count'] != 1:
-                        screen.blit(label, (x + self.item_size - 13, y + self.item_size - 20))
+                        screen.blit(label, label_rect)
                     
             # Draw floor icons
             elif self.selected_tab == self.FLOOR_TAB:
@@ -294,6 +297,66 @@ class InventoryUI:
         # Walls
         else:
             return handle_grid_selection(self.walls, lambda i: setattr(self, "selected_wall", self.walls[i]))
+        
+    def attempt_item_sale(self):
+        item = self.selected_item
+
+        if item:
+            price = item.get('price', 0)
+
+        inventory = inventory_abl.load_inventory()
+            
+        for existing in inventory['item']:
+            if existing.get('id') == item.get('id'):
+                if existing['count'] > 1:
+                    existing['count'] = existing.get('count', 1) - 1
+                    self.total_balance += price
+                    break
+                elif existing['count'] == 1:
+                    inventory['item'].remove(existing)
+                    self.total_balance += price
+                    self.selected_item = None
+
+        inventory_abl.save_inventory(inventory)
+        return True
+    
+    def attempt_floor_sale(self):
+        floor = self.selected_floor
+
+        if floor:
+            price = floor.get('price', 0)
+
+        inventory = inventory_abl.load_inventory()
+            
+        for existing in inventory['floor']:
+            if floor:
+                if existing.get('id') == floor.get('id'):
+                    if len(inventory['floor']) > 1:
+                        inventory['floor'].remove(existing)
+                        self.total_balance += price
+                        self.selected_floor = None
+
+        inventory_abl.save_inventory(inventory)
+        return True
+    
+    def attempt_wall_sale(self):
+        wall = self.selected_wall
+
+        if wall:
+            price = wall.get('price', 0)
+
+        inventory = inventory_abl.load_inventory()
+            
+        for existing in inventory['wall']:
+            if wall:
+                if existing.get('id') == wall.get('id'):
+                    if len(inventory['wall']) > 1:
+                        inventory['wall'].remove(existing)
+                        self.total_balance += price
+                        self.selected_wall = None
+
+        inventory_abl.save_inventory(inventory)
+        return True
 
 class MinigameUI:
     def __init__(self, thumbnail_size, x, y, cols, rows):
@@ -495,7 +558,7 @@ class ShopUI:
     
     def attempt_purchase(self):
         asset = self.selected_asset
-        price = asset.get("price", 0)
+        price = asset.get('price', 0)
 
         if self.total_balance < price:
             return False
@@ -503,29 +566,29 @@ class ShopUI:
         self.total_balance -= price
 
         inventory = inventory_abl.load_inventory()
-        asset_type = asset.get("type")
+        asset_type = asset.get('type')
 
         # Disallow re-buying floors/walls
         if asset_type in ['floor', 'wall']:
             for existing in inventory[asset_type]:
-                if existing.get("id") == asset.get("id"):
+                if existing.get("id") == asset.get('id'):
                     self.total_balance += price
                     return False
             inventory[asset_type].append(asset)
 
-        elif asset_type == "item":
+        elif asset_type == 'item':
             found = False
-            for existing in inventory["item"]:
-                if existing.get("id") == asset.get("id"):
-                    existing["count"] = existing.get("count", 1) + 1
+            for existing in inventory['item']:
+                if existing.get('id') == asset.get('id'):
+                    existing['count'] = existing.get('count', 1) + 1
                     found = True
                     break
 
             if not found:
                 # Copy asset and add count field
                 asset_copy = asset.copy()
-                asset_copy["count"] = 1
-                inventory["item"].append(asset_copy)
+                asset_copy['count'] = 1
+                inventory['item'].append(asset_copy)
 
         inventory_abl.save_inventory(inventory)
         return True
