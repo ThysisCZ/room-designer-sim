@@ -311,10 +311,13 @@ class InventoryUI:
                 if existing['count'] > 1:
                     existing['count'] = existing.get('count', 1) - 1
                     self.total_balance += price
+                    # Keep selection when more items remain
+                    item['count'] = existing['count']
                     break
                 elif existing['count'] == 1:
                     inventory['item'].remove(existing)
                     self.total_balance += price
+                    # Only clear selection when no items remain
                     self.selected_item = None
 
         inventory_abl.save_inventory(inventory)
