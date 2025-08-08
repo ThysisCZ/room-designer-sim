@@ -13,7 +13,7 @@ shop_assets = [
         "name": "Minimalist Floor",
         "spritesheet": "minimalist_floor.png",
         "type": "floor",
-        "description": "Polished floor with no splinters.",
+        "description": "Polished floor without splinters.",
         "price": 200
     },
     {

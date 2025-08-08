@@ -94,8 +94,8 @@ class RoomDesignerGame:
         # No object at start
         self.object = None
 
-        self.total_balance = self.load_stats_data()
-        
+        self.total_balance, self.snake_hi_score, self.fruit_hi_score, self.bullet_hi_score = self.load_stats_data()
+
         # Inventory
         self.show_inventory = False
         inventory = inventory_abl.load_inventory()
@@ -240,6 +240,13 @@ class RoomDesignerGame:
             score_rect = score_text.get_rect()
             score_rect.bottomright = (self.WIDTH - self.WIDTH//3.25, self.HEIGHT//6 - 10)
             self.screen.blit(score_text, score_rect)
+
+            current_hs = self.snake_hi_score if self.snake_hi_score > self.score else self.score
+
+            hi_score_text = font.render('Hi-Score: ' + str(current_hs), True, 'white')
+            hi_score_rect = hi_score_text.get_rect()
+            hi_score_rect.bottomright = (self.WIDTH - self.WIDTH//3.25, self.HEIGHT//6 - 30)
+            self.screen.blit(hi_score_text, hi_score_rect)
         
         def show_coins():
             font = pygame.font.SysFont(None, 30)
@@ -273,7 +280,22 @@ class RoomDesignerGame:
             show_coins()
 
             self.total_balance += self.coins
-            self.save_stats_data(self.total_balance)
+            self.save_stats_data(
+                                    balance=self.total_balance,
+                                    snake_hs=self.snake_hi_score,
+                                    fruit_hs=self.fruit_hi_score,
+                                    bullet_hs=self.bullet_hi_score
+                                )
+
+            # Handle new hi-score
+            if self.score > self.snake_hi_score:
+                self.snake_hi_score = self.score
+                self.save_stats_data(
+                                    balance=self.total_balance,
+                                    snake_hs=self.snake_hi_score,
+                                    fruit_hs=self.fruit_hi_score,
+                                    bullet_hs=self.bullet_hi_score
+                                )
 
             pygame.display.flip()
             time.sleep(2)
@@ -476,15 +498,22 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), False, 'white')
             score_rect = score_text.get_rect()
-            score_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 40)
+            score_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 60)
             self.screen.blit(score_text, score_rect)
+
+            current_hs = self.fruit_hi_score if self.fruit_hi_score > self.score else self.score
+
+            hi_score_text = font.render('Hi-Score: ' + str(current_hs), False, 'white')
+            hi_score_rect = hi_score_text.get_rect()
+            hi_score_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 40)
+            self.screen.blit(hi_score_text, hi_score_rect)
 
         def show_coins():
             font = pygame.font.SysFont(None, 30)
 
             coin_text = font.render('Gamecoins: ' + str(self.coin_count), False, 'white')
             coin_rect = coin_text.get_rect()
-            coin_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 60)
+            coin_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 80)
             self.screen.blit(coin_text, coin_rect)
         
         def show_info():
@@ -630,7 +659,22 @@ class RoomDesignerGame:
                     self.screen.blit(score_text, score_rect)
 
                     self.total_balance += self.coin_count
-                    self.save_stats_data(self.total_balance)
+                    self.save_stats_data(
+                                            balance=self.total_balance,
+                                            snake_hs=self.snake_hi_score,
+                                            fruit_hs=self.fruit_hi_score,
+                                            bullet_hs=self.bullet_hi_score
+                                        )
+
+                    # Handle new hi-score
+                    if self.score > self.fruit_hi_score:
+                        self.fruit_hi_score = self.score
+                        self.save_stats_data(
+                                            balance=self.total_balance,
+                                            snake_hs=self.snake_hi_score,
+                                            fruit_hs=self.fruit_hi_score,
+                                            bullet_hs=self.bullet_hi_score
+                                        )
 
                     pygame.display.flip()
                     time.sleep(2)
@@ -769,15 +813,22 @@ class RoomDesignerGame:
 
             score_text = font.render('Score: ' + str(self.score), False, 'white')
             score_rect = score_text.get_rect()
-            score_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 40)
+            score_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 60)
             self.screen.blit(score_text, score_rect)
+
+            current_hs = self.bullet_hi_score if self.bullet_hi_score > self.score else self.score
+
+            hi_score_text = font.render('Hi-Score: ' + str(current_hs), False, 'white')
+            hi_score_rect = hi_score_text.get_rect()
+            hi_score_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 40)
+            self.screen.blit(hi_score_text, hi_score_rect)
 
         def show_coins():
             font = pygame.font.SysFont(None, 30)
 
             coin_text = font.render('Gamecoins: ' + str(self.coin_count), False, 'white')
             coin_rect = coin_text.get_rect()
-            coin_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 60)
+            coin_rect.bottomleft = (self.WIDTH - self.WIDTH//5 + 25, 80)
             self.screen.blit(coin_text, coin_rect)
         
         def show_info():
@@ -1012,7 +1063,22 @@ class RoomDesignerGame:
                 self.screen.blit(score_text, score_rect)
 
                 self.total_balance += self.coin_count
-                self.save_stats_data(self.total_balance)
+                self.save_stats_data(
+                                        balance=self.total_balance,
+                                        snake_hs=self.snake_hi_score,
+                                        fruit_hs=self.fruit_hi_score,
+                                        bullet_hs=self.bullet_hi_score
+                                    )
+                
+                # Handle new hi-score
+                if self.score > self.bullet_hi_score:
+                    self.bullet_hi_score = self.score
+                    self.save_stats_data(
+                                            balance=self.total_balance,
+                                            snake_hs=self.snake_hi_score,
+                                            fruit_hs=self.fruit_hi_score,
+                                            bullet_hs=self.bullet_hi_score
+                                        )
 
                 pygame.display.flip()
                 time.sleep(2)
@@ -1265,7 +1331,12 @@ class RoomDesignerGame:
                                             self.object = None
 
                                     self.reload_inventory()
-                                    self.save_stats_data(self.total_balance)
+                                    self.save_stats_data(
+                                            balance=self.total_balance,
+                                            snake_hs=self.snake_hi_score,
+                                            fruit_hs=self.fruit_hi_score,
+                                            bullet_hs=self.bullet_hi_score
+                                        )
                             
                             elif selected_tab == self.FLOOR_TAB:
                                 self.sounds['ui_click'].play()
@@ -1284,7 +1355,12 @@ class RoomDesignerGame:
                                         )[0]['floor']
 
                                     self.reload_inventory()
-                                    self.save_stats_data(self.total_balance)
+                                    self.save_stats_data(
+                                            balance=self.total_balance,
+                                            snake_hs=self.snake_hi_score,
+                                            fruit_hs=self.fruit_hi_score,
+                                            bullet_hs=self.bullet_hi_score
+                                        )
                                     self.inventory_ui.selected_tab = self.FLOOR_TAB
                             else:
                                 self.sounds['ui_click'].play()
@@ -1303,7 +1379,12 @@ class RoomDesignerGame:
                                         )[0]['wall']
 
                                     self.reload_inventory()
-                                    self.save_stats_data(self.total_balance)
+                                    self.save_stats_data(
+                                            balance=self.total_balance,
+                                            snake_hs=self.snake_hi_score,
+                                            fruit_hs=self.fruit_hi_score,
+                                            bullet_hs=self.bullet_hi_score
+                                        )
                                     self.inventory_ui.selected_tab = self.WALL_TAB
                     
                     # Handle ghost object placement
@@ -1401,7 +1482,12 @@ class RoomDesignerGame:
                             if success:
                                 self.total_balance = self.shop_ui.total_balance
                                 self.reload_inventory()
-                                self.save_stats_data(self.total_balance)
+                                self.save_stats_data(
+                                            balance=self.total_balance,
+                                            snake_hs=self.snake_hi_score,
+                                            fruit_hs=self.fruit_hi_score,
+                                            bullet_hs=self.bullet_hi_score
+                                        )
                     # Handle static object removal
                     else:
                         mx, my = pygame.mouse.get_pos()
@@ -1636,15 +1722,26 @@ class RoomDesignerGame:
             try:
                 with open(file_path, 'r') as f:
                     data = json.load(f)
-                    return data.get('total_balance', 0)
+                    balance = data.get('total_balance', 0)
+                    snake_hs = data.get('snake_hi_score', 0)
+                    fruit_hs = data.get('fruit_hi_score', 0)
+                    bullet_hs = data.get('bullet_hi_score', 0)
+                    return balance, snake_hs, fruit_hs, bullet_hs
             except FileNotFoundError:
                 return 0
     
-    def save_stats_data(self, balance):
+    def save_stats_data(self, balance, snake_hs, fruit_hs, bullet_hs):
         file_path = os.path.join('storage', 'stats_data.json')
 
+        data = {
+            "total_balance": balance,
+            "snake_hi_score": snake_hs,
+            "fruit_hi_score": fruit_hs,
+            "bullet_hi_score": bullet_hs
+        }
+
         with open(file_path, 'w') as f:
-            json.dump({"total_balance": balance}, f)
+            json.dump(data, f)
     
     def save_placed_object(self, obj_id, grid_x, grid_y, col, row):
         file_path = os.path.join('storage', 'tile_data.json')
