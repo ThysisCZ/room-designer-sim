@@ -1308,7 +1308,7 @@ class RoomDesignerGame:
                     
                     # Handle ghost object placement
                     elif self.selected_item_data:
-                        # First verify we actually have items in inventory
+                        # Verify that inventory has items
                         item_exists = False
                         for item in self.inventory_ui.items:
                             if item.get('id') == self.selected_item_data.get('id') and item.get('count', 0) > 0:
@@ -1321,7 +1321,7 @@ class RoomDesignerGame:
                             self.inventory_ui.selected_item = None
                             continue
 
-                        # Only proceed with ghost object creation if we don't already have one
+                        # Create ghost object if it doesn't exist
                         if not self.object:
                             mx, my = pygame.mouse.get_pos()
 
@@ -1406,76 +1406,69 @@ class RoomDesignerGame:
                     else:
                         mx, my = pygame.mouse.get_pos()
 
-                        def get_floor_surface(px, py, cx, cy, w, h):
-                            dx = abs(px - cx)
-                            dy = abs(py - cy)
-                            return (dx / (w / 2) + dy / (h / 2)) <= 1
-                        
-                        # Prepare clickable floor
-                        for y in range(self.grid_height):
-                            for x in range(self.grid_width):
-                                screen_x, screen_y = self.iso_utils.grid_to_screen(x, y)
-                                screen_x += self.camera_offset_x
-                                screen_y += self.camera_offset_y
+                        def pickup_object():
+                            def get_object_surface(px, py, cx, cy, w, h):
+                                dx = abs(px - cx)
+                                dy = abs(py - cy)
+                                return (dx / (w / 2 + 4) + dy / (h + 3)) <= 1
+                            
+                            # Prepare clickable objects
+                            for y in reversed(range(self.grid_height)):
+                                for x in reversed(range(self.grid_width)):
+                                    screen_x, screen_y = self.iso_utils.grid_to_screen(x, y)
+                                    screen_x += self.camera_offset_x
+                                    screen_y += self.camera_offset_y
 
-                                if 'floor' in self.sprites and self.game_map[y, x, 0] == self.STATIC_OBJECT:
-                                    floor_rect = self.sprites['floor'].get_rect()
-                                    floor_rect.x = screen_x - self.iso_utils.half_tile_width
-                                    floor_rect.y = screen_y - self.iso_utils.half_tile_height + 15
+                                    if 'floor' in self.sprites and self.game_map[y, x, 0] == self.STATIC_OBJECT:
+                                        object_rect = self.sprites['floor'].get_rect()
+                                        object_rect.x = screen_x - self.iso_utils.half_tile_width
+                                        object_rect.y = screen_y - self.iso_utils.half_tile_height + 15
 
-                                    tile_width = self.iso_utils.tile_width
-                                    tile_height = self.iso_utils.tile_height
+                                        tile_width = self.iso_utils.tile_width
+                                        tile_height = self.iso_utils.tile_height
 
-                                    center_x = screen_x
-                                    center_y = screen_y + 20
+                                        center_x = screen_x + 3
+                                        center_y = screen_y + 3
 
-                                    # Handle floor click
-                                    if get_floor_surface(mx, my, center_x, center_y, tile_width, tile_height):
-                                        objects = tile_abl.load_tiles()
-                                        inventory = inventory_abl.load_inventory()
+                                        # Handle object click
+                                        if get_object_surface(mx, my, center_x, center_y, tile_width, tile_height):
+                                            objects = tile_abl.load_tiles()
+                                            inventory = inventory_abl.load_inventory()
 
-                                        # Add the static object to inventory
-                                        for object in objects:
-                                            if object.get('grid_x') == x and object.get('grid_y') == y:
-                                                obj_id = object.get('id')
-                                                added = False
+                                            # Add the static object to inventory
+                                            for object in objects:
+                                                if object.get('grid_x') == x and object.get('grid_y') == y:
+                                                    obj_id = object.get('id')
+                                                    added = False
 
-                                                for item in inventory['item']:
-                                                    if item.get('id') == obj_id:
-                                                        item['count'] = item.get('count', 1) + 1
-                                                        added = True
-                                                        break
-
-                                                if not added:
-                                                    # Get full item data from shop assets
-                                                    for item in shop_assets:
+                                                    for item in inventory['item']:
                                                         if item.get('id') == obj_id:
-                                                            item_copy = item.copy()
-                                                            item_copy['count'] = 1
-                                                            inventory['item'].append(item_copy)
+                                                            item['count'] = item.get('count', 1) + 1
+                                                            added = True
                                                             break
 
-                                                objects.remove(object)
-                                                break
+                                                    if not added:
+                                                        # Get full item data from shop assets
+                                                        for item in shop_assets:
+                                                            if item.get('id') == obj_id:
+                                                                item_copy = item.copy()
+                                                                item_copy['count'] = 1
+                                                                inventory['item'].append(item_copy)
+                                                                break
 
-                                        tile_abl.save_tiles(objects)
-                                        inventory_abl.save_inventory(inventory)
+                                                    objects.remove(object)
+                                                    break
 
-                                        # Keep the current selection for continuous pickup
-                                        found = False
-                                        for item in self.inventory_ui.items:
-                                            if item.get('id') == obj_id:
-                                                found = True
-                                                break
-                                        
-                                        if not found:
-                                            self.selected_item_data = None
-                                            self.inventory_ui.selected_item = None
-                                        
-                                        self.clear_sprites()
-                                        self.init_game_world()
-                                        self.load_placed_objects()
-                                        self.reload_inventory()
+                                            tile_abl.save_tiles(objects)
+                                            inventory_abl.save_inventory(inventory)
+                                            
+                                            self.clear_sprites()
+                                            self.init_game_world()
+                                            self.load_placed_objects()
+                                            self.reload_inventory()
+                                            return
+                        
+                        pickup_object()
             elif event.type == pygame.MOUSEMOTION:
                 if self.game_state == GameState.MENU:
                     self.play_button.handle_event(event)  # Handle hover effects
@@ -1584,7 +1577,7 @@ class RoomDesignerGame:
                 # Update selection state
                 for item in self.inventory_ui.items:
                     if item.get('id') == selected_id:
-                        item['count'] = remaining_count  # Update count in the current item
+                        item['count'] = remaining_count
                         if remaining_count == 0:
                             self.selected_item_data = None
                             self.inventory_ui.selected_item = None
@@ -1594,7 +1587,7 @@ class RoomDesignerGame:
                             self.inventory_ui.selected_item = item
                         break
 
-                # Remove ghost object to allow for new placement
+                # Remove ghost object
                 if self.object:
                     self.objects.remove(self.object)
                     self.all_sprites.remove(self.object)
@@ -1602,7 +1595,7 @@ class RoomDesignerGame:
     
     def reload_inventory(self):
         inventory = inventory_abl.load_inventory()
-        # Update our selected item if it exists in the new inventory
+        # Update selected item if it exists in the new inventory
         if self.selected_item_data:
             for item in inventory['item']:
                 if item.get('id') == self.selected_item_data.get('id'):
@@ -1619,7 +1612,7 @@ class RoomDesignerGame:
             y=250,
             cols=8,
             rows=4,
-            selected_item=self.selected_item_data,  # Pass the updated selected_item_data
+            selected_item=self.selected_item_data,
             selected_floor=self.selected_floor_data,
             selected_wall=self.selected_wall_data,
             selected_tab=self.selected_tab,
@@ -1910,8 +1903,8 @@ class RoomDesignerGame:
                 info = [
                     ("INFO:"),
                     ("Click on the floor to start placing"),
-                    ("Use arrow keys to adjust position"),
                     ("Click on an icon again to stop placing"),
+                    ("Use arrow keys to adjust position"),
                     ("Click on a placed item to pick it up")
                 ]
 
