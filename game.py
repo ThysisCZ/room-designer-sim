@@ -1215,9 +1215,9 @@ class RoomDesignerGame:
                             if selected_tab == self.ITEM_TAB:
                                 self.show_sell_button = self.inventory_ui.selected_item is not None
                             elif selected_tab == self.FLOOR_TAB:
-                                self.show_sell_button = self.inventory_ui.selected_floor is not None
+                                self.show_sell_button = self.inventory_ui.selected_floor != 0
                             else:
-                                self.show_sell_button = self.inventory_ui.selected_wall is not None
+                                self.show_sell_button = self.inventory_ui.selected_wall != 0
                     elif self.minigame_button.handle_event(event):
                         self.show_inventory = False
                         self.show_shop = False
@@ -1294,7 +1294,7 @@ class RoomDesignerGame:
                                     self.iso_utils, self.FLOOR_TAB, self.inventory_ui.selected_floor
                                 )[0]["floor"]
 
-                                self.show_sell_button = self.inventory_ui.selected_floor is not None
+                                self.show_sell_button = self.inventory_ui.selected_floor['id'] != 'stone_floor'
 
                             # Wall selection
                             else:
@@ -1303,8 +1303,8 @@ class RoomDesignerGame:
                                 self.sprites["wall"] = create_isometric_sprites(
                                     self.iso_utils, self.WALL_TAB, self.inventory_ui.selected_wall
                                 )[0]["wall"]
-
-                                self.show_sell_button = self.inventory_ui.selected_wall is not None
+                                
+                                self.show_sell_button = self.inventory_ui.selected_wall['id'] != 'stone_wall'
 
                         # Close inventory
                         elif not inner_click and not self.sell_button.handle_event(event):
@@ -1326,6 +1326,7 @@ class RoomDesignerGame:
                                     # Handle no amount
                                     if not self.inventory_ui.selected_item:
                                         self.selected_item_data = None
+                                        self.show_sell_button = None
 
                                         # Remove ghost object
                                         if self.object:
@@ -1357,6 +1358,8 @@ class RoomDesignerGame:
                                             self.iso_utils, self.FLOOR_TAB, self.selected_floor_data
                                         )[0]['floor']
 
+                                        self.show_sell_button = False
+
                                     self.reload_inventory()
                                     self.save_stats_data(
                                             balance=self.total_balance,
@@ -1380,6 +1383,8 @@ class RoomDesignerGame:
                                         self.sprites['wall'] = create_isometric_sprites(
                                             self.iso_utils, self.WALL_TAB, self.selected_wall_data
                                         )[0]['wall']
+
+                                    self.show_sell_button = False
 
                                     self.reload_inventory()
                                     self.save_stats_data(

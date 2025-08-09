@@ -152,7 +152,7 @@ class InventoryUI:
                     font = pygame.font.SysFont(None, 36)
                     count_str = str(item['count'])
                     label = font.render(count_str, True, (255, 255, 255))
-                    label_rect = label.get_rect(bottomright=(x + self.item_size, y + self.item_size + 3))
+                    label_rect = label.get_rect(bottomright=(x + self.item_size - 3, y + self.item_size))
                     
                     if item['count'] != 1:
                         screen.blit(label, label_rect)
@@ -334,10 +334,9 @@ class InventoryUI:
         for existing in inventory['floor']:
             if floor:
                 if existing.get('id') == floor.get('id'):
-                    if len(inventory['floor']) > 1:
-                        inventory['floor'].remove(existing)
-                        self.total_balance += price
-                        self.selected_floor = None
+                    inventory['floor'].remove(existing)
+                    self.total_balance += price
+                    self.selected_floor = None
 
         inventory_abl.save_inventory(inventory)
         return True
@@ -353,10 +352,9 @@ class InventoryUI:
         for existing in inventory['wall']:
             if wall:
                 if existing.get('id') == wall.get('id'):
-                    if len(inventory['wall']) > 1:
-                        inventory['wall'].remove(existing)
-                        self.total_balance += price
-                        self.selected_wall = None
+                    inventory['wall'].remove(existing)
+                    self.total_balance += price
+                    self.selected_wall = None
 
         inventory_abl.save_inventory(inventory)
         return True
