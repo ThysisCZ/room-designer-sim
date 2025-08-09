@@ -1,1 +1,9 @@
-[]
+[
+    {
+        "grid_x": 6,
+        "grid_y": 6,
+        "col": 0,
+        "row": 0,
+        "id": "minimalist_table"
+    }
+]
