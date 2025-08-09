@@ -16,14 +16,13 @@ def create_game_map(grid_width, grid_height, grid_volume):
 
 def create_isometric_sprites(iso_utils, type, selected=None):
     """Creates isometric sprite objects for floor or wall from a spritesheet."""
-    # Base directory
     base_path = "assets/spritesheets"
 
-    if type == 1:  # Floor
+    if type == 1:
         subdir = "floors"
         key = "floor"
         default_file = "stone_floor.png"
-    else:  # Wall
+    else:
         subdir = "walls"
         key = "wall"
         default_file = "stone_wall.png"
@@ -53,15 +52,22 @@ def create_isometric_sprites(iso_utils, type, selected=None):
 
 def create_background(screen_width, screen_height):
     """Creates background"""
-    # Load menu background
     menu_bg = pygame.image.load("assets/backgrounds/menu.png")
     menu_bg = pygame.transform.scale(menu_bg, (screen_width, screen_height))
         
-    # Load game background
     game_bg = pygame.image.load("assets/backgrounds/game.png")
     game_bg = pygame.transform.scale(game_bg, (screen_width, screen_height))
+
+    snake_bg = pygame.image.load("assets/backgrounds/snake.png").convert()
+    snake_bg = pygame.transform.scale(snake_bg, (screen_width, screen_height))
+
+    fruit_bg = pygame.image.load("assets/backgrounds/fruit.png").convert()
+    fruit_bg = pygame.transform.scale(fruit_bg, (screen_width, screen_height))
+
+    bullet_bg = pygame.image.load("assets/backgrounds/bullet.png").convert()
+    bullet_bg = pygame.transform.scale(bullet_bg, (screen_width, screen_height))
         
-    return [menu_bg, game_bg]
+    return [menu_bg, game_bg, snake_bg, fruit_bg, bullet_bg]
     
 
 def create_sounds():

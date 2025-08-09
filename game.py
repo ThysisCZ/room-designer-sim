@@ -189,6 +189,8 @@ class RoomDesignerGame:
 
         pygame.mouse.set_visible(False)
 
+        self.bg_surface = self.bg_surface_collection[2]
+
         self.area_size = 500
 
         # Snake start position
@@ -402,7 +404,7 @@ class RoomDesignerGame:
             
             self.food_eaten = False
             self.coin_picked = False
-            self.screen.fill('black')
+            self.screen.blit(self.bg_surface, (0, 0))
 
             # Draw the snake
             for pos in self.snake_body:
@@ -443,6 +445,8 @@ class RoomDesignerGame:
         self.sounds['coin'].set_volume(0.2)
 
         pygame.mouse.set_visible(False)
+
+        self.bg_surface = self.bg_surface_collection[3]
 
         self.basket_size = 80
 
@@ -487,9 +491,6 @@ class RoomDesignerGame:
         self.coin_count = 0
         self.timer = 0
 
-        background_rect = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
-        pygame.draw.rect(self.screen, (0, 0, 0), background_rect)
-
         self.score_font = pygame.font.SysFont(None, 30)
         self.info_font = pygame.font.SysFont(None, 24)
 
@@ -533,7 +534,7 @@ class RoomDesignerGame:
         # Game loop
         while self.game_state == GameState.CATCH_THE_FRUIT:
             # Clear the screen each frame to prevent trails
-            self.screen.fill('black')
+            self.screen.blit(self.bg_surface, (0, 0))
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -741,6 +742,8 @@ class RoomDesignerGame:
 
         pygame.mouse.set_visible(False)
 
+        self.bg_surface = self.bg_surface_collection[4]
+
         self.player_size = 80
 
         self.border_offset = 3
@@ -849,7 +852,7 @@ class RoomDesignerGame:
         # Game loop
         while self.game_state == GameState.BULLET_HELL:
             # Clear the screen each frame to prevent trails
-            self.screen.fill('black')
+            self.screen.blit(self.bg_surface, (0, 0))
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
