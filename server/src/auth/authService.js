@@ -25,16 +25,22 @@ module.exports.registerUserService = (userDetails) => {
 
 module.exports.loginUserService = (loginDetails) => {
     return new Promise((resolve, reject) => {
-        userModel.findOne({ username: loginDetails.username })
+        // Check if login credential is email or username
+        const isEmail = loginDetails.username.includes('@');
+        const query = isEmail
+            ? { email: loginDetails.username }
+            : { username: loginDetails.username };
+
+        userModel.findOne(query)
             .then(async (user) => {
                 if (!user) {
-                    reject({ success: false, message: "Invalid username or password" });
+                    reject({ success: false, message: "Invalid username/email or password" });
                     return;
                 }
 
                 const isValidPassword = await user.comparePassword(loginDetails.password);
                 if (!isValidPassword) {
-                    reject({ success: false, message: "Invalid username or password" });
+                    reject({ success: false, message: "Invalid username/email or password" });
                     return;
                 }
 
