@@ -16,7 +16,7 @@ def game_startup():
             print(f"Sync: {message}")
         else:
             print(f"Sync failed: {message} (playing offline)")
-        return show_auth_screen()
+        return True
     else:
         print("Playing offline - login to sync progress")
         return show_auth_screen()

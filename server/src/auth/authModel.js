@@ -1,6 +1,7 @@
 //dependencies
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 //schema library
 const Schema = mongoose.Schema;
@@ -20,6 +21,14 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true
+    },
+    reset_code: {
+        type: String,
+        default: null
+    },
+    reset_code_expires: {
+        type: Date,
+        default: null
     },
     created_at: {
         type: Date,
@@ -41,6 +50,27 @@ userSchema.pre('save', async function (next) {
 //compare password method
 userSchema.methods.comparePassword = async function (password) {
     return await bcrypt.compare(password, this.password);
+};
+
+//generate password reset code
+userSchema.methods.generateResetCode = function () {
+    // Generate 6-digit code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    this.reset_code = code;
+    // Code expires in 15 minutes
+    this.reset_code_expires = Date.now() + 15 * 60 * 1000;
+    return code;
+};
+
+//verify reset code
+userSchema.methods.verifyResetCode = function (code) {
+    return this.reset_code === code && this.reset_code_expires > Date.now();
+};
+
+//clear reset code after use
+userSchema.methods.clearResetCode = function () {
+    this.reset_code = null;
+    this.reset_code_expires = null;
 };
 
 //export user model

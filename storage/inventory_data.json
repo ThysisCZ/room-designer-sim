@@ -1,5 +1,16 @@
 {
-    "item": [],
+    "item": [
+        {
+            "id": "minimalist_table",
+            "name": "Minimalist Table",
+            "spritesheet": "minimalist_table.png",
+            "type": "item",
+            "description": "Simple and cheap table that is good enough for visitors.",
+            "price": 150,
+            "count": 5,
+            "_id": "689bb4e4db5261c733031c07"
+        }
+    ],
     "floor": [
         {
             "id": "stone_floor",
@@ -9,6 +20,15 @@
             "description": "Boring but stable.",
             "price": 0,
             "_id": "6898857c4f0a5e4f39555670"
+        },
+        {
+            "id": "minimalist_floor",
+            "name": "Minimalist Floor",
+            "spritesheet": "minimalist_floor.png",
+            "type": "floor",
+            "description": "Polished floor without splinters.",
+            "price": 200,
+            "_id": "689bb4e4db5261c733031c06"
         }
     ],
     "wall": [
@@ -20,6 +40,15 @@
             "description": "Boring but stable.",
             "price": 0,
             "_id": "6898857c4f0a5e4f3955566e"
+        },
+        {
+            "id": "minimalist_wall",
+            "name": "Minimalist Wall",
+            "spritesheet": "minimalist_wall.png",
+            "type": "wall",
+            "description": "You should lean against it only if your clothes are clean.",
+            "price": 200,
+            "_id": "689b862d24d31b4c2ad15472"
         }
     ]
 }

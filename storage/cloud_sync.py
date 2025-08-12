@@ -118,6 +118,44 @@ class CloudSyncManager:
         except Exception as e:
             return False, f"Login error: {str(e)}"
 
+    def request_password_reset(self, email: str) -> Tuple[bool, str]:
+        """Request password reset code via email"""
+        try:
+            response = requests.post(f"{self.api_base}/auth/forgot-password", json={
+                "email": email
+            })
+            
+            if response.status_code == 200:
+                return True, ""
+            else:
+                error_msg = response.json().get("message", "Failed to send reset code")
+                return False, error_msg
+                
+        except requests.RequestException:
+            return False, "Network error - check your connection"
+        except Exception as e:
+            return False, f"Password reset request error: {str(e)}"
+
+    def reset_password(self, email: str, reset_code: str, new_password: str) -> Tuple[bool, str]:
+        """Reset password using the code from email"""
+        try:
+            response = requests.post(f"{self.api_base}/auth/reset-password", json={
+                "email": email,
+                "resetCode": reset_code,
+                "newPassword": new_password
+            })
+            
+            if response.status_code == 200:
+                return True, ""
+            else:
+                error_msg = response.json().get("message", "Password reset failed")
+                return False, error_msg
+                
+        except requests.RequestException:
+            return False, "Network error - check your connection"
+        except Exception as e:
+            return False, f"Password reset error: {str(e)}"
+
     def is_logged_in(self) -> bool:
         """Check if user is logged in"""
         return self.user_id is not None
@@ -297,3 +335,9 @@ def upload_to_cloud() -> Tuple[bool, str]:
 
 def download_from_cloud() -> Tuple[bool, str]:
     return cloud_sync.download_game_data()
+
+def request_password_reset(email: str) -> Tuple[bool, str]:
+    return cloud_sync.request_password_reset(email)
+
+def reset_password(email: str, reset_code: str, new_password: str) -> Tuple[bool, str]:
+    return cloud_sync.reset_password(email, reset_code, new_password)

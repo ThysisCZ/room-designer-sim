@@ -94,7 +94,7 @@ class InventoryUI:
             if idx == 0 or idx == 2:
                 x_offset = 2
             else:
-                x_offset = 0
+                x_offset = -1
 
             tab_rect = pygame.Rect(x, y, self.item_size, self.item_size)
             pygame.draw.rect(screen, (175, 86, 31), tab_rect)
@@ -193,12 +193,8 @@ class InventoryUI:
                     # Show icons
                     screen.blit(icon, (x, y))
 
-                    # Handle initial selection
-                    if idx == 0 and self.selected_floor is None:
-                        pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
-
                     # Yellow border
-                    if self.selected_floor == floor:
+                    if self.selected_floor == floor or (idx == 0 and self.selected_floor is None):
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
             # Draw wall icons
             else:
@@ -236,12 +232,8 @@ class InventoryUI:
                     # Show icons
                     screen.blit(icon, (x, y))
 
-                    # Handle initial selection
-                    if idx == 0 and self.selected_wall is None:
-                        pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
-
                     # Yellow border
-                    if self.selected_wall == wall:
+                    if self.selected_wall == wall or (idx == 0 and self.selected_floor is None):
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
 
     def next_page(self):
@@ -414,7 +406,7 @@ class MinigameUI:
 
                 font = pygame.font.Font('ithaca.ttf', 20)
                 label = font.render(minigame, True, (255, 255, 255))
-                screen.blit(label, (x + 15, y + 105))
+                screen.blit(label, (x + 12, y + 105))
             else:
                 screen.blit(self.bullet_thumbnail, (x + 1, y + 2))
 

@@ -236,7 +236,7 @@ class RoomDesignerGame:
         self.block_counter = 0
 
         def show_score():
-            font = pygame.font.SysFont(None, 30)
+            font = pygame.font.Font('ithaca.ttf', 30)
 
             score_text = font.render('Score: ' + str(self.score), True, 'white')
             score_rect = score_text.get_rect()
@@ -251,7 +251,7 @@ class RoomDesignerGame:
             self.screen.blit(hi_score_text, hi_score_rect)
         
         def show_coins():
-            font = pygame.font.SysFont(None, 30)
+            font = pygame.font.Font('ithaca.ttf', 30)
 
             coin_text = font.render('Gamecoins: ' + str(self.coins), True, 'white')
             coin_rect = coin_text.get_rect()
@@ -264,7 +264,7 @@ class RoomDesignerGame:
             pygame.draw.rect(self.screen, (255, 255, 255), border_rect, 3)
             show_score()
 
-            font = pygame.font.SysFont(None, 50)
+            font = pygame.font.Font('ithaca.ttf', 50)
 
             game_over_text = font.render(
                 'GAME OVER', True, 'white')
@@ -491,11 +491,11 @@ class RoomDesignerGame:
         self.coin_count = 0
         self.timer = 0
 
-        self.score_font = pygame.font.SysFont(None, 30)
-        self.info_font = pygame.font.SysFont(None, 24)
+        self.score_font = pygame.font.Font('ithaca.ttf', 30)
+        self.info_font = pygame.font.Font('ithaca.ttf', 24)
 
         def show_score():
-            font = pygame.font.SysFont(None, 30)
+            font = pygame.font.Font('ithaca.ttf', 30)
 
             score_text = font.render('Score: ' + str(self.score), False, 'white')
             score_rect = score_text.get_rect()
@@ -510,7 +510,7 @@ class RoomDesignerGame:
             self.screen.blit(hi_score_text, hi_score_rect)
 
         def show_coins():
-            font = pygame.font.SysFont(None, 30)
+            font = pygame.font.Font('ithaca.ttf', 30)
 
             coin_text = font.render('Gamecoins: ' + str(self.coin_count), False, 'white')
             coin_rect = coin_text.get_rect()
@@ -523,7 +523,7 @@ class RoomDesignerGame:
                     ("Hold left SHIFT to dash")
                 ]
 
-            font = pygame.font.SysFont(None, 24)
+            font = pygame.font.Font('ithaca.ttf', 24)
             y_offset = self.HEIGHT - 55
 
             for row in info:
@@ -645,7 +645,7 @@ class RoomDesignerGame:
                     show_coins()
                     show_info()
 
-                    font = pygame.font.SysFont(None, 50)
+                    font = pygame.font.Font('ithaca.ttf', 50)
 
                     game_over_text = font.render(
                         'GAME OVER', True, 'white')
@@ -808,11 +808,11 @@ class RoomDesignerGame:
         background_rect = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
         pygame.draw.rect(self.screen, (0, 0, 0), background_rect)
 
-        self.score_font = pygame.font.SysFont(None, 30)
-        self.info_font = pygame.font.SysFont(None, 24)
+        self.score_font = pygame.font.Font('ithaca.ttf', 30)
+        self.info_font = pygame.font.Font('ithaca.ttf', 24)
 
         def show_score():
-            font = pygame.font.SysFont(None, 30)
+            font = pygame.font.Font('ithaca.ttf', 30)
 
             score_text = font.render('Score: ' + str(self.score), False, 'white')
             score_rect = score_text.get_rect()
@@ -827,7 +827,7 @@ class RoomDesignerGame:
             self.screen.blit(hi_score_text, hi_score_rect)
 
         def show_coins():
-            font = pygame.font.SysFont(None, 30)
+            font = pygame.font.Font('ithaca.ttf', 30)
 
             coin_text = font.render('Gamecoins: ' + str(self.coin_count), False, 'white')
             coin_rect = coin_text.get_rect()
@@ -841,7 +841,7 @@ class RoomDesignerGame:
                     ("Hold left SHIFT to focus")
                 ]
 
-            font = pygame.font.SysFont(None, 24)
+            font = pygame.font.Font('ithaca.ttf', 24)
             y_offset = self.HEIGHT - 70
 
             for row in info:
@@ -1051,7 +1051,7 @@ class RoomDesignerGame:
                 show_coins()
                 show_info()
 
-                font = pygame.font.SysFont(None, 50)
+                font = pygame.font.Font('ithaca.ttf', 50)
 
                 game_over_text = font.render(
                     'GAME OVER', True, 'white')
@@ -1192,7 +1192,7 @@ class RoomDesignerGame:
                 if self.game_state == GameState.MENU:
                     if self.play_button.handle_event(event):
                         self.sounds['ui_click'].play()
-                        self.restart_game()
+                        self.start_new_game()
                     elif self.quit_button.handle_event(event):
                         self.running = False
                 elif self.game_state == GameState.PLAYING:
@@ -1936,7 +1936,7 @@ class RoomDesignerGame:
 
         self.screen.blit(self.balance_border, (20, 20))
 
-        font = pygame.font.SysFont(None, 30)
+        font = pygame.font.Font('ithaca.ttf', 30)
 
         balance_text = font.render(str(self.total_balance), True, 'white')
         balance_rect = balance_text.get_rect()
@@ -2013,7 +2013,7 @@ class RoomDesignerGame:
                     ("Click on a placed item to pick it up")
                 ]
 
-                font = pygame.font.SysFont(None, 24)
+                font = pygame.font.Font('ithaca.ttf', 24)
                 y_offset = self.HEIGHT - 115
 
                 for row in info:
@@ -2028,6 +2028,57 @@ class RoomDesignerGame:
         self.all_sprites.empty()
         self.objects.empty()
 
+    def start_new_game(self):
+        """Starts a fresh game from the menu"""
+        self.sounds['minigame'].stop()
+        
+        # Reset game state
+        self.clear_sprites()
+        self.init_game_world()
+        
+        # Reset inventory and selection state
+        inventory = inventory_abl.load_inventory()
+        self.selected_item_data = None
+        self.selected_tab = 0
+
+        # Load existing selections first
+        selected_assets = selection_abl.load_selected_assets()
+        
+        # Find matching items in inventory
+        selected_floor = None
+        selected_wall = None
+        
+        if selected_assets['floor']:
+            # Find the selected floor in inventory
+            for floor in inventory['floor']:
+                if floor['id'] == selected_assets['floor']['id']:
+                    selected_floor = floor
+                    break
+        
+        if selected_assets['wall']:
+            # Find the selected wall in inventory
+            for wall in inventory['wall']:
+                if wall['id'] == selected_assets['wall']['id']:
+                    selected_wall = wall
+                    break
+        
+        # Use defaults if no matches found
+        if not selected_floor and inventory['floor']:
+            selected_floor = inventory['floor'][0]
+        if not selected_wall and inventory['wall']:
+            selected_wall = inventory['wall'][0]
+            
+        # Save selections and update game state
+        selection_abl.save_selected_assets(selected_floor, selected_wall)
+        self.selected_floor_data = selected_floor
+        self.selected_wall_data = selected_wall
+        
+        # Reload game state with defaults
+        self.reload_inventory()
+        self.load_placed_objects()
+        self.apply_selected_assets()
+        self.game_state = GameState.PLAYING
+
     def restart_game(self):
         """Restarts game"""
         self.sounds['minigame'].stop()
@@ -2038,8 +2089,12 @@ class RoomDesignerGame:
 
         pygame.mouse.set_visible(True)
         
+        # Clear game state
         self.clear_sprites()
         self.init_game_world()
+        
+        # Reload game state
+        self.reload_inventory()
         self.load_placed_objects()
         self.apply_selected_assets()
         self.game_state = GameState.PLAYING
