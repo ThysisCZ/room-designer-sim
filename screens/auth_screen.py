@@ -1,6 +1,7 @@
 import pygame
 import sys
 from storage.cloud_sync import login_user, register_user
+from game_logic import create_background, create_sounds
 
 class AuthScreen:
     def __init__(self, screen, font):
@@ -11,6 +12,9 @@ class AuthScreen:
         # Screen dimensions
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
+
+        self.bg_surface_collection = create_background(self.screen_width, self.screen_height)
+        self.bg_surface = self.bg_surface_collection[0]
         
         # Colors
         self.WHITE = (255, 255, 255)
@@ -28,7 +32,7 @@ class AuthScreen:
         self.password_visible = False
         
         # UI state
-        self.active_field = "username_or_email"
+        self.active_field = None
         self.mode = "login"  
         self.message = ""
         self.message_color = self.BLACK
@@ -39,14 +43,22 @@ class AuthScreen:
         self.email_rect = pygame.Rect(self.screen_width // 2 - 165, 390, 300, 40)
         
         # Button rects
-        self.show_hide_btn = pygame.Rect(self.screen_width // 2 + 145, 335, 60, 30)
-        self.login_register_btn = pygame.Rect(self.screen_width // 2 - 110, 470, 85, 40)
-        self.continue_btn = pygame.Rect(self.screen_width // 2 + 10, 470, 85, 40)
-        self.forgot_btn = pygame.Rect(self.screen_width // 2 - 85, 420, 150, 30)
+        self.show_hide_btn = pygame.Rect(self.screen_width // 2 + 145, 335, 52, 30)
+        self.login_register_btn = pygame.Rect(self.screen_width // 2 - 110, 470, 78, 40)
+        self.continue_btn = pygame.Rect(self.screen_width // 2 + 10, 470, 78, 40)
+        self.forgot_btn = pygame.Rect(self.screen_width // 2 - 82, 420, 150, 30)
         
         # Animation
         self.cursor_timer = 0
         self.show_cursor = True
+
+        # Enable key repeat when typing
+        pygame.key.set_repeat(250, 50)
+
+        self.extended_text_rect = None
+
+        self.sounds = create_sounds()
+        self.sounds['ui_click'].set_volume(0.5)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -58,38 +70,52 @@ class AuthScreen:
                 
                 # Check input field clicks
                 if self.username_or_email_rect.collidepoint(pos):
+                    self.sounds['ui_click'].play()
                     self.active_field = "username_or_email"
                 elif self.password_rect.collidepoint(pos):
+                    self.sounds['ui_click'].play()
                     self.active_field = "password"
                 elif self.email_rect.collidepoint(pos) and self.mode == "register":
+                    self.sounds['ui_click'].play()
                     self.active_field = "email"
                 
                 # Check button clicks
                 elif self.show_hide_btn.collidepoint(pos):
+                    self.sounds['ui_click'].play()
                     self.password_visible = not self.password_visible
                 
                 elif self.login_register_btn.collidepoint(pos):
                     if self.mode == "login":
+                        self.sounds['ui_click'].play()
                         self.mode = "register"
                         self.message = ""
+                        self.active_field = None
+                        self.username_or_email = ""  
+                        self.password = ""
+                        self.email = ""
                     else:
+                        self.sounds['ui_click'].play()
                         self.mode = "login"
                         self.message = ""
-                        self.email = ""
+                        self.active_field = None
+                        self.username_or_email = ""  
+                        self.password = ""
                 
                 elif self.continue_btn.collidepoint(pos):
                     if self.mode == "login":
+                        self.sounds['ui_click'].play()
                         return self.attempt_login()
-                    return self.attempt_register()
+                    else:
+                        self.sounds['ui_click'].play()
+                        return self.attempt_register()
                 
                 elif self.forgot_btn.collidepoint(pos):
+                    self.sounds['ui_click'].play()
                     self.message = "TODO"
-                    self.message_color = self.GRAY
+                    self.message_color = self.WHITE
             
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_TAB:
-                    self.cycle_active_field()
-                elif event.key == pygame.K_RETURN:
+                if event.key == pygame.K_RETURN:
                     if self.mode == "login":
                         return self.attempt_login()
                     else:
@@ -102,21 +128,6 @@ class AuthScreen:
                     self.handle_text_input(event.unicode)
         
         return None
-
-    def cycle_active_field(self):
-        """Cycle through input fields with Tab"""
-        if self.mode == "login":
-            if self.active_field == "username_or_email":
-                self.active_field = "password"
-            else:
-                self.active_field = "username_or_email"
-        else:  # register mode
-            if self.active_field == "username_or_email":
-                self.active_field = "email"
-            elif self.active_field == "email":
-                self.active_field = "password"
-            else:
-                self.active_field = "username_or_email"
 
     def handle_backspace(self):
         """Handle backspace key"""
@@ -131,10 +142,10 @@ class AuthScreen:
         """Handle text input"""
         if text.isprintable():
             if self.active_field == "username_or_email":
-                if len(self.username_or_email) < 50:  # Increased for email length
+                if len(self.username_or_email) < 50:
                     self.username_or_email += text
             elif self.active_field == "password":
-                if len(self.password) < 30:
+                if len(self.password) < 20:
                     self.password += text
             elif self.active_field == "email":
                 if len(self.email) < 50:
@@ -168,7 +179,6 @@ class AuthScreen:
             self.message_color = self.RED
             return None
         
-        # For registration, username_or_email field should be username only
         success, message = register_user(self.username_or_email, self.email, self.password)
         self.message = message
         self.message_color = self.GREEN if success else self.RED
@@ -185,7 +195,7 @@ class AuthScreen:
         pygame.draw.rect(self.screen, self.BLACK, rect, 2)
         
         # Text content
-        display_text = text if not hide_text else "*" * len(text)
+        display_text = text if not hide_text else "•" * len(text)
         if not display_text and not is_active:
             display_text = placeholder
             text_color = self.GRAY
@@ -195,7 +205,24 @@ class AuthScreen:
         text_surface = self.font.render(display_text, True, text_color)
         text_rect = text_surface.get_rect()
         text_rect.centery = rect.centery
-        text_rect.x = rect.x + 10
+        border_offset = 10
+        text_rect.x = rect.x + border_offset
+        
+        # Handle longer input
+        if text_rect.width > rect.width:
+            self.extended_text_rect = pygame.Rect.inflate(text_rect, border_offset, border_offset)
+            self.extended_text_rect.topleft = rect.topleft
+            self.extended_text_rect.height = rect.height
+            self.extended_text_rect.width += border_offset
+
+            if self.username_or_email:
+                self.username_or_email_rect.width = self.extended_text_rect.width
+            elif self.email:
+                self.email_rect.width = self.extended_text_rect.width
+
+            pygame.draw.rect(self.screen, color, self.extended_text_rect)
+            pygame.draw.rect(self.screen, self.BLACK, self.extended_text_rect, 2)
+
         self.screen.blit(text_surface, text_rect)
         
         # Cursor
@@ -219,16 +246,16 @@ class AuthScreen:
 
     def draw(self):
         """Draw the authentication screen"""
-        self.screen.fill(self.WHITE)
+        self.screen.blit(self.bg_surface, (0, 0))
         
         # Title
         title_text = "Log In" if self.mode == "login" else "Register"
-        title_surface = pygame.font.Font(None, 48).render(title_text, True, self.BLACK)
+        title_surface = pygame.font.Font('ithaca.ttf', 48).render(title_text, True, self.WHITE)
         title_rect = title_surface.get_rect(center=(self.screen_width // 2 - 15, 175))
         self.screen.blit(title_surface, title_rect)
         
         # Input fields
-        login_placeholder = "Username or Email" if self.mode == "login" else "Username"
+        login_placeholder = "Username / Email" if self.mode == "login" else "Username"
         self.draw_input_field(self.username_or_email_rect, self.username_or_email, login_placeholder, 
                              self.active_field == "username_or_email")
         
@@ -243,9 +270,9 @@ class AuthScreen:
         show_hide_text = "Hide" if self.password_visible else "Show"
         self.draw_button(self.show_hide_btn, show_hide_text, self.GRAY)
         
-        # Forgot password (only in login mode)
+        # Forgot password
         if self.mode == "login":
-            forgot_surface = self.font.render("Forgot password?", True, self.BLUE)
+            forgot_surface = self.font.render("Forgot password?", True, self.WHITE)
             forgot_rect = forgot_surface.get_rect(center=self.forgot_btn.center)
             self.screen.blit(forgot_surface, forgot_rect)
         

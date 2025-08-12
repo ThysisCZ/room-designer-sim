@@ -104,7 +104,7 @@ class InventoryUI:
                 pygame.draw.rect(screen, (124, 67, 0), tab_rect)
             
             # Draw tab name text
-            font = pygame.font.SysFont(None, 20)
+            font = pygame.font.Font('ithaca.ttf', 20)
             label = font.render(tab, True, (255, 255, 255))
             screen.blit(label, (x + 12 + x_offset, y + 25))
 
@@ -149,7 +149,7 @@ class InventoryUI:
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
 
                     # Show count
-                    font = pygame.font.SysFont(None, 36)
+                    font = pygame.font.Font('ithaca.ttf', 36)
                     count_str = str(item['count'])
                     label = font.render(count_str, True, (255, 255, 255))
                     label_rect = label.get_rect(bottomright=(x + self.item_size - 3, y + self.item_size))
@@ -406,19 +406,19 @@ class MinigameUI:
                 screen.blit(self.snake_thumbnail, (x + 1, y + 2))
 
                 # Draw minigame name text
-                font = pygame.font.SysFont(None, 20)
+                font = pygame.font.Font('ithaca.ttf', 20)
                 label = font.render(minigame, True, (255, 255, 255))
                 screen.blit(label, (x + 44, y + 105))
             elif minigame == 'Catch the Fruit':
                 screen.blit(self.fruit_thumbnail, (x + 1, y + 2))
 
-                font = pygame.font.SysFont(None, 20)
+                font = pygame.font.Font('ithaca.ttf', 20)
                 label = font.render(minigame, True, (255, 255, 255))
                 screen.blit(label, (x + 15, y + 105))
             else:
                 screen.blit(self.bullet_thumbnail, (x + 1, y + 2))
 
-                font = pygame.font.SysFont(None, 20)
+                font = pygame.font.Font('ithaca.ttf', 20)
                 label = font.render(minigame, True, (255, 255, 255))
                 screen.blit(label, (x + 30, y + 105))
     

@@ -57,8 +57,8 @@ class RoomDesignerGame:
         
         self.game_state = GameState.MENU
 
-        self.font = pygame.font.Font(None, 36)
-        self.big_font = pygame.font.Font(None, 72)
+        self.font = pygame.font.Font('ithaca.ttf', 36)
+        self.big_font = pygame.font.Font('ithaca.ttf', 72)
         
         self.running = True
         
@@ -1831,7 +1831,7 @@ class RoomDesignerGame:
                 # Asset hover
                 if self.hovered_asset:
                     mx, my = pygame.mouse.get_pos()
-                    font = pygame.font.SysFont(None, 24)
+                    font = pygame.font.Font('ithaca.ttf', 24)
                     
                     name = font.render(self.hovered_asset['name'], True, (255, 255, 0))  
                     name_rect = name.get_rect()
@@ -1903,7 +1903,7 @@ class RoomDesignerGame:
             ("Escape", "Quit game")
         ]
         
-        small_font = pygame.font.Font(None, 30)
+        small_font = pygame.font.Font('ithaca.ttf', 30)
         y_offset = self.HEIGHT - 120
         
         # Draw authors on the left

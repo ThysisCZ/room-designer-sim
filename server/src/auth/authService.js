@@ -34,13 +34,13 @@ module.exports.loginUserService = (loginDetails) => {
         userModel.findOne(query)
             .then(async (user) => {
                 if (!user) {
-                    reject({ success: false, message: "Invalid username/email or password" });
+                    reject({ success: false, message: "Username or email doesn't exist" });
                     return;
                 }
 
                 const isValidPassword = await user.comparePassword(loginDetails.password);
                 if (!isValidPassword) {
-                    reject({ success: false, message: "Invalid username/email or password" });
+                    reject({ success: false, message: "Invalid password" });
                     return;
                 }
 
