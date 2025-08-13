@@ -4,7 +4,7 @@ shop_assets = [
         "name": "Minimalist Table",
         "spritesheet": "minimalist_table.png",
         "type": "item",
-        "description": "Simple and cheap table that is good enough for visitors.",
+        "description": "Good enough for visitors.",
         "price": 150,
         "count": 0
     },

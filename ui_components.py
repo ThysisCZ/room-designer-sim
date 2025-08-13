@@ -2,7 +2,7 @@ import pygame
 from pathlib import Path
 
 from utils.sprite_sheet import SpriteSheet
-from game_logic import create_graphics
+from game_logic import create_graphics, create_sounds
 import storage.inventory_abl as inventory_abl
 
 class Button:
@@ -54,7 +54,6 @@ class InventoryUI:
         self.item_size = item_size
         self.x = x
         self.y = y
-        self.page = 0
         self.selected_item = selected_item
         self.selected_floor = selected_floor
         self.selected_wall = selected_wall
@@ -67,7 +66,7 @@ class InventoryUI:
         self.WALL_TAB = 2
     
     def draw(self, screen):
-        start = self.page * self.cols * self.rows
+        start = 0
         end = start + self.cols * self.rows
 
         # Prepare 8x4 grid
@@ -235,14 +234,6 @@ class InventoryUI:
                     # Yellow border
                     if self.selected_wall == wall or (idx == 0 and self.selected_floor is None):
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
-
-    def next_page(self):
-        if (self.page + 1) * self.cols * self.rows < len(self.items):
-            self.page += 1
-    
-    def prev_page(self):
-        if self.page > 0:
-            self.page -= 1
     
     def handle_click(self, mouse_pos):
         mx, my = mouse_pos
@@ -268,7 +259,7 @@ class InventoryUI:
                 rect = pygame.Rect(x, y, self.item_size, self.item_size)
                 
                 if rect.collidepoint(mx, my):
-                    index = self.page * self.cols * self.rows + idx
+                    index = idx
 
                     if index < len(grid_list):
                         set_selected_callback(index)
@@ -442,9 +433,24 @@ class ShopUI:
         self.hovered_asset = None
         self.rect = pygame.Rect(self.x, self.y, self.cols * self.thumbnail_size, self.rows * self.thumbnail_size)
         self.total_balance = total_balance
+        self.ui_graphics_collection = create_graphics()
+        self.sounds = create_sounds()
+        self.sounds['ui_click'].set_volume(0.5)
+        self.arrow_width = 60
+        self.arrow_height = 45
+        self.arrow_offset = 50
+        self.left_arrow_x = self.x - self.arrow_width - self.arrow_offset
+        self.left_arrow_y = self.y + (self.rows * self.thumbnail_size) // 2.175
+        self.left_arrow_icon = self.ui_graphics_collection[23]
+        self.left_arrow_rect = pygame.Rect(0, 0, 0, 0)
+        self.right_arrow_x = self.x + (self.cols * self.thumbnail_size) + self.arrow_offset
+        self.right_arrow_y = self.y + (self.rows * self.thumbnail_size) // 2.175
+        self.right_arrow_icon = self.ui_graphics_collection[24]
+        self.right_arrow_rect = pygame.Rect(0, 0, 0, 0)
+        self.page = 0
     
     def draw(self, screen):
-        start = 0
+        start = self.page * self.cols * self.rows
         end = start + self.cols * self.rows
 
         # Prepare 2x4 grid
@@ -505,9 +511,32 @@ class ShopUI:
                 # Yellow border
                 if self.selected_asset == asset:
                     pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
+        
+        # Handle left arrow display
+        if self.page > 0:
+            screen.blit(self.left_arrow_icon, (self.left_arrow_x, self.left_arrow_y))
+            self.left_arrow_rect = pygame.Rect(self.left_arrow_x, self.left_arrow_y, self.arrow_width, self.arrow_height)
+        else:
+            self.left_arrow_rect = pygame.Rect(0, 0, 0, 0)
+        
+        # Handle right arrow display
+        if self.page < len(self.assets) // (self.cols * self.rows):
+            screen.blit(self.right_arrow_icon, (self.right_arrow_x, self.right_arrow_y))
+            self.right_arrow_rect = pygame.Rect(self.right_arrow_x, self.right_arrow_y, self.arrow_width, self.arrow_height)
+        else:
+            self.right_arrow_rect = pygame.Rect(0, 0, 0, 0)
+
     
     def handle_click(self, mouse_pos):
         mx, my = mouse_pos
+
+        # Arrow click
+        if self.left_arrow_rect.collidepoint(mx, my):
+            self.sounds['ui_click'].play()
+            self.page -= 1
+        elif self.right_arrow_rect.collidepoint(mx, my):
+            self.sounds['ui_click'].play()
+            self.page += 1
 
         # Asset selection
         def handle_grid_selection(grid_list, set_selected_callback):
@@ -520,7 +549,7 @@ class ShopUI:
                 rect = pygame.Rect(x, y, self.thumbnail_size, self.thumbnail_size)
                 
                 if rect.collidepoint(mx, my):
-                    index = idx
+                    index = idx + self.page * self.cols * self.rows
 
                     if index < len(grid_list):
                         set_selected_callback(index)
@@ -546,8 +575,11 @@ class ShopUI:
             rect = pygame.Rect(x, y, self.thumbnail_size, self.thumbnail_size)
 
             if rect.collidepoint(mx, my):
-                self.hovered_asset = asset
-                return asset
+                index = idx + self.page * self.cols * self.rows
+
+                if index < len(self.assets):
+                    self.hovered_asset = asset
+                    return self.assets[index]
     
     def attempt_purchase(self):
         asset = self.selected_asset

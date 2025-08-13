@@ -5,9 +5,9 @@
             "name": "Minimalist Table",
             "spritesheet": "minimalist_table.png",
             "type": "item",
-            "description": "Simple and cheap table that is good enough for visitors.",
+            "description": "Good enough for visitors.",
             "price": 150,
-            "count": 5,
+            "count": 8,
             "_id": "689bb4e4db5261c733031c07"
         }
     ],

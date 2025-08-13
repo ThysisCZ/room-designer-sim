@@ -164,6 +164,7 @@ class RoomDesignerGame:
         self.inventory_border = self.ui_graphics_collection[0]
         self.minigames_border = self.ui_graphics_collection[1]
         self.balance_border = self.ui_graphics_collection[22]
+        self.shop_border = self.ui_graphics_collection[25]
         
         self.sounds['background'].play(loops=-1).set_volume(0.8)
         self.sounds['object_rotate'].set_volume(0.6)
@@ -842,7 +843,7 @@ class RoomDesignerGame:
                 ]
 
             font = pygame.font.Font('ithaca.ttf', 24)
-            y_offset = self.HEIGHT - 70
+            y_offset = self.HEIGHT - 75
 
             for row in info:
                 info_text = font.render(f"{row}", False, (255, 255, 255))
@@ -1476,8 +1477,10 @@ class RoomDesignerGame:
                             self.show_buy_button = self.shop_ui.selected_asset is not None
                         
                         inner_click = self.shop_ui.rect.collidepoint(pygame.mouse.get_pos())
+                        left_arrow_click = self.shop_ui.left_arrow_rect.collidepoint(pygame.mouse.get_pos())
+                        right_arrow_click = self.shop_ui.right_arrow_rect.collidepoint(pygame.mouse.get_pos())
 
-                        if not inner_click and not self.buy_button.handle_event(event):
+                        if not inner_click and not left_arrow_click and not right_arrow_click and not self.buy_button.handle_event(event):
                             self.sounds['ui_click'].play()
                             self.show_shop = False
                             self.show_buy_button = False
@@ -1853,7 +1856,7 @@ class RoomDesignerGame:
                     bg_rect = pygame.Rect(name_rect.x - 6, name_rect.y - 6, description_rect.width + 12,
                                           name_rect.height + description_rect.height + price_rect.height + 10)
                     bg_rect_center = pygame.Rect(name_rect.x - 6, name_rect.y - 6, description_rect.width + 12,
-                                          name_rect.height + description_rect.height)
+                                          name_rect.height + description_rect.height + 2)
                     pygame.draw.rect(self.screen, (255, 70, 0), bg_rect, 29, 5)
                     pygame.draw.rect(self.screen, (255, 70, 0), bg_rect_center, 15, 5)
                     pygame.draw.rect(self.screen, (255, 120, 0), bg_rect, 3, 5)
@@ -1883,7 +1886,7 @@ class RoomDesignerGame:
         self.screen.blit(self.bg_surface, (0, 0))
         
         title_text = self.big_font.render("Room Designer Simulator", True, (255, 255, 255))
-        title_rect = title_text.get_rect(center=(self.WIDTH // 2, 175))
+        title_rect = title_text.get_rect(center=(self.WIDTH // 2 + 10, 175))
         
         self.screen.blit(title_text, title_rect)
         
@@ -1918,6 +1921,10 @@ class RoomDesignerGame:
             control_text = small_font.render(f"{control}: {action}", True, (255, 255, 255))
             self.screen.blit(control_text, (1053, y_offset))
             y_offset += 30
+
+        copyright = "©2025 | Thysis | All rights reserved"
+        copyright_text = small_font.render(copyright, True, (255, 255, 255))
+        self.screen.blit(copyright_text, (self.WIDTH // 3 + 40, 30))
     
     def draw_game(self):
         """Draws room."""
@@ -1940,7 +1947,7 @@ class RoomDesignerGame:
 
         balance_text = font.render(str(self.total_balance), True, 'white')
         balance_rect = balance_text.get_rect()
-        balance_rect.bottomleft = (65, 51)
+        balance_rect.bottomleft = (65, 53)
         self.screen.blit(balance_text, balance_rect)
         
         render_list = []
@@ -2022,6 +2029,8 @@ class RoomDesignerGame:
                     y_offset += 20
         elif self.show_minigames:
             self.screen.blit(self.minigames_border, (371, 172))
+        elif self.show_shop:
+            self.screen.blit(self.shop_border, (504, 91))
     
     def clear_sprites(self):
         """Deletes all sprite groups"""
