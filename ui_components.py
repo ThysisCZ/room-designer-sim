@@ -140,8 +140,13 @@ class InventoryUI:
                     # White border
                     pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
 
+                    item_type = item.get('type')
+
                     # Show icons
-                    screen.blit(icon, (x, y))
+                    if item_type == 'wall item':
+                        screen.blit(icon, (x - 13, y + 5))
+                    else:
+                        screen.blit(icon, (x, y))
 
                     # Yellow border
                     if self.selected_item == item:
@@ -505,8 +510,13 @@ class ShopUI:
                 # White border
                 pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
 
+                asset_type = asset.get('type')
+
                 # Show icons
-                screen.blit(icon, (x + icon_margin, y + icon_margin))
+                if asset_type == 'wall item': 
+                    screen.blit(icon, (x - 16 + icon_margin, y + 9 + icon_margin))
+                else:
+                    screen.blit(icon, (x + icon_margin, y + icon_margin))
 
                 # Yellow border
                 if self.selected_asset == asset:
@@ -601,7 +611,7 @@ class ShopUI:
                     return False
             inventory[asset_type].append(asset)
 
-        elif asset_type == 'item':
+        elif asset_type in ['floor item', 'wall item']:
             found = False
             for existing in inventory['item']:
                 if existing.get('id') == asset.get('id'):

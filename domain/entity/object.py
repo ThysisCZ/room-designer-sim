@@ -7,20 +7,24 @@ class Object(pygame.sprite.Sprite):
 
     object represents anything that is controlled by the player
     """
-    def __init__(self, x, y, c, r, iso_utils, asset=None, obj_id=None):
+    def __init__(self, x, y, z, c, r, iso_utils, asset=None, obj_id=None):
         super().__init__()
         self.iso_utils = iso_utils
         self.grid_x = x
         self.grid_y = y
+        self.grid_z = z
         self.col = c
         self.row = r
-        self.z = 0
         self.animation_frame = 0
         self.animation_timer = 0
         self.flickering_timer = 0
         self.object_placed_position = None
         self.asset = asset
         self.obj_id = obj_id or (asset['id'] if asset else None)
+        
+        # Store camera offsets
+        self.camera_offset_x = 0
+        self.camera_offset_y = 0
 
         self.WALL_TILE = 1
         self.STATIC_OBJECT = 2
@@ -30,22 +34,30 @@ class Object(pygame.sprite.Sprite):
     def create_sprite(self):
         # Flickering when moving the object
         if (self.flickering_timer // 3) % 2:
-            # Lower opacity
             self.image = self.iso_utils.create_object_sprite(self.col, self.row, 100, self.obj_id)
         else:
-            # Normal color
             self.image = self.iso_utils.create_object_sprite(self.col, self.row, 255, self.obj_id)
         
         self.rect = self.image.get_rect()
         self.update_position()
 
-    def update_position(self):
-        screen_x, screen_y = self.iso_utils.grid_to_screen(self.grid_x, self.grid_y, self.z)
-        offset_x, offset_y = self.iso_utils.get_tile_center_offset()
-        self.rect.centerx = screen_x + offset_x
-        self.rect.bottom = screen_y + offset_y
+    def update_position(self, camera_offset_x=None, camera_offset_y=None):
+        """Update position using the exact same logic as the render system"""
+        if camera_offset_x is not None:
+            self.camera_offset_x = camera_offset_x
+        if camera_offset_y is not None:
+            self.camera_offset_y = camera_offset_y
+        
+        screen_x, screen_y = self.iso_utils.grid_to_screen(self.grid_x, self.grid_y)
+        self.rect.x = screen_x - self.iso_utils.half_tile_width + self.camera_offset_x
+        
+        # Apply z-positioning
+        tile_spacing = 1.3
+        base_y = screen_y - self.iso_utils.tile_height + self.camera_offset_y
+        z_offset = self.grid_z * self.iso_utils.tile_height * tile_spacing
+        self.rect.y = base_y - z_offset
 
-    def move(self, dx, dy, game_map, grid_width, grid_height, objects=None):
+    def move(self, dx, dy, dz, game_map, grid_width, grid_height, grid_volume, objects=None):
         """
         Function for moving the object.
         It checks if the move is valid.
@@ -57,6 +69,8 @@ class Object(pygame.sprite.Sprite):
             x change from current position
         dy : int
             y change from current position
+        dz : int
+            z change from current position
         game_map : 3d array
             map of the game, used for determining valid moves
         grid_width : int
@@ -68,27 +82,25 @@ class Object(pygame.sprite.Sprite):
         """
         new_x = max(0, min(grid_width - 1, self.grid_x + dx))
         new_y = max(0, min(grid_height - 1, self.grid_y + dy))
+        new_z = max(0, min(grid_volume - 1, self.grid_z + dz))
 
-        # Check walls and placed objects
-        if game_map[new_y, new_x, 0] == self.WALL_TILE or game_map[new_y, new_x, 0] == self.STATIC_OBJECT:
+        # Check walls and static objects at the target z
+        if game_map[new_x, new_y, new_z] in (self.WALL_TILE, self.STATIC_OBJECT):
             return False
-        
-        # Check objects
-        if objects:
-            for object in objects:
-                if object.grid_x == new_x and object.grid_y == new_y:
-                    # If we try to go to an object and it is not the object we just placed
-                    if self.object_placed_position != (new_x, new_y):
-                        return False
-        
-        # If we move, check if we leave the position with the object placed
-        if self.object_placed_position and (self.grid_x, self.grid_y) == self.object_placed_position:
-            # We leave the position with the object placed - we cannot return to it anymore
-            self.object_placed_position = None
-        
-        self.grid_x = new_x
-        self.grid_y = new_y
 
+        # Check other objects at the same position and z
+        if objects:
+            for obj in objects:
+                if obj.grid_x == new_x and obj.grid_y == new_y and obj.grid_z == new_z:
+                    if self.object_placed_position != (new_x, new_y, new_z):
+                        return False
+
+        # Update placement tracking
+        if self.object_placed_position and (self.grid_x, self.grid_y, self.grid_z) == self.object_placed_position:
+            self.object_placed_position = None
+
+        # Apply movement
+        self.grid_x, self.grid_y, self.grid_z = new_x, new_y, new_z
         self.update_position()
         return True
     

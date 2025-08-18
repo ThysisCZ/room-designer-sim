@@ -1,14 +1,5 @@
 shop_assets = [
     {
-        "id": "minimalist_table",
-        "name": "Minimalist Table",
-        "spritesheet": "minimalist_table.png",
-        "type": "item",
-        "description": "Good enough for visitors.",
-        "price": 150,
-        "count": 0
-    },
-    {
         "id": "minimalist_floor",
         "name": "Minimalist Floor",
         "spritesheet": "minimalist_floor.png",
@@ -23,5 +14,23 @@ shop_assets = [
         "type": "wall",
         "description": "You should lean against it only if your clothes are clean.",
         "price": 200
+    },
+    {
+        "id": "minimalist_table",
+        "name": "Minimalist Table",
+        "spritesheet": "minimalist_table.png",
+        "type": "floor item",
+        "description": "Good enough for visitors.",
+        "price": 150,
+        "count": 0
+    },
+    {
+        "id": "wooden_window",
+        "name": "Wooden Window",
+        "spritesheet": "wooden_window.png",
+        "type": "wall item",
+        "description": "Made out of an oak tree.",
+        "price": 150,
+        "count": 0
     }
 ]

@@ -4,12 +4,12 @@ import os
 
 def create_game_map(grid_width, grid_height, grid_volume):
     """Creates a 3D game map with walls"""
-    game_map = np.zeros((grid_height, grid_width, grid_volume), dtype=int)
+    game_map = np.zeros((grid_width, grid_height, grid_volume), dtype=int)
 
     # Create walls along the edges
     for z in range(grid_volume):
-        game_map[0, :, z] = 1  # North wall
-        game_map[:, 0, z] = 1  # West wall
+        game_map[:, 0, z] = 1  # north wall
+        game_map[0, :, z] = 1  # east wall
 
     return game_map
 
@@ -139,6 +139,9 @@ def create_graphics():
     shop = pygame.image.load("assets/graphics/shop.png")
     shop = pygame.transform.scale(shop, (346, 540))
 
+    logo = pygame.image.load("assets/graphics/logo.png")
+    logo = pygame.transform.scale(logo, (720, 138))
+
         
     return [inventory, minigames, apple, snake_thumbnail, basket,
             orange, banana, dragon_fruit, avocado, fruit_thumbnail,
@@ -146,5 +149,5 @@ def create_graphics():
             green_ship, dark_blue_bullet, light_blue_bullet,
             dark_red_bullet, light_red_bullet, bullet_thumbnail,
             game_coin, total_balance, left_arrow, right_arrow,
-            shop
+            shop, logo
         ]

@@ -75,6 +75,7 @@ const gameDataSchema = new Schema({
     tiles: [{
         "grid_x": Number,
         "grid_y": Number,
+        "grid_z": Number,
         "col": Number,
         "row": Number,
         "id": String

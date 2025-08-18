@@ -19,6 +19,9 @@ class IsometricUtils:
         # Sprite groups
         self.all_sprites = pygame.sprite.Group()
         self.objects = pygame.sprite.Group()
+        
+        # Dictionary to store sprite sheets by object ID
+        self.object_sheets = {}
     
     def load_sprite_sheets(self, selected, type):
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -34,7 +37,9 @@ class IsometricUtils:
         spritesheets_path = os.path.join(spritesheets_dir, selected["spritesheet"])
 
         if type == self.ITEM_TAB:
-            self.object_sheet = SpriteSheet(spritesheets_path)
+            # For items, store the sprite sheet in the object_sheets dictionary
+            if "id" in selected:
+                self.object_sheets[selected["id"]] = SpriteSheet(spritesheets_path)
         elif type == self.FLOOR_TAB:
             self.floor_sheet = SpriteSheet(spritesheets_path)
         else:
@@ -44,10 +49,11 @@ class IsometricUtils:
         self.row = 0
         self.sprites_loaded = True
         
-    def grid_to_screen(self, grid_x, grid_y, z=0):
+    def grid_to_screen(self, grid_x, grid_y):
         """Convert grid coordinates to screen coordinates"""
         screen_x = (grid_x - grid_y) * self.half_tile_width
-        screen_y = (grid_x + grid_y) * self.half_tile_height - z * self.half_tile_height
+        screen_y = (grid_x + grid_y) * self.half_tile_height
+        
         return int(screen_x), int(screen_y)
     
     def screen_to_grid(self, screen_x, screen_y):
@@ -141,6 +147,10 @@ class IsometricUtils:
         return surface
     
     def _load_object_spritesheet_by_id(self, object_id):
+        # If we already have this sprite sheet loaded, no need to load it again
+        if object_id in self.object_sheets:
+            return
+            
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.dirname(current_dir)
 
@@ -148,7 +158,7 @@ class IsometricUtils:
         spritesheets_path = os.path.join(spritesheets_dir, f"{object_id}.png")
 
         if os.path.exists(spritesheets_path):
-            self.object_sheet = SpriteSheet(spritesheets_path)
+            self.object_sheets[object_id] = SpriteSheet(spritesheets_path)
             self.sprites_loaded = True
     
     def create_object_sprite(self, c=0, r=0, alpha=255, object_id=None):
@@ -156,26 +166,28 @@ class IsometricUtils:
         col, row = c, r
 
         # Load sprite sheet if not already loaded
-        if not self.sprites_loaded and object_id:
+        if object_id:
             self._load_object_spritesheet_by_id(object_id)
 
-        if not hasattr(self, 'object_sheet'):
-            raise RuntimeError("Object spritesheet not loaded or missing.")
+            if object_id not in self.object_sheets:
+                raise RuntimeError(f"Object spritesheet for {object_id} not loaded or missing.")
 
-        # Calculate sprite dimensions (assuming 10x10 grid)
-        total_width = self.object_sheet.sheet.get_width()
-        total_height = self.object_sheet.sheet.get_height()
-        sprite_width = total_width // 10
-        sprite_height = total_height // 10
+            sprite_sheet = self.object_sheets[object_id]
+            
+            # Calculate sprite dimensions (assuming 10x10 grid)
+            total_width = sprite_sheet.sheet.get_width()
+            total_height = sprite_sheet.sheet.get_height()
+            sprite_width = total_width // 10
+            sprite_height = total_height // 10
 
-        # Get sprite from position (col, row)
-        sprite = self.object_sheet.get_sprite(
-            col * sprite_width,
-            row * sprite_height,
-            sprite_width,
-            sprite_height,
-            scale=4
-        )
+            # Get sprite from position (col, row)
+            sprite = sprite_sheet.get_sprite(
+                col * sprite_width,
+                row * sprite_height,
+                sprite_width,
+                sprite_height,
+                scale=4
+            )
 
         # Set opacity
         sprite.set_alpha(alpha)

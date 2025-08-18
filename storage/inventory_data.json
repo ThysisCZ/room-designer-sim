@@ -4,11 +4,21 @@
             "id": "minimalist_table",
             "name": "Minimalist Table",
             "spritesheet": "minimalist_table.png",
-            "type": "item",
+            "type": "floor item",
             "description": "Good enough for visitors.",
             "price": 150,
-            "count": 8,
+            "count": 6,
             "_id": "689bb4e4db5261c733031c07"
+        },
+        {
+            "id": "wooden_window",
+            "name": "Wooden Window",
+            "spritesheet": "wooden_window.png",
+            "type": "wall item",
+            "description": "Made out of an oak tree.",
+            "price": 150,
+            "count": 2,
+            "_id": "689f73c560dbdeada30988cf"
         }
     ],
     "floor": [

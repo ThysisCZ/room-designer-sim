@@ -112,9 +112,9 @@ module.exports.forgotPasswordService = (email) => {
                                 <h1 style="color: #333; font-size: 36px; letter-spacing: 5px; margin: 0;">${resetCode}</h1>
                             </div>
                             <p>This code will expire in 15 minutes.</p>
-                            <p>If you didn't request this reset, you can safely ignore this email.</p>
+                            <p>If you didn't request this reset, you can ignore this email.</p>
                             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                            <p style="color: #666; font-size: 12px;">Room Designer Simulator - Keep Building!</p>
+                            <p style="color: #666; font-size: 12px;">©2025 | Thysis | All rights reserved</p>
                         </div>
                     `
                 };
