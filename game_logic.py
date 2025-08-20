@@ -80,7 +80,8 @@ def create_sounds():
         "ui_click" : pygame.mixer.Sound("assets/sounds/click.wav"),
         "score" : pygame.mixer.Sound("assets/sounds/score.wav"),
         "bullets" : pygame.mixer.Sound("assets/sounds/bullets.wav"),
-        "coin" : pygame.mixer.Sound("assets/sounds/coin.wav")
+        "coin" : pygame.mixer.Sound("assets/sounds/coin.wav"),
+        "hit" : pygame.mixer.Sound("assets/sounds/hit.wav")
     }
 
 
@@ -142,6 +143,7 @@ def create_graphics():
     logo = pygame.image.load("assets/graphics/logo.png")
     logo = pygame.transform.scale(logo, (720, 138))
 
+    damaged_ship = pygame.image.load("assets/graphics/damaged_spaceship.png")
         
     return [inventory, minigames, apple, snake_thumbnail, basket,
             orange, banana, dragon_fruit, avocado, fruit_thumbnail,
@@ -149,5 +151,5 @@ def create_graphics():
             green_ship, dark_blue_bullet, light_blue_bullet,
             dark_red_bullet, light_red_bullet, bullet_thumbnail,
             game_coin, total_balance, left_arrow, right_arrow,
-            shop, logo
+            shop, logo, damaged_ship
         ]

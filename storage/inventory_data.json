@@ -7,8 +7,8 @@
             "type": "floor item",
             "description": "Good enough for visitors.",
             "price": 150,
-            "count": 6,
-            "_id": "689bb4e4db5261c733031c07"
+            "count": 3,
+            "_id": "68a4b0176903d73e172d2d55"
         },
         {
             "id": "wooden_window",
@@ -17,8 +17,18 @@
             "type": "wall item",
             "description": "Made out of an oak tree.",
             "price": 150,
-            "count": 2,
-            "_id": "689f73c560dbdeada30988cf"
+            "count": 4,
+            "_id": "68a4b0176903d73e172d2d56"
+        },
+        {
+            "id": "orchid",
+            "name": "Orchid",
+            "spritesheet": "orchid.png",
+            "type": "surface item",
+            "description": "Plant from the Orchidaceae family.",
+            "price": 100,
+            "count": 3,
+            "_id": "68a4b0176903d73e172d2d57"
         }
     ],
     "floor": [
@@ -56,7 +66,7 @@
             "name": "Minimalist Wall",
             "spritesheet": "minimalist_wall.png",
             "type": "wall",
-            "description": "You should lean against it only if your clothes are clean.",
+            "description": "You can lean against it only if your clothes are clean.",
             "price": 200,
             "_id": "689b862d24d31b4c2ad15472"
         }

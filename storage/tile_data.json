@@ -1,27 +1,21 @@
 [
     {
-        "grid_x": 4,
-        "grid_y": 1,
-        "grid_z": 2,
+        "grid_x": 6,
+        "grid_y": 6,
+        "grid_z": 0,
         "col": 0,
         "row": 0,
-        "id": "wooden_window"
+        "id": "minimalist_table",
+        "_id": "68a64fc2326123a469073b94"
     },
     {
-        "grid_x": 1,
-        "grid_y": 8,
-        "grid_z": 2,
-        "col": 1,
+        "grid_x": 6,
+        "grid_y": 6,
+        "grid_z": 1,
+        "col": 0,
         "row": 0,
-        "id": "wooden_window"
-    },
-    {
-        "grid_x": 1,
-        "grid_y": 4,
-        "grid_z": 2,
-        "col": 1,
-        "row": 0,
-        "id": "wooden_window"
+        "id": "orchid",
+        "_id": "68a64fc2326123a469073b95"
     },
     {
         "grid_x": 8,
@@ -29,14 +23,34 @@
         "grid_z": 2,
         "col": 0,
         "row": 0,
-        "id": "wooden_window"
+        "id": "wooden_window",
+        "_id": "68a64fc2326123a469073b96"
     },
     {
-        "grid_x": 6,
-        "grid_y": 6,
-        "grid_z": 0,
+        "grid_x": 4,
+        "grid_y": 1,
+        "grid_z": 2,
         "col": 0,
         "row": 0,
-        "id": "minimalist_table"
+        "id": "wooden_window",
+        "_id": "68a64fc2326123a469073b97"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 4,
+        "grid_z": 2,
+        "col": 1,
+        "row": 0,
+        "id": "wooden_window",
+        "_id": "68a64fc2326123a469073b98"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 8,
+        "grid_z": 2,
+        "col": 1,
+        "row": 0,
+        "id": "wooden_window",
+        "_id": "68a64fc2326123a469073b99"
     }
 ]

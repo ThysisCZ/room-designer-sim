@@ -14,11 +14,9 @@ def game_startup():
         success, message = sync_to_cloud()
         if success:
             print(f"Sync: {message}")
-        else:
-            print(f"Sync failed: {message} (playing offline)")
-        return True
+
+        return show_auth_screen()
     else:
-        print("Playing offline - login to sync progress")
         return show_auth_screen()
 
 def show_auth_screen():

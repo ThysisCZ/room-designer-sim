@@ -26,8 +26,10 @@ class Object(pygame.sprite.Sprite):
         self.camera_offset_x = 0
         self.camera_offset_y = 0
 
+        self.EMPTY_SPACE = 0
         self.WALL_TILE = 1
-        self.STATIC_OBJECT = 2
+        self.TOP_SURFACE = 2
+        self.NON_TOP_SURFACE = 3
         
         self.create_sprite()
 
@@ -57,7 +59,7 @@ class Object(pygame.sprite.Sprite):
         z_offset = self.grid_z * self.iso_utils.tile_height * tile_spacing
         self.rect.y = base_y - z_offset
 
-    def move(self, dx, dy, dz, game_map, grid_width, grid_height, grid_volume, objects=None):
+    def move(self, dx, dy, dz, game_map, grid_width, grid_height, grid_volume):
         """
         Function for moving the object.
         It checks if the move is valid.
@@ -71,33 +73,32 @@ class Object(pygame.sprite.Sprite):
             y change from current position
         dz : int
             z change from current position
-        game_map : 3d array
-            map of the game, used for determining valid moves
+        game_map : 3D array
+            entire isometric room
         grid_width : int
-            width of the map, used for determining valid moves
+            width of the map
         grid_height : int
-            height of the map, used for determining valid moves
-        objects, default None
-            other objects placed on the map
+            height of the map
         """
-        new_x = max(0, min(grid_width - 1, self.grid_x + dx))
-        new_y = max(0, min(grid_height - 1, self.grid_y + dy))
+
+        # Store new position and check map border
+        new_x = min(grid_width - 1, self.grid_x + dx)
+        new_y = min(grid_height - 1, self.grid_y + dy)
         new_z = max(0, min(grid_volume - 1, self.grid_z + dz))
 
-        # Check walls and static objects at the target z
-        if game_map[new_x, new_y, new_z] in (self.WALL_TILE, self.STATIC_OBJECT):
-            return False
-
-        # Check other objects at the same position and z
-        if objects:
-            for obj in objects:
-                if obj.grid_x == new_x and obj.grid_y == new_y and obj.grid_z == new_z:
-                    if self.object_placed_position != (new_x, new_y, new_z):
-                        return False
-
-        # Update placement tracking
-        if self.object_placed_position and (self.grid_x, self.grid_y, self.grid_z) == self.object_placed_position:
-            self.object_placed_position = None
+        # Check walls and objects
+        if not self.asset.get('type') == 'surface item':
+            if game_map[new_x, new_y, new_z] in (self.WALL_TILE, self.TOP_SURFACE, self.NON_TOP_SURFACE):
+                return False
+        else:
+            if game_map[new_x, new_y, new_z] in (self.WALL_TILE, self.NON_TOP_SURFACE):
+                return False
+            elif game_map[new_x, new_y, new_z] == self.TOP_SURFACE:
+                new_z += 1
+            elif game_map[new_x, new_y, new_z - 1] == self.EMPTY_SPACE and new_z == 1:
+                new_z -= 1
+            elif game_map[new_x, new_y, new_z - 1] == self.NON_TOP_SURFACE and new_z == 1:
+                return False
 
         # Apply movement
         self.grid_x, self.grid_y, self.grid_z = new_x, new_y, new_z

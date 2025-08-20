@@ -39,7 +39,7 @@ module.exports.registerUserService = (userDetails) => {
                 if (error.code === 11000) {
                     reject({ success: false, message: "Username or email already exists" });
                 } else {
-                    reject({ success: false, message: "Registration failed" });
+                    reject({ success: false, message: "Network error - check your connection" });
                 }
             });
     });
@@ -73,7 +73,7 @@ module.exports.loginUserService = (loginDetails) => {
                 resolve({ success: true, userId: user._id, username: user.username });
             })
             .catch(() => {
-                reject({ success: false, message: "Login failed" });
+                reject({ success: false, message: "Network error - check your connection" });
             });
     });
 }

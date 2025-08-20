@@ -12,7 +12,7 @@ shop_assets = [
         "name": "Minimalist Wall",
         "spritesheet": "minimalist_wall.png",
         "type": "wall",
-        "description": "You should lean against it only if your clothes are clean.",
+        "description": "You can lean against it only if your clothes are clean.",
         "price": 200
     },
     {
@@ -31,6 +31,15 @@ shop_assets = [
         "type": "wall item",
         "description": "Made out of an oak tree.",
         "price": 150,
+        "count": 0
+    },
+    {
+        "id": "orchid",
+        "name": "Orchid",
+        "spritesheet": "orchid.png",
+        "type": "surface item",
+        "description": "Plant from the Orchidaceae family.",
+        "price": 100,
         "count": 0
     }
 ]

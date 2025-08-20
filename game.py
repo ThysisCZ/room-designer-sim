@@ -34,7 +34,8 @@ class RoomDesignerGame:
         # Set up tile types
         self.EMPTY_SPACE = 0
         self.WALL_TILE = 1
-        self.STATIC_OBJECT = 2
+        self.TOP_SURFACE = 2
+        self.NON_TOP_SURFACE = 3
 
         # Set up tab types
         self.ITEM_TAB = 0
@@ -734,9 +735,10 @@ class RoomDesignerGame:
         self.game_state = GameState.BULLET_HELL
         self.sounds = create_sounds()
         self.sounds['minigame'].play(loops=-1).set_volume(0.4)
-        self.sounds['score'].set_volume(1)
-        self.sounds['bullets'].set_volume(0.2)
+        self.sounds['score'].set_volume(1.5)
+        self.sounds['bullets'].set_volume(0.3)
         self.sounds['coin'].set_volume(0.2)
+        self.sounds['hit'].set_volume(0.125)
 
         pygame.mouse.set_visible(False)
 
@@ -819,10 +821,12 @@ class RoomDesignerGame:
             pygame.transform.scale(self.graphics_collection[15], (self.enemy_size, self.enemy_size))
         ]
 
-        # Set limits
+        self.damage_image = pygame.transform.scale(self.graphics_collection[27], (self.enemy_size, self.enemy_size))
+
         self.MAX_PLAYER_BULLETS = 150
         self.MAX_ENEMY_BULLETS = 300
         self.MAX_ENEMIES = 50
+        self.ENEMY_HEALTH = 10
 
         background_rect = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
         pygame.draw.rect(self.screen, (0, 0, 0), background_rect)
@@ -946,20 +950,20 @@ class RoomDesignerGame:
                 self.sounds['bullets'].stop()
 
             # Update and draw player bullets
-            i = 0
-            while i < len(self.player_bullets):
-                bullet = self.player_bullets[i]
+            idx = 0
+            while idx < len(self.player_bullets):
+                bullet = self.player_bullets[idx]
                 bullet_pos = bullet["pos"]
                 bullet_image = bullet["image"]
 
                 bullet_pos[1] -= self.bullet_speed
                 
                 if bullet_pos[1] < -self.bullet_size:
-                    del self.player_bullets[i]
+                    del self.player_bullets[idx]
                     continue
                     
                 self.screen.blit(bullet_image, (bullet_pos[0], bullet_pos[1]))
-                i += 1
+                idx += 1
             
             player_rect = pygame.Rect(self.player_pos[0], self.player_pos[1], self.player_size, self.player_size//6)
             
@@ -971,10 +975,13 @@ class RoomDesignerGame:
                 new_enemy_pos = [random.randrange(self.WIDTH//5, self.WIDTH - self.WIDTH//5 - self.enemy_size), 0]
                 
                 enemy_image = random.choice(self.enemy_images)
+
+                hit_count = 0
                 
                 self.enemies.append({"pos": new_enemy_pos, 
                                 "image": enemy_image, 
-                                "last_shot": self.timer})
+                                "last_shot": self.timer,
+                                "hit_count": hit_count})
                 
                 self.enemy_count += 1
             
@@ -1028,9 +1035,9 @@ class RoomDesignerGame:
                 generate_coin()
 
             # Update and draw coins
-            i = 0
-            while i < len(self.coins):
-                coin = self.coins[i]
+            idx = 0
+            while idx < len(self.coins):
+                coin = self.coins[idx]
                 coin_pos = coin["pos"]
 
                 coin_rect = pygame.Rect(coin_pos[0], coin_pos[1], self.coin_size, self.coin_size)
@@ -1039,17 +1046,17 @@ class RoomDesignerGame:
                     self.sounds['bullets'].stop()
                     self.sounds['coin'].play()
                     self.coin_count += 1
-                    del self.coins[i]
+                    del self.coins[idx]
                     continue
 
                 coin_pos[1] += self.enemy_speed
                 
                 if coin_pos[1] > self.HEIGHT:
-                    del self.coins[i]
+                    del self.coins[idx]
                     continue
 
                 self.screen.blit(self.coin_image, (coin_pos[0], coin_pos[1]))
-                i += 1
+                idx += 1
 
             def game_over():
                 border_rect = pygame.Rect(self.WIDTH//5, 0, self.WIDTH - 2 * (self.WIDTH//5), self.HEIGHT)
@@ -1096,6 +1103,30 @@ class RoomDesignerGame:
                 self.restart_game()
                 self.sounds['ui_click'].set_volume(0.5)
 
+            # Update and draw enemies
+            idx = 0
+            while idx < len(self.enemies):
+                enemy = self.enemies[idx]
+                enemy_pos = enemy["pos"]
+                enemy_image = enemy["image"]
+
+                enemy_pos[1] += self.enemy_speed
+                
+                if enemy_pos[1] > self.HEIGHT + self.enemy_size:
+                    del self.enemies[idx]
+                    continue
+
+                # Check hitbox-enemy collisions
+                enemy_rect = pygame.Rect(enemy_pos[0], enemy_pos[1], self.enemy_size, self.enemy_size)
+                
+                if hitbox_rect.colliderect(enemy_rect):
+                    self.sounds['bullets'].stop()
+                    game_over()
+                    return
+                
+                self.screen.blit(enemy_image, (enemy_pos[0], enemy_pos[1]))
+                idx += 1
+            
             bullets_to_remove = []
             enemies_to_remove = []
 
@@ -1113,15 +1144,24 @@ class RoomDesignerGame:
                         
                     enemy_pos = enemy["pos"]
                     enemy_rect = pygame.Rect(enemy_pos[0], enemy_pos[1], self.enemy_size, self.enemy_size)
+                    enemy_image = self.damage_image
 
+                    # Enemy hit
                     if bullet_rect.colliderect(enemy_rect):
-                        if enemy_pos[1] > 3 * self.player_size:
-                            self.sounds['bullets'].stop()
-                            self.sounds['score'].play()
-                            self.score += 10
-                            bullets_to_remove.append(bullet)
-                            enemies_to_remove.append(enemy)
-                            break  # one bullet hits one enemy only
+                        enemy["hit_count"] += 1
+                        self.sounds['bullets'].stop()
+                        self.sounds['hit'].play()
+                        self.screen.blit(enemy_image, enemy_rect)
+
+                        bullets_to_remove.append(bullet)
+                    # Enemy death
+                    elif enemy["hit_count"] > self.ENEMY_HEALTH:
+                        self.sounds['bullets'].stop()
+                        self.sounds['hit'].stop()
+                        self.sounds['score'].play()
+                        self.score += 10
+
+                        enemies_to_remove.append(enemy)
             
             # Remove bullets
             for bullet in bullets_to_remove:
@@ -1134,16 +1174,16 @@ class RoomDesignerGame:
                     self.enemies.remove(enemy)
 
             # Update and draw enemy bullets
-            i = 0
-            while i < len(self.enemy_bullets):
-                bullet = self.enemy_bullets[i]
+            idx = 0
+            while idx < len(self.enemy_bullets):
+                bullet = self.enemy_bullets[idx]
                 bullet_pos = bullet["pos"]
                 bullet_image = bullet["image"]
 
                 bullet_pos[1] += self.bullet_speed
 
                 if bullet_pos[1] > self.HEIGHT + self.bullet_size:
-                    del self.enemy_bullets[i]
+                    del self.enemy_bullets[idx]
                     continue
 
                 # Check hitbox-bullet collisions
@@ -1154,30 +1194,7 @@ class RoomDesignerGame:
                     return
 
                 self.screen.blit(bullet_image, (bullet_pos[0], bullet_pos[1]))
-                i += 1
-
-            # Update and draw enemies
-            i = 0
-            while i < len(self.enemies):
-                enemy = self.enemies[i]
-                enemy_pos = enemy["pos"]
-                enemy_image = enemy["image"]
-
-                enemy_pos[1] += self.enemy_speed
-                
-                if enemy_pos[1] > self.HEIGHT + self.enemy_size:
-                    del self.enemies[i]
-                    continue
-
-                # Check hitbox-enemy collisions
-                enemy_rect = pygame.Rect(enemy_pos[0], enemy_pos[1], self.enemy_size, self.enemy_size)
-                if hitbox_rect.colliderect(enemy_rect):
-                    self.sounds['bullets'].stop()
-                    game_over()
-                    return
-                
-                self.screen.blit(enemy_image, (enemy_pos[0], enemy_pos[1]))
-                i += 1
+                idx += 1
             
             # Draw border
             border_rect = pygame.Rect(self.WIDTH//5, 0, self.WIDTH - 2 * (self.WIDTH//5), self.HEIGHT)
@@ -1202,13 +1219,16 @@ class RoomDesignerGame:
                         )
                     self.running = False
                 if self.game_state == GameState.PLAYING:
-                    if event.key == pygame.K_RETURN:
+                    if event.key == pygame.K_SPACE:
                         self.place_object()
                     elif event.key == pygame.K_r:
                         if self.object:
-                            self.object.rotate()
-                            self.object.animate(True)  # Trigger animation for one frame
-                            self.sounds['object_rotate'].play()
+                            asset_type = self.selected_item_data.get('type')
+
+                            if not asset_type == 'wall item':
+                                self.object.rotate()
+                                self.object.animate(True)  # trigger animation for one frame
+                                self.sounds['object_rotate'].play()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.game_state == GameState.MENU:
                     if self.play_button.handle_event(event):
@@ -1456,7 +1476,8 @@ class RoomDesignerGame:
                                         screen_x += self.camera_offset_x
                                         screen_y += self.camera_offset_y
 
-                                        if 'floor' in self.sprites and self.game_map[x, y, 0] == self.EMPTY_SPACE:
+                                        # Handle floor click
+                                        if self.game_map[x, y, 0] == self.EMPTY_SPACE:
                                             floor_rect = self.sprites['floor'].get_rect()
                                             floor_rect.x = screen_x - self.iso_utils.half_tile_width
                                             floor_rect.y = screen_y - self.iso_utils.half_tile_height
@@ -1468,13 +1489,12 @@ class RoomDesignerGame:
                                             y_offset = 20
                                             center_y = screen_y + y_offset
 
-                                            # Handle floor click
                                             if get_floor_surface(mx, my, center_x, center_y, tile_width, tile_height):
                                                 # Create ghost object at clicked position
                                                 self.object = Object(x=x, y=y, z=0, c=0, r=0, iso_utils=self.iso_utils, asset=self.selected_item_data)
                                                 self.objects.add(self.object)
                                                 self.all_sprites.add(self.object)
-                            else:
+                            elif item_type == 'wall item':
                                 def point_in_polygon(px, py, polygon):
                                     """Check if point is inside a polygon using ray casting."""
                                     inside = False
@@ -1517,7 +1537,7 @@ class RoomDesignerGame:
                                     return east_quad, north_quad
 
 
-                                def find_adjacent_floor_position(wall_x, wall_y, wall_z, side, game_map, grid_width, grid_height, grid_volume, objects, WALL_TILE, STATIC_OBJECT, EMPTY_SPACE):
+                                def find_adjacent_floor_position(wall_x, wall_y, wall_z, side, game_map, grid_width, grid_height, grid_volume, objects, EMPTY_SPACE):
                                     """
                                     Adjacent floor position calculation.
                                     """
@@ -1608,7 +1628,7 @@ class RoomDesignerGame:
                                             placement_pos = find_adjacent_floor_position(
                                                 x, y, z, side,
                                                 self.game_map, self.grid_width, self.grid_height, self.grid_volume,
-                                                self.objects, self.WALL_TILE, self.STATIC_OBJECT, self.EMPTY_SPACE
+                                                self.objects, self.EMPTY_SPACE
                                             )
 
                                             if placement_pos:
@@ -1632,6 +1652,63 @@ class RoomDesignerGame:
                                                 self.objects.add(self.object)
                                                 self.all_sprites.add(self.object)
                                                 object_placed = True
+                            else:
+                                def get_floor_surface(px, py, cx, cy, w, h):
+                                    """Check if click point is on floor using rhombus inequality."""
+                                    dx = abs(px - cx)
+                                    dy = abs(py - cy)
+                                    return (dx / (w / 2) + dy / (h / 2)) <= 1
+                                
+                                # Prepare clickable floor
+                                for y in range(self.grid_height):
+                                    for x in range(self.grid_width):
+                                        screen_x, screen_y = self.iso_utils.grid_to_screen(x, y)
+                                        screen_x += self.camera_offset_x
+                                        screen_y += self.camera_offset_y
+
+                                        # Handle static object top surface click
+                                        if self.game_map[x, y, 0] == self.TOP_SURFACE:
+                                            floor_rect = self.sprites['floor'].get_rect()
+                                            floor_rect.x = screen_x - self.iso_utils.half_tile_width
+                                            floor_rect.y = screen_y - self.iso_utils.half_tile_height
+
+                                            tile_width = self.iso_utils.tile_width
+                                            tile_height = self.iso_utils.tile_height
+
+                                            center_x = screen_x
+                                            y_offset = 20
+                                            center_y = screen_y + y_offset - tile_height
+
+                                            if get_floor_surface(mx, my, center_x, center_y, tile_width, tile_height):
+                                                # Remove duplicit sprite
+                                                if self.object:
+                                                    self.objects.remove(self.object)
+                                                    self.all_sprites.remove(self.object)
+                                                    self.object = None
+
+                                                # Create ghost object at clicked position
+                                                self.object = Object(x=x, y=y, z=1, c=0, r=0, iso_utils=self.iso_utils, asset=self.selected_item_data)
+                                                self.objects.add(self.object)
+                                                self.all_sprites.add(self.object)
+
+                                        # Handle floor click
+                                        elif self.game_map[x, y, 0] == self.EMPTY_SPACE:
+                                            floor_rect = self.sprites['floor'].get_rect()
+                                            floor_rect.x = screen_x - self.iso_utils.half_tile_width
+                                            floor_rect.y = screen_y - self.iso_utils.half_tile_height
+
+                                            tile_width = self.iso_utils.tile_width
+                                            tile_height = self.iso_utils.tile_height
+
+                                            center_x = screen_x
+                                            y_offset = 20
+                                            center_y = screen_y + y_offset
+
+                                            if get_floor_surface(mx, my, center_x, center_y, tile_width, tile_height):
+                                                # Create ghost object at clicked position
+                                                self.object = Object(x=x, y=y, z=0, c=0, r=0, iso_utils=self.iso_utils, asset=self.selected_item_data)
+                                                self.objects.add(self.object)
+                                                self.all_sprites.add(self.object)
 
                     elif self.show_minigames:
                         selected = self.minigame_ui.handle_click(pygame.mouse.get_pos())
@@ -1711,7 +1788,7 @@ class RoomDesignerGame:
                                         tile_spacing = 1.3
                                         screen_y = screen_y - (z * self.iso_utils.tile_height * tile_spacing + self.iso_utils.half_tile_height)
 
-                                        if 'floor' in self.sprites and self.game_map[x, y, z] == self.STATIC_OBJECT:
+                                        if self.game_map[x, y, z] == self.TOP_SURFACE or self.game_map[x, y, z] == self.NON_TOP_SURFACE:
                                             object_rect = self.sprites['floor'].get_rect()
                                             object_rect.x = screen_x - self.iso_utils.half_tile_width
                                             object_rect.y = screen_y - self.iso_utils.half_tile_height
@@ -1792,8 +1869,11 @@ class RoomDesignerGame:
         
         keys = pygame.key.get_pressed()
         if self.object:
+
+            item_type = self.selected_item_data.get('type')
+
             # Movement on the floor
-            if self.object.asset.get('type') == 'floor item':
+            if item_type == 'floor item' or item_type == 'surface item':
                 if keys[pygame.K_LEFT]:
                     if self.object.move(-1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
                         moving = True
@@ -1809,7 +1889,7 @@ class RoomDesignerGame:
         
                 self.object.animate(moving)
 
-            elif self.object.asset.get('type') == 'wall item':
+            else:
                 # Movement on the east wall
                 if self.object.grid_y == 1 and self.object.grid_x > 1:
                     if keys[pygame.K_LEFT]:
@@ -1907,9 +1987,13 @@ class RoomDesignerGame:
                 
                 self.sounds['object_place'].play()
 
+                item_type = self.selected_item_data.get('type')
+
                 # Mark the position in the game map as occupied
-                self.game_map[current_x, current_y, current_z] = self.STATIC_OBJECT
-                self.object.set_object_placed_position(current_x, current_y)
+                if item_type == 'floor item':
+                    self.game_map[current_x, current_y, current_z] = self.TOP_SURFACE
+                else:
+                    self.game_map[current_x, current_y, current_z] = self.NON_TOP_SURFACE
                     
                 self.save_placed_object(
                     self.object.asset['id'],
@@ -2067,8 +2151,14 @@ class RoomDesignerGame:
             row = obj["row"]
             obj_id = obj["id"]
 
-            # Update map
-            self.game_map[grid_x, grid_y, grid_z] = self.STATIC_OBJECT
+            # Find item type from shop assets
+            for asset in shop_assets:
+                if asset.get("id") == obj_id:
+                    # Update map
+                    if asset.get("type") == 'floor item':
+                        self.game_map[grid_x, grid_y, grid_z] = self.TOP_SURFACE
+                    else:
+                        self.game_map[grid_x, grid_y, grid_z] = self.NON_TOP_SURFACE
 
             # Recreate the static object
             static_object = Object(grid_x, grid_y, grid_z, col, row, self.iso_utils, obj_id=obj_id,
@@ -2173,7 +2263,7 @@ class RoomDesignerGame:
         controls = [
             ("Arrow keys", "Move"),
             ("R", "Rotate"),
-            ("Enter", "Place"),
+            ("Space", "Place"),
             ("Escape", "Quit game")
         ]
         
@@ -2232,8 +2322,8 @@ class RoomDesignerGame:
                 screen_y += self.camera_offset_y
                 
                 # Floor tile - render for empty spaces and spaces with objects
-                if 'floor' in self.sprites and (
-                    self.game_map[x, y, 0] == self.EMPTY_SPACE or self.game_map[x, y, 0] == self.STATIC_OBJECT):
+                if self.game_map[x, y, 0] == self.EMPTY_SPACE or self.game_map[x, y, 0] == self.TOP_SURFACE \
+                or self.game_map[x, y, 0] == self.NON_TOP_SURFACE:
                     floor_rect = self.sprites['floor'].get_rect()
                     floor_rect.x = screen_x - self.iso_utils.half_tile_width
                     y_offset = 15
@@ -2241,7 +2331,7 @@ class RoomDesignerGame:
                     render_list.append((y + x, 'floor', floor_rect))
                 
                 # Walls - render each layer
-                if 'wall' in self.sprites and self.game_map[x, y, 0] == self.WALL_TILE:
+                if self.game_map[x, y, 0] == self.WALL_TILE:
                     # Render each vertical layer of the wall
                     for z in range(self.grid_volume):
                         if self.game_map[x, y, z] == self.WALL_TILE:

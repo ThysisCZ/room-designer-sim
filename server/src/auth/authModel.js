@@ -1,7 +1,6 @@
 //dependencies
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
 
 //schema library
 const Schema = mongoose.Schema;
@@ -40,10 +39,10 @@ const userSchema = new Schema({
     }
 });
 
-//hash password before saving
+//hash password with 16 cost factor rounds
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
-    this.password = await bcrypt.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 16);
     next();
 });
 
@@ -54,10 +53,10 @@ userSchema.methods.comparePassword = async function (password) {
 
 //generate password reset code
 userSchema.methods.generateResetCode = function () {
-    // Generate 6-digit code
+    //generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     this.reset_code = code;
-    // Code expires in 15 minutes
+    //code expires in 15 minutes
     this.reset_code_expires = Date.now() + 15 * 60 * 1000;
     return code;
 };

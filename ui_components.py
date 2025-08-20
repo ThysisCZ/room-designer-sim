@@ -611,7 +611,7 @@ class ShopUI:
                     return False
             inventory[asset_type].append(asset)
 
-        elif asset_type in ['floor item', 'wall item']:
+        elif asset_type in ['floor item', 'wall item', 'surface item']:
             found = False
             for existing in inventory['item']:
                 if existing.get('id') == asset.get('id'):

@@ -219,7 +219,7 @@ class AuthScreen:
                 if len(self.email) < 50:
                     self.email += text
             elif self.active_field == "reset_code":
-                if len(self.reset_code) < 10:  # Reset codes are usually 6-8 digits
+                if len(self.reset_code) < 10:
                     self.reset_code += text
             elif self.active_field == "new_password":
                 if len(self.new_password) < 20:
@@ -250,6 +250,11 @@ class AuthScreen:
         
         if "@" not in self.email or "." not in self.email:
             self.message = "Please enter a valid email address"
+            self.message_color = self.RED
+            return None
+        
+        if len(self.password) < 8:
+            self.message = "Password must be at least 8 characters"
             self.message_color = self.RED
             return None
         
@@ -293,8 +298,8 @@ class AuthScreen:
             self.message_color = self.RED
             return None
         
-        if len(self.new_password) < 6:
-            self.message = "Password must be at least 6 characters"
+        if len(self.new_password) < 8:
+            self.message = "Password must be at least 8 characters"
             self.message_color = self.RED
             return None
         
@@ -382,7 +387,7 @@ class AuthScreen:
             title_text = "Register"
         elif self.mode == "forgot_password":
             title_text = "Reset Password"
-        else:  # reset_password
+        else:
             title_text = "Enter Reset Code"
             
         title_surface = pygame.font.Font('ithaca.ttf', 48).render(title_text, True, self.WHITE)
