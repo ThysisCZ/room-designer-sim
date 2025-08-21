@@ -9,15 +9,6 @@
         "_id": "68a64fc2326123a469073b94"
     },
     {
-        "grid_x": 6,
-        "grid_y": 6,
-        "grid_z": 1,
-        "col": 0,
-        "row": 0,
-        "id": "orchid",
-        "_id": "68a64fc2326123a469073b95"
-    },
-    {
         "grid_x": 8,
         "grid_y": 1,
         "grid_z": 2,
@@ -52,5 +43,68 @@
         "row": 0,
         "id": "wooden_window",
         "_id": "68a64fc2326123a469073b99"
+    },
+    {
+        "grid_x": 7,
+        "grid_y": 6,
+        "grid_z": 0,
+        "col": 2,
+        "row": 0,
+        "id": "minimalist_chair",
+        "_id": "68a7498f8ebdcea2d6ff1970"
+    },
+    {
+        "grid_x": 6,
+        "grid_y": 7,
+        "grid_z": 0,
+        "col": 3,
+        "row": 0,
+        "id": "minimalist_chair",
+        "_id": "68a7498f8ebdcea2d6ff1971"
+    },
+    {
+        "grid_x": 5,
+        "grid_y": 6,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "minimalist_chair",
+        "_id": "68a7498f8ebdcea2d6ff1972"
+    },
+    {
+        "grid_x": 6,
+        "grid_y": 5,
+        "grid_z": 0,
+        "col": 1,
+        "row": 0,
+        "id": "minimalist_chair",
+        "_id": "68a7498f8ebdcea2d6ff1973"
+    },
+    {
+        "grid_x": 6,
+        "grid_y": 6,
+        "grid_z": 1,
+        "col": 0,
+        "row": 0,
+        "id": "coffee",
+        "_id": "68a7498f8ebdcea2d6ff1974"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 1,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "minimalist_table",
+        "_id": "68a74f4e8ebdcea2d6ff1da0"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 1,
+        "grid_z": 1,
+        "col": 0,
+        "row": 0,
+        "id": "orchid",
+        "_id": "68a74f4e8ebdcea2d6ff1da1"
     }
 ]

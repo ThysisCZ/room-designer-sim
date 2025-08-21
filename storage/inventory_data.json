@@ -7,7 +7,7 @@
             "type": "floor item",
             "description": "Good enough for visitors.",
             "price": 150,
-            "count": 3,
+            "count": 2,
             "_id": "68a4b0176903d73e172d2d55"
         },
         {
@@ -29,6 +29,26 @@
             "price": 100,
             "count": 3,
             "_id": "68a4b0176903d73e172d2d57"
+        },
+        {
+            "id": "minimalist_chair",
+            "name": "Minimalist Chair",
+            "spritesheet": "minimalist_chair.png",
+            "type": "non top floor item",
+            "description": "Simple wooden chair.",
+            "price": 50,
+            "count": 2,
+            "_id": "68a729f08ebdcea2d6ff10e7"
+        },
+        {
+            "id": "coffee",
+            "name": "Coffee",
+            "spritesheet": "coffee.png",
+            "type": "surface item",
+            "description": "Basic human need.",
+            "price": 25,
+            "count": 2,
+            "_id": "68a729f08ebdcea2d6ff10e8"
         }
     ],
     "floor": [

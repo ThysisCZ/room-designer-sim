@@ -30,7 +30,7 @@ shop_assets = [
         "spritesheet": "wooden_window.png",
         "type": "wall item",
         "description": "Made out of an oak tree.",
-        "price": 150,
+        "price": 50,
         "count": 0
     },
     {
@@ -40,6 +40,24 @@ shop_assets = [
         "type": "surface item",
         "description": "Plant from the Orchidaceae family.",
         "price": 100,
+        "count": 0
+    },
+    {
+        "id": "coffee",
+        "name": "Coffee",
+        "spritesheet": "coffee.png",
+        "type": "surface item",
+        "description": "Basic human need.",
+        "price": 25,
+        "count": 0
+    },
+    {
+        "id": "minimalist_chair",
+        "name": "Minimalist Chair",
+        "spritesheet": "minimalist_chair.png",
+        "type": "non top floor item",
+        "description": "Simple wooden chair.",
+        "price": 50,
         "count": 0
     }
 ]

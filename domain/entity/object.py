@@ -93,12 +93,14 @@ class Object(pygame.sprite.Sprite):
         else:
             if game_map[new_x, new_y, new_z] in (self.WALL_TILE, self.NON_TOP_SURFACE):
                 return False
+            elif game_map[new_x, new_y, new_z + 1] == self.NON_TOP_SURFACE:
+                return False
+            elif game_map[new_x, new_y, new_z - 1] == self.NON_TOP_SURFACE and new_z == 1:
+                return False
             elif game_map[new_x, new_y, new_z] == self.TOP_SURFACE:
                 new_z += 1
             elif game_map[new_x, new_y, new_z - 1] == self.EMPTY_SPACE and new_z == 1:
                 new_z -= 1
-            elif game_map[new_x, new_y, new_z - 1] == self.NON_TOP_SURFACE and new_z == 1:
-                return False
 
         # Apply movement
         self.grid_x, self.grid_y, self.grid_z = new_x, new_y, new_z

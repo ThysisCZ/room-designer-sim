@@ -1221,14 +1221,15 @@ class RoomDesignerGame:
                 if self.game_state == GameState.PLAYING:
                     if event.key == pygame.K_SPACE:
                         self.place_object()
-                    elif event.key == pygame.K_r:
-                        if self.object:
-                            asset_type = self.selected_item_data.get('type')
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_r:
+                    if self.object:
+                        asset_type = self.selected_item_data.get('type')
 
-                            if not asset_type == 'wall item':
-                                self.object.rotate()
-                                self.object.animate(True)  # trigger animation for one frame
-                                self.sounds['object_rotate'].play()
+                        if not asset_type == 'wall item':
+                            self.object.rotate()
+                            self.object.animate(True)
+                            self.sounds['object_rotate'].play()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.game_state == GameState.MENU:
                     if self.play_button.handle_event(event):
@@ -1462,7 +1463,7 @@ class RoomDesignerGame:
 
                             item_type = self.selected_item_data.get('type')
 
-                            if item_type == 'floor item':
+                            if item_type == 'floor item' or item_type == 'non top floor item':
                                 def get_floor_surface(px, py, cx, cy, w, h):
                                     """Check if click point is on floor using rhombus inequality."""
                                     dx = abs(px - cx)
@@ -1667,7 +1668,7 @@ class RoomDesignerGame:
                                         screen_y += self.camera_offset_y
 
                                         # Handle static object top surface click
-                                        if self.game_map[x, y, 0] == self.TOP_SURFACE:
+                                        if self.game_map[x, y, 0] == self.TOP_SURFACE and self.game_map[x, y, 1] == self.EMPTY_SPACE:
                                             floor_rect = self.sprites['floor'].get_rect()
                                             floor_rect.x = screen_x - self.iso_utils.half_tile_width
                                             floor_rect.y = screen_y - self.iso_utils.half_tile_height
@@ -1804,30 +1805,66 @@ class RoomDesignerGame:
                                             if get_object_surface(mx, my, center_x, center_y, tile_width, tile_height):
                                                 objects = tile_abl.load_tiles()
                                                 inventory = inventory_abl.load_inventory()
+                                                objects_to_remove = []  
 
-                                                # Add the static object to inventory
                                                 for object in objects:
                                                     if object.get('grid_x') == x and object.get('grid_y') == y and object.get('grid_z') == z:
-                                                        obj_id = object.get('id')
-                                                        added = False
+                                                        break
 
-                                                        for item in inventory['item']:
+                                                if object:
+                                                    obj_id = object.get('id')
+                                                    added = False
+
+                                                    for item in inventory['item']:
+                                                        if item.get('id') == obj_id:
+                                                            item['count'] = item.get('count', 1) + 1
+                                                            added = True
+                                                            break
+
+                                                    if not added:
+                                                        # Get full item data from shop assets
+                                                        for item in shop_assets:
                                                             if item.get('id') == obj_id:
-                                                                item['count'] = item.get('count', 1) + 1
-                                                                added = True
+                                                                item_copy = item.copy()
+                                                                item_copy['count'] = 1
+                                                                inventory['item'].append(item_copy)
                                                                 break
 
-                                                        if not added:
-                                                            # Get full item data from shop assets
-                                                            for item in shop_assets:
+                                                    objects_to_remove.append(object)
+
+                                                # Check for surface objects on top of floor tile
+                                                for object in objects:
+                                                    if object.get('grid_x') == x and object.get('grid_y') == y and object.get('grid_z') == z + 1:
+                                                        for asset in shop_assets:
+                                                            if asset.get('id') == object.get('id'):
+                                                                item_type = asset.get('type')
+                                                                break
+
+                                                        if item_type == 'surface item':
+                                                            obj_id = object.get('id')
+                                                            added = False
+
+                                                            for item in inventory['item']:
                                                                 if item.get('id') == obj_id:
-                                                                    item_copy = item.copy()
-                                                                    item_copy['count'] = 1
-                                                                    inventory['item'].append(item_copy)
+                                                                    item['count'] = item.get('count', 1) + 1
+                                                                    added = True
                                                                     break
 
-                                                        objects.remove(object)
-                                                        break
+                                                            if not added:
+                                                                # Get full item data from shop assets
+                                                                for item in shop_assets:
+                                                                    if item.get('id') == obj_id:
+                                                                        item_copy = item.copy()
+                                                                        item_copy['count'] = 1
+                                                                        inventory['item'].append(item_copy)
+                                                                        break
+
+                                                            objects_to_remove.append(object)
+
+                                                # Remove all collected objects
+                                                for removable in objects_to_remove:
+                                                    if removable in objects:
+                                                        objects.remove(removable)
 
                                                 tile_abl.save_tiles(objects)
                                                 inventory_abl.save_inventory(inventory)
@@ -1837,7 +1874,7 @@ class RoomDesignerGame:
                                                 self.load_placed_objects()
                                                 self.reload_inventory()
                                                 return
-                        
+
                         pickup_object()
             elif event.type == pygame.MOUSEMOTION:
                 if self.game_state == GameState.MENU:
@@ -1873,7 +1910,7 @@ class RoomDesignerGame:
             item_type = self.selected_item_data.get('type')
 
             # Movement on the floor
-            if item_type == 'floor item' or item_type == 'surface item':
+            if item_type == 'floor item' or item_type == 'non top floor item' or item_type == 'surface item':
                 if keys[pygame.K_LEFT]:
                     if self.object.move(-1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
                         moving = True
