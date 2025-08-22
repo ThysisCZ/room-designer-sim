@@ -36,15 +36,6 @@
         "_id": "68a64fc2326123a469073b98"
     },
     {
-        "grid_x": 1,
-        "grid_y": 8,
-        "grid_z": 2,
-        "col": 1,
-        "row": 0,
-        "id": "wooden_window",
-        "_id": "68a64fc2326123a469073b99"
-    },
-    {
         "grid_x": 7,
         "grid_y": 6,
         "grid_z": 0,
@@ -106,5 +97,32 @@
         "row": 0,
         "id": "orchid",
         "_id": "68a74f4e8ebdcea2d6ff1da1"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 8,
+        "grid_z": 2,
+        "col": 1,
+        "row": 0,
+        "id": "wooden_window",
+        "_id": "68a79373cd4bd37aa63c9537"
+    },
+    {
+        "grid_x": 6,
+        "grid_y": 1,
+        "grid_z": 2,
+        "col": 0,
+        "row": 0,
+        "id": "bookshelf",
+        "_id": "68a87e03e6dd6ce8263bbcc1"
+    },
+    {
+        "grid_x": 6,
+        "grid_y": 1,
+        "grid_z": 0,
+        "col": 1,
+        "row": 0,
+        "id": "minimalist_couch",
+        "_id": "68a8917e9f24309fbb69465a"
     }
 ]

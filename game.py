@@ -1809,28 +1809,25 @@ class RoomDesignerGame:
 
                                                 for object in objects:
                                                     if object.get('grid_x') == x and object.get('grid_y') == y and object.get('grid_z') == z:
-                                                        break
+                                                        obj_id = object.get('id')
+                                                        added = False
 
-                                                if object:
-                                                    obj_id = object.get('id')
-                                                    added = False
-
-                                                    for item in inventory['item']:
-                                                        if item.get('id') == obj_id:
-                                                            item['count'] = item.get('count', 1) + 1
-                                                            added = True
-                                                            break
-
-                                                    if not added:
-                                                        # Get full item data from shop assets
-                                                        for item in shop_assets:
+                                                        for item in inventory['item']:
                                                             if item.get('id') == obj_id:
-                                                                item_copy = item.copy()
-                                                                item_copy['count'] = 1
-                                                                inventory['item'].append(item_copy)
+                                                                item['count'] = item.get('count', 1) + 1
+                                                                added = True
                                                                 break
 
-                                                    objects_to_remove.append(object)
+                                                        if not added:
+                                                            # Get full item data from shop assets
+                                                            for item in shop_assets:
+                                                                if item.get('id') == obj_id:
+                                                                    item_copy = item.copy()
+                                                                    item_copy['count'] = 1
+                                                                    inventory['item'].append(item_copy)
+                                                                    break
+
+                                                        objects_to_remove.append(object)
 
                                                 # Check for surface objects on top of floor tile
                                                 for object in objects:

@@ -5,7 +5,7 @@ shop_assets = [
         "spritesheet": "minimalist_floor.png",
         "type": "floor",
         "description": "Polished floor without splinters.",
-        "price": 200
+        "price": 100
     },
     {
         "id": "minimalist_wall",
@@ -13,7 +13,7 @@ shop_assets = [
         "spritesheet": "minimalist_wall.png",
         "type": "wall",
         "description": "You can lean against it only if your clothes are clean.",
-        "price": 200
+        "price": 100
     },
     {
         "id": "minimalist_table",
@@ -58,6 +58,24 @@ shop_assets = [
         "type": "non top floor item",
         "description": "Simple wooden chair.",
         "price": 50,
+        "count": 0
+    },
+    {
+        "id": "bookshelf",
+        "name": "Bookshelf",
+        "spritesheet": "bookshelf.png",
+        "type": "wall item",
+        "description": "Reading fuels the imagination.",
+        "price": 300,
+        "count": 0
+    },
+    {
+        "id": "minimalist_couch",
+        "name": "Minimalist Couch",
+        "spritesheet": "minimalist_couch.png",
+        "type": "non top floor item",
+        "description": "Awesome place for chilling.",
+        "price": 150,
         "count": 0
     }
 ]

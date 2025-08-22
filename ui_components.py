@@ -140,13 +140,8 @@ class InventoryUI:
                     # White border
                     pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
 
-                    item_type = item.get('type')
-
                     # Show icons
-                    if item_type == 'wall item':
-                        screen.blit(icon, (x - 13, y + 5))
-                    else:
-                        screen.blit(icon, (x, y))
+                    screen.blit(icon, (x, y))
 
                     # Yellow border
                     if self.selected_item == item:
@@ -510,13 +505,8 @@ class ShopUI:
                 # White border
                 pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
 
-                asset_type = asset.get('type')
-
                 # Show icons
-                if asset_type == 'wall item': 
-                    screen.blit(icon, (x - 16 + icon_margin, y + 9 + icon_margin))
-                else:
-                    screen.blit(icon, (x + icon_margin, y + icon_margin))
+                screen.blit(icon, (x + icon_margin, y + icon_margin))
 
                 # Yellow border
                 if self.selected_asset == asset:
@@ -530,11 +520,11 @@ class ShopUI:
             self.left_arrow_rect = pygame.Rect(0, 0, 0, 0)
         
         # Handle right arrow display
-        if self.page < len(self.assets) // (self.cols * self.rows):
+        if self.page + 1 < len(self.assets) / (self.cols * self.rows):
             screen.blit(self.right_arrow_icon, (self.right_arrow_x, self.right_arrow_y))
             self.right_arrow_rect = pygame.Rect(self.right_arrow_x, self.right_arrow_y, self.arrow_width, self.arrow_height)
         else:
-            self.right_arrow_rect = pygame.Rect(0, 0, 0, 0)
+            self.right_arrow_rect = pygame.Rect(0, 0, 0, 0) 
 
     
     def handle_click(self, mouse_pos):
@@ -611,7 +601,7 @@ class ShopUI:
                     return False
             inventory[asset_type].append(asset)
 
-        elif asset_type in ['floor item', 'wall item', 'surface item']:
+        else:
             found = False
             for existing in inventory['item']:
                 if existing.get('id') == asset.get('id'):

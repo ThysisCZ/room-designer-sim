@@ -31,16 +31,6 @@
             "_id": "68a4b0176903d73e172d2d57"
         },
         {
-            "id": "minimalist_chair",
-            "name": "Minimalist Chair",
-            "spritesheet": "minimalist_chair.png",
-            "type": "non top floor item",
-            "description": "Simple wooden chair.",
-            "price": 50,
-            "count": 2,
-            "_id": "68a729f08ebdcea2d6ff10e7"
-        },
-        {
             "id": "coffee",
             "name": "Coffee",
             "spritesheet": "coffee.png",
@@ -49,6 +39,36 @@
             "price": 25,
             "count": 2,
             "_id": "68a729f08ebdcea2d6ff10e8"
+        },
+        {
+            "id": "minimalist_chair",
+            "name": "Minimalist Chair",
+            "spritesheet": "minimalist_chair.png",
+            "type": "non top floor item",
+            "description": "Simple wooden chair.",
+            "price": 50,
+            "count": 3,
+            "_id": "68a8917e9f24309fbb694663"
+        },
+        {
+            "id": "bookshelf",
+            "name": "Bookshelf",
+            "spritesheet": "bookshelf.png",
+            "type": "wall item",
+            "description": "Reading fuels the imagination.",
+            "price": 300,
+            "count": 2,
+            "_id": "68a8917e9f24309fbb694664"
+        },
+        {
+            "id": "minimalist_couch",
+            "name": "Minimalist Couch",
+            "spritesheet": "minimalist_couch.png",
+            "type": "non top floor item",
+            "description": "Awesome place for chilling.",
+            "price": 150,
+            "count": 2,
+            "_id": "68a8917e9f24309fbb694665"
         }
     ],
     "floor": [
@@ -87,8 +107,8 @@
             "spritesheet": "minimalist_wall.png",
             "type": "wall",
             "description": "You can lean against it only if your clothes are clean.",
-            "price": 200,
-            "_id": "689b862d24d31b4c2ad15472"
+            "price": 100,
+            "_id": "68a87fb6e6dd6ce8263bbd9d"
         }
     ]
 }
