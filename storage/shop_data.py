@@ -77,5 +77,37 @@ shop_assets = [
         "description": "Awesome place for chilling.",
         "price": 150,
         "count": 0
+    },
+    {
+        "id": "wooden_floor",
+        "name": "Wooden Floor",
+        "spritesheet": "wooden_floor.png",
+        "type": "floor",
+        "description": "Stable floor crafted by a lumberjack.",
+        "price": 100
+    },
+    {
+        "id": "wooden_wall",
+        "name": "Wooden Wall",
+        "spritesheet": "wooden_wall.png",
+        "type": "wall",
+        "description": "Stable wall crafted by a lumberjack.",
+        "price": 100
+    },
+    {
+        "id": "brick_wall",
+        "name": "Brick Wall",
+        "spritesheet": "brick_wall.png",
+        "type": "wall",
+        "description": "For those who like it raw.",
+        "price": 100
+    },
+    {
+        "id": "cottagecore_wall",
+        "name": "Cottagecore Wall",
+        "spritesheet": "cottagecore_wall.png",
+        "type": "wall",
+        "description": "Roses everywhere!",
+        "price": 100
     }
 ]

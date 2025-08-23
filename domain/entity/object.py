@@ -59,7 +59,7 @@ class Object(pygame.sprite.Sprite):
         z_offset = self.grid_z * self.iso_utils.tile_height * tile_spacing
         self.rect.y = base_y - z_offset
 
-    def move(self, dx, dy, dz, game_map, grid_width, grid_height, grid_volume):
+    def move(self, dx, dy, dz, game_map, grid_width, grid_height, grid_depth):
         """
         Function for moving the object.
         It checks if the move is valid.
@@ -84,7 +84,7 @@ class Object(pygame.sprite.Sprite):
         # Store new position and check map border
         new_x = min(grid_width - 1, self.grid_x + dx)
         new_y = min(grid_height - 1, self.grid_y + dy)
-        new_z = max(0, min(grid_volume - 1, self.grid_z + dz))
+        new_z = max(0, min(grid_depth - 1, self.grid_z + dz))
 
         # Check walls and objects
         if not self.asset.get('type') == 'surface item':

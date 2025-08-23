@@ -177,10 +177,10 @@ class RoomDesignerGame:
         """
         self.grid_width = 12
         self.grid_height = 12
-        self.grid_volume = 6
+        self.grid_depth = 5
         
         # Create game map
-        self.game_map = create_game_map(self.grid_width, self.grid_height, self.grid_volume)
+        self.game_map = create_game_map(self.grid_width, self.grid_height, self.grid_depth)
     
     def init_snake_game(self):
         self.game_state = GameState.SNAKE
@@ -1538,7 +1538,7 @@ class RoomDesignerGame:
                                     return east_quad, north_quad
 
 
-                                def find_adjacent_floor_position(wall_x, wall_y, wall_z, side, game_map, grid_width, grid_height, grid_volume, objects, EMPTY_SPACE):
+                                def find_adjacent_floor_position(wall_x, wall_y, wall_z, side, game_map, grid_width, grid_height, grid_depth, objects, EMPTY_SPACE):
                                     """
                                     Adjacent floor position calculation.
                                     """
@@ -1560,7 +1560,7 @@ class RoomDesignerGame:
                                     target_z = wall_z
                                     
                                     # Ensure target z is within bounds
-                                    if not (0 <= target_z < grid_volume):
+                                    if not (0 <= target_z < grid_depth):
                                         return None
                                     
                                     # Check if the target cell is empty
@@ -1582,13 +1582,13 @@ class RoomDesignerGame:
                                 # Collect all walls
                                 for x in range(self.grid_width):
                                     for y in range(self.grid_height):
-                                        for z in range(self.grid_volume):
+                                        for z in range(self.grid_depth):
                                             if self.game_map[x, y, z] == self.WALL_TILE:
                                                 screen_x, screen_y = self.iso_utils.grid_to_screen(x, y)
                                                 screen_x += self.camera_offset_x
                                                 screen_y += self.camera_offset_y
 
-                                                tile_spacing = 1.3
+                                                tile_spacing = 1.375
                                                 wall_screen_y = screen_y - self.iso_utils.half_tile_height - (z * self.iso_utils.tile_height * tile_spacing + self.iso_utils.half_tile_height)
 
                                                 wall_candidates.append({
@@ -1610,7 +1610,7 @@ class RoomDesignerGame:
                                     half_w = self.iso_utils.half_tile_width
                                     half_h = self.iso_utils.half_tile_height
                                     tile_h = self.iso_utils.tile_height
-                                    tile_spacing = 1.3
+                                    tile_spacing = 1.375
 
                                     east_quad, north_quad = build_wall_quads(cx, cy, half_w, half_h, z, tile_h, tile_spacing)
 
@@ -1628,7 +1628,7 @@ class RoomDesignerGame:
                                         if not object_placed:
                                             placement_pos = find_adjacent_floor_position(
                                                 x, y, z, side,
-                                                self.game_map, self.grid_width, self.grid_height, self.grid_volume,
+                                                self.game_map, self.grid_width, self.grid_height, self.grid_depth,
                                                 self.objects, self.EMPTY_SPACE
                                             )
 
@@ -1780,13 +1780,13 @@ class RoomDesignerGame:
                             # Prepare clickable objects
                             for x in reversed(range(self.grid_width)):
                                 for y in reversed(range(self.grid_height)):
-                                    for z in reversed(range(self.grid_volume)):
+                                    for z in reversed(range(self.grid_depth)):
                                         screen_x, screen_y = self.iso_utils.grid_to_screen(x, y)
                                         screen_x += self.camera_offset_x
                                         screen_y += self.camera_offset_y
 
                                         # Adjust vertical screen position based on z-level
-                                        tile_spacing = 1.3
+                                        tile_spacing = 1.375
                                         screen_y = screen_y - (z * self.iso_utils.tile_height * tile_spacing + self.iso_utils.half_tile_height)
 
                                         if self.game_map[x, y, z] == self.TOP_SURFACE or self.game_map[x, y, z] == self.NON_TOP_SURFACE:
@@ -1909,16 +1909,16 @@ class RoomDesignerGame:
             # Movement on the floor
             if item_type == 'floor item' or item_type == 'non top floor item' or item_type == 'surface item':
                 if keys[pygame.K_LEFT]:
-                    if self.object.move(-1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                    if self.object.move(-1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                         moving = True
                 elif keys[pygame.K_RIGHT]:
-                    if self.object.move(1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                    if self.object.move(1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                         moving = True
                 elif keys[pygame.K_UP]:
-                    if self.object.move(0, -1, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                    if self.object.move(0, -1, 0, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                         moving = True
                 elif keys[pygame.K_DOWN]:
-                    if self.object.move(0, 1, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                    if self.object.move(0, 1, 0, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                         moving = True
         
                 self.object.animate(moving)
@@ -1927,16 +1927,16 @@ class RoomDesignerGame:
                 # Movement on the east wall
                 if self.object.grid_y == 1 and self.object.grid_x > 1:
                     if keys[pygame.K_LEFT]:
-                        if self.object.move(-1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(-1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     elif keys[pygame.K_RIGHT]:
-                        if self.object.move(1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     elif keys[pygame.K_UP]:
-                        if self.object.move(0, 0, 1, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, 0, 1, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                                 moving = True
                     elif keys[pygame.K_DOWN]:
-                        if self.object.move(0, 0, -1, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, 0, -1, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     
                         self.object.animate(moving)
@@ -1945,16 +1945,16 @@ class RoomDesignerGame:
                 # Movement on the north wall
                 elif self.object.grid_x == 1 and self.object.grid_y > 1:
                     if keys[pygame.K_LEFT]:
-                        if self.object.move(0, 1, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, 1, 0, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     elif keys[pygame.K_RIGHT]:
-                        if self.object.move(0, -1, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, -1, 0, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     elif keys[pygame.K_UP]:
-                        if self.object.move(0, 0, 1, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, 0, 1, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     elif keys[pygame.K_DOWN]:
-                        if self.object.move(0, 0, -1, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, 0, -1, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     
                     self.object.animate(moving)
@@ -1966,29 +1966,29 @@ class RoomDesignerGame:
                         self.object.col = 1
                         moving = True
                     elif keys[pygame.K_RIGHT]:
-                        if self.object.move(1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(1, 0, 0, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     elif keys[pygame.K_UP]:
-                        if self.object.move(0, 0, 1, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, 0, 1, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     elif keys[pygame.K_DOWN]:
-                        if self.object.move(0, 0, -1, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, 0, -1, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     
                     self.object.animate(moving)
 
                 elif self.object.grid_x == 1 and self.object.grid_y == 1 and self.object.col == 1:
                     if keys[pygame.K_LEFT]:
-                        if self.object.move(0, 1, 0, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, 1, 0, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     elif keys[pygame.K_RIGHT]:
                         self.object.col = 0
                         moving = True
                     elif keys[pygame.K_UP]:
-                        if self.object.move(0, 0, 1, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, 0, 1, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     elif keys[pygame.K_DOWN]:
-                        if self.object.move(0, 0, -1, self.game_map, self.grid_width, self.grid_height, self.grid_volume):
+                        if self.object.move(0, 0, -1, self.game_map, self.grid_width, self.grid_height, self.grid_depth):
                             moving = True
                     
                     self.object.animate(moving)
@@ -2348,8 +2348,8 @@ class RoomDesignerGame:
         render_list = []
         
         # Collect all tiles and objects for proper depth sorting
-        for y in range(self.grid_height):
-            for x in range(self.grid_width):
+        for x in range(self.grid_width):
+            for y in range(self.grid_height):
                 # Calculate base position for the tile
                 screen_x, screen_y = self.iso_utils.grid_to_screen(x, y)
                 screen_x += self.camera_offset_x
@@ -2362,18 +2362,20 @@ class RoomDesignerGame:
                     floor_rect.x = screen_x - self.iso_utils.half_tile_width
                     y_offset = 15
                     floor_rect.y = screen_y - self.iso_utils.half_tile_height + y_offset
-                    render_list.append((y + x, 'floor', floor_rect))
+                    render_list.append((x + y, 'floor', floor_rect))
                 
                 # Walls - render each layer
                 if self.game_map[x, y, 0] == self.WALL_TILE:
                     # Render each vertical layer of the wall
-                    for z in range(self.grid_volume):
+                    for z in range(self.grid_depth):
                         if self.game_map[x, y, z] == self.WALL_TILE:
                             wall_rect = self.sprites['wall'].get_rect()
                             wall_rect.x = screen_x - self.iso_utils.half_tile_width
-                            tile_spacing = 1.3
-                            wall_rect.y = screen_y - self.iso_utils.half_tile_height - (z * self.iso_utils.tile_height * tile_spacing + self.iso_utils.half_tile_height)
-                            render_list.append((y + x + z, 'wall', wall_rect))
+                            tile_spacing = 1.5
+                            y_offset = 3
+                            wall_rect.y = screen_y - self.iso_utils.half_tile_height - (z * self.iso_utils.tile_height
+                                         * tile_spacing + self.iso_utils.tile_height - y_offset)
+                            render_list.append((x + y + z, 'wall', wall_rect))
         
         all_entities = list(self.all_sprites)
 
@@ -2386,13 +2388,14 @@ class RoomDesignerGame:
             adjusted_rect = sprite.rect.copy()
             screen_x, screen_y = self.iso_utils.grid_to_screen(sprite.grid_x, sprite.grid_y)
             adjusted_rect.x = screen_x - self.iso_utils.half_tile_width + self.camera_offset_x
- 
-            base_y = screen_y - self.iso_utils.half_tile_height + self.camera_offset_y
-            tile_spacing = 1.3
+            
+            y_offset = 10
+            base_y = screen_y - self.iso_utils.half_tile_height + self.camera_offset_y - y_offset
+            tile_spacing = 1.5
             z_offset = sprite.grid_z * self.iso_utils.tile_height * tile_spacing + self.iso_utils.half_tile_height
             adjusted_rect.y = base_y - z_offset
             
-            render_depth = sprite.grid_y + sprite.grid_x + sprite.grid_z
+            render_depth = sprite.grid_x + sprite.grid_y + sprite.grid_z
             render_list.append((render_depth, 'sprite', sprite, adjusted_rect))
         
         # Sort and render everything

@@ -5,13 +5,7 @@ class SpriteSheet:
     
     def __init__(self, image_path):
         """Class for working with sprite sheets"""
-        try:
-            self.sheet = pygame.image.load(image_path)
-        except pygame.error:
-            print(f"Failed to load sprite sheet: {image_path}")
-            # Create an empty surface as a fallback
-            self.sheet = pygame.Surface((32, 32))
-            self.sheet.fill((255, 0, 255))  # Magenta as error
+        self.sheet = pygame.image.load(image_path)
     
     def get_sprite(self, x, y, width, height, scale):
         """Extracts a sprite from sheet at a given position"""

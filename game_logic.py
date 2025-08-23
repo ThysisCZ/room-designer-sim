@@ -2,12 +2,12 @@ import numpy as np
 import pygame
 import os
 
-def create_game_map(grid_width, grid_height, grid_volume):
+def create_game_map(grid_width, grid_height, grid_depth):
     """Creates a 3D game map with walls"""
-    game_map = np.zeros((grid_width, grid_height, grid_volume), dtype=int)
+    game_map = np.zeros((grid_width, grid_height, grid_depth), dtype=int)
 
     # Create walls along the edges
-    for z in range(grid_volume):
+    for z in range(grid_depth):
         game_map[:, 0, z] = 1  # north wall
         game_map[0, :, z] = 1  # east wall
 

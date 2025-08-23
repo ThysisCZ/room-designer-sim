@@ -130,8 +130,13 @@ class InventoryUI:
                     tile_w = total_width // 10
                     tile_h = total_height // 10
 
+                    # Resize and center the icon
+                    icon_resize = 1.35
+                    icon_margin = self.item_size // 13
+
                     # Extract the first tile
-                    icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h, scale=self.item_size / tile_w)
+                    icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h,
+                                                scale=self.item_size / tile_w / icon_resize)
 
                     #Draw square behind icon
                     cell_rect = pygame.Rect(x, y, self.item_size, self.item_size)
@@ -141,7 +146,10 @@ class InventoryUI:
                     pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
 
                     # Show icons
-                    screen.blit(icon, (x, y))
+                    if item.get('type') == 'wall item':
+                        screen.blit(icon, (x + 2 * icon_margin, y + 2 * icon_margin))
+                    else:
+                        screen.blit(icon, (x + 2 * icon_margin, y))
 
                     # Yellow border
                     if self.selected_item == item:
@@ -179,8 +187,13 @@ class InventoryUI:
                     tile_w = total_width // 10
                     tile_h = total_height // 10
 
+                    # Resize and center the icon
+                    icon_resize = 1.35
+                    icon_margin = self.item_size // 13
+
                     # Extract the first tile
-                    icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h, scale=self.item_size / tile_w)
+                    icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h,
+                                                scale=self.item_size / tile_w / icon_resize)
 
                     #Draw square behind icon
                     cell_rect = pygame.Rect(x, y, self.item_size, self.item_size)
@@ -190,7 +203,7 @@ class InventoryUI:
                     pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
 
                     # Show icons
-                    screen.blit(icon, (x, y))
+                    screen.blit(icon, (x + 2 * icon_margin, y + 1.25 * icon_margin))
 
                     # Yellow border
                     if self.selected_floor == floor or (idx == 0 and self.selected_floor is None):
@@ -218,8 +231,13 @@ class InventoryUI:
                     tile_w = total_width // 10
                     tile_h = total_height // 10
 
+                    # Resize and center the icon
+                    icon_resize = 1.35
+                    icon_margin = self.item_size // 13
+
                     # Extract the first tile
-                    icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h, scale=self.item_size / tile_w)
+                    icon = icon_sheet.get_sprite(0, 0, tile_w, tile_h,
+                                                scale=self.item_size / tile_w / icon_resize)
 
                     #Draw square behind icon
                     cell_rect = pygame.Rect(x, y, self.item_size, self.item_size)
@@ -229,7 +247,7 @@ class InventoryUI:
                     pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
 
                     # Show icons
-                    screen.blit(icon, (x, y))
+                    screen.blit(icon, (x + 2 * icon_margin, y + icon_margin))
 
                     # Yellow border
                     if self.selected_wall == wall or (idx == 0 and self.selected_floor is None):
@@ -506,7 +524,14 @@ class ShopUI:
                 pygame.draw.rect(screen, (255, 255, 255), cell_rect, 1)
 
                 # Show icons
-                screen.blit(icon, (x + icon_margin, y + icon_margin))
+                if asset.get('type') == 'floor' or asset.get('type') == 'wall':
+                    screen.blit(icon, (x + icon_margin, y + 0.75 * icon_margin))
+                elif asset.get('type') == 'floor item' or asset.get('type') == 'non top floor item':
+                    screen.blit(icon, (x + icon_margin, y + 0.15 * icon_margin))
+                elif asset.get('type') == 'surface item':
+                    screen.blit(icon, (x + icon_margin, y))
+                else:
+                    screen.blit(icon, (x + icon_margin, y + icon_margin))
 
                 # Yellow border
                 if self.selected_asset == asset:
@@ -524,7 +549,7 @@ class ShopUI:
             screen.blit(self.right_arrow_icon, (self.right_arrow_x, self.right_arrow_y))
             self.right_arrow_rect = pygame.Rect(self.right_arrow_x, self.right_arrow_y, self.arrow_width, self.arrow_height)
         else:
-            self.right_arrow_rect = pygame.Rect(0, 0, 0, 0) 
+            self.right_arrow_rect = pygame.Rect(0, 0, 0, 0)
 
     
     def handle_click(self, mouse_pos):
