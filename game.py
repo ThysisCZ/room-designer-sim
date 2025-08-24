@@ -17,10 +17,10 @@ class RoomDesignerGame:
     def __init__(self):
         """
         Initializes the game
-        prepares map width and height, fps, welcome screen (with buttons)
+        prepares menu screen and game map
         """
         pygame.init()
-        # Get the display info to set up fullscreen dimensions
+        # Set up fullscreen dimensions
         display_info = pygame.display.Info()
         self.WIDTH = display_info.current_w
         self.HEIGHT = display_info.current_h
@@ -169,7 +169,7 @@ class RoomDesignerGame:
         
         self.sounds['background'].play(loops=-1).set_volume(0.8)
         self.sounds['object_rotate'].set_volume(0.6)
-        self.sounds['ui_click'].set_volume(0.5)
+        self.sounds['ui_click'].set_volume(0.6)
     
     def init_game_world(self):
         """
@@ -304,7 +304,7 @@ class RoomDesignerGame:
             pygame.display.flip()
             time.sleep(2)
             self.restart_game()
-            self.sounds['ui_click'].set_volume(0.5)
+            self.sounds['ui_click'].set_volume(0.6)
 
         # Handle snake movements
         dir = 'RIGHT'
@@ -325,6 +325,11 @@ class RoomDesignerGame:
                         next_dir = 'RIGHT'
                     # Quit
                     if event.key == pygame.K_ESCAPE:
+                        selection_abl.save_selected_assets(
+                                self.selected_floor_data,
+                                self.selected_wall_data
+                            )
+                        
                         self.restart_game()
             
             # Update the movements with input in next_dir
@@ -550,6 +555,11 @@ class RoomDesignerGame:
                 if event.type == pygame.KEYDOWN:
                     # Quit
                     if event.key == pygame.K_ESCAPE:
+                        selection_abl.save_selected_assets(
+                                self.selected_floor_data,
+                                self.selected_wall_data
+                            )
+                        
                         self.restart_game()
 
             self.timer += 1
@@ -679,7 +689,7 @@ class RoomDesignerGame:
                     pygame.display.flip()
                     time.sleep(2)
                     self.restart_game()
-                    self.sounds['ui_click'].set_volume(0.5)
+                    self.sounds['ui_click'].set_volume(0.6)
             
             # Generate new coin
             def generate_coin():
@@ -880,6 +890,11 @@ class RoomDesignerGame:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
+                        selection_abl.save_selected_assets(
+                                self.selected_floor_data,
+                                self.selected_wall_data
+                            )
+                        
                         self.restart_game()
 
             self.timer += 1
@@ -1009,10 +1024,10 @@ class RoomDesignerGame:
                 if self.timer % 30 == 0:
                     generate_enemy()
             elif self.enemy_count > 15 and self.enemy_count <= 30:
-                if self.timer % 20 == 0:
+                if self.timer % 25 == 0:
                     generate_enemy()
             elif self.enemy_count > 30:
-                if self.timer % 10 == 0:
+                if self.timer % 15 == 0:
                     generate_enemy()
 
             # Draw the player and hitbox
@@ -1031,7 +1046,7 @@ class RoomDesignerGame:
                 self.coins.append({"pos": new_coin_pos})
 
             # Coin spawn frequency
-            if self.timer % 480 == 0:
+            if self.timer % 240 == 0:
                 generate_coin()
 
             # Update and draw coins
@@ -1101,7 +1116,7 @@ class RoomDesignerGame:
                 pygame.display.flip()
                 time.sleep(2)
                 self.restart_game()
-                self.sounds['ui_click'].set_volume(0.5)
+                self.sounds['ui_click'].set_volume(0.6)
 
             # Update and draw enemies
             idx = 0
@@ -1211,16 +1226,27 @@ class RoomDesignerGame:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    selection_abl.save_selected_assets(
-                            self.selected_floor_data,
-                            self.selected_wall_data
-                        )
-                    self.running = False
-                if self.game_state == GameState.PLAYING:
+                if self.game_state == GameState.MENU:
+                    if event.key == pygame.K_ESCAPE:
+                        selection_abl.save_selected_assets(
+                                self.selected_floor_data,
+                                self.selected_wall_data
+                            )
+                        
+                        self.running = False
+                elif self.game_state == GameState.PLAYING:
                     if event.key == pygame.K_SPACE:
                         self.place_object()
+                    elif event.key == pygame.K_ESCAPE:
+                        selection_abl.save_selected_assets(
+                                self.selected_floor_data,
+                                self.selected_wall_data
+                            )
+
+                        self.game_state = GameState.MENU
+
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_r:
                     if self.object:
@@ -1230,13 +1256,20 @@ class RoomDesignerGame:
                             self.object.rotate()
                             self.object.animate(True)
                             self.sounds['object_rotate'].play()
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.game_state == GameState.MENU:
                     if self.play_button.handle_event(event):
                         self.sounds['ui_click'].play()
                         self.restart_game()
                     elif self.quit_button.handle_event(event):
+                        selection_abl.save_selected_assets(
+                                self.selected_floor_data,
+                                self.selected_wall_data
+                            )
+                        
                         self.running = False
+                
                 elif self.game_state == GameState.PLAYING:
                     if self.inventory_button.handle_event(event):
                         self.show_minigames = False
@@ -1260,6 +1293,7 @@ class RoomDesignerGame:
                                 self.show_sell_button = self.inventory_ui.selected_floor != 0
                             else:
                                 self.show_sell_button = self.inventory_ui.selected_wall != 0
+                    
                     elif self.minigame_button.handle_event(event):
                         self.show_inventory = False
                         self.show_shop = False
@@ -1277,6 +1311,7 @@ class RoomDesignerGame:
                         else:
                             self.sounds['ui_click'].play()
                             self.show_minigames = True
+                    
                     elif self.shop_button.handle_event(event):
                         # Cancel inventory selection to enable shop selection
                         self.inventory_ui.selected_item = None
@@ -1299,6 +1334,7 @@ class RoomDesignerGame:
                             self.sounds['ui_click'].play()
                             self.show_shop = True
                             self.show_buy_button = self.shop_ui.selected_asset is not None
+                    
                     elif self.show_inventory:
                         selected = self.inventory_ui.handle_click(pygame.mouse.get_pos())
 
@@ -2445,50 +2481,25 @@ class RoomDesignerGame:
         """Starts a fresh game when switching from menu or minigames"""
         self.sounds['minigame'].stop()
 
-        # Handle theme song refresh
+        # Handle sound refresh after exiting a minigame
         if not self.game_state == GameState.MENU:
             self.sounds['background'].play(loops=-1).set_volume(0.8)
+            self.sounds['ui_click'].set_volume(0.6)
         
         pygame.mouse.set_visible(True)
         
-        # Reset game state
         self.clear_sprites()
-        self.init_game_world()
         
         # Reset inventory and selection state
-        inventory = inventory_abl.load_inventory()
         self.selected_item_data = None
         self.selected_tab = 0
 
-        # Load existing selections first
+        # Load existing selections
         selected_assets = selection_abl.load_selected_assets()
-        
-        # Find matching items in inventory
-        selected_floor = None
-        selected_wall = None
-        
-        if selected_assets['floor']:
-            # Find the selected floor in inventory
-            for floor in inventory['floor']:
-                if floor['id'] == selected_assets['floor']['id']:
-                    selected_floor = floor
-                    break
-        
-        if selected_assets['wall']:
-            # Find the selected wall in inventory
-            for wall in inventory['wall']:
-                if wall['id'] == selected_assets['wall']['id']:
-                    selected_wall = wall
-                    break
-        
-        # Use defaults if no matches found
-        if not selected_floor and inventory['floor']:
-            selected_floor = inventory['floor'][0]
-        if not selected_wall and inventory['wall']:
-            selected_wall = inventory['wall'][0]
+        selected_floor = selected_assets['floor']
+        selected_wall = selected_assets['wall']
             
-        # Save selections and update game state
-        selection_abl.save_selected_assets(selected_floor, selected_wall)
+        # Update game state
         self.selected_floor_data = selected_floor
         self.selected_wall_data = selected_wall
         

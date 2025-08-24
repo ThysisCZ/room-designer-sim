@@ -124,5 +124,50 @@
         "row": 0,
         "id": "minimalist_couch",
         "_id": "68a8917e9f24309fbb69465a"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 7,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "wooden_desk",
+        "_id": "68ab8dcb394859f13facd9be"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 6,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "wooden_desk",
+        "_id": "68ab8dcb394859f13facd9bf"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 5,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "wooden_desk",
+        "_id": "68ab8dcb394859f13facd9c0"
+    },
+    {
+        "grid_x": 2,
+        "grid_y": 6,
+        "grid_z": 0,
+        "col": 2,
+        "row": 0,
+        "id": "cottagecore_chair",
+        "_id": "68ab8dcb394859f13facd9c1"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 5,
+        "grid_z": 1,
+        "col": 0,
+        "row": 0,
+        "id": "mushroom_lamp",
+        "_id": "68ab8f01394859f13facdb08"
     }
 ]

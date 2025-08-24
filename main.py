@@ -24,8 +24,10 @@ def show_auth_screen():
     pygame.init()
     # Set up fullscreen display
     display_info = pygame.display.Info()
-    screen = pygame.display.set_mode((display_info.current_w, display_info.current_w), pygame.FULLSCREEN)
-    pygame.display.set_caption("Room Designer - Login")
+    width = display_info.current_w
+    height = display_info.current_h
+    screen = pygame.display.set_mode((width, height), pygame.FULLSCREEN)
+    pygame.display.set_caption("Room Designer Simulator")
     font = pygame.font.Font('ithaca.ttf', 24)
     
     auth_screen = AuthScreen(screen, font)

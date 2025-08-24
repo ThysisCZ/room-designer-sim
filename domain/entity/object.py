@@ -93,7 +93,7 @@ class Object(pygame.sprite.Sprite):
         else:
             if game_map[new_x, new_y, new_z] in (self.WALL_TILE, self.NON_TOP_SURFACE):
                 return False
-            elif game_map[new_x, new_y, new_z + 1] == self.NON_TOP_SURFACE:
+            elif game_map[new_x, new_y, new_z + 1] == self.NON_TOP_SURFACE and game_map[new_x, new_y, new_z] != self.EMPTY_SPACE:
                 return False
             elif game_map[new_x, new_y, new_z - 1] == self.NON_TOP_SURFACE and new_z == 1:
                 return False

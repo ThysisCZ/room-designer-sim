@@ -1,16 +1,6 @@
 {
     "item": [
         {
-            "id": "minimalist_table",
-            "name": "Minimalist Table",
-            "spritesheet": "minimalist_table.png",
-            "type": "floor item",
-            "description": "Good enough for visitors.",
-            "price": 150,
-            "count": 2,
-            "_id": "68a4b0176903d73e172d2d55"
-        },
-        {
             "id": "wooden_window",
             "name": "Wooden Window",
             "spritesheet": "wooden_window.png",
@@ -69,6 +59,36 @@
             "price": 150,
             "count": 2,
             "_id": "68a8917e9f24309fbb694665"
+        },
+        {
+            "id": "cottagecore_chair",
+            "name": "Cottagecore Chair",
+            "spritesheet": "cottagecore_chair.png",
+            "type": "non top floor item",
+            "description": "Simple wooden chair for garden enthusiasts.",
+            "price": 50,
+            "count": 2,
+            "_id": "68aaf0dad906d373cf09934b"
+        },
+        {
+            "id": "mushroom_lamp",
+            "name": "Mushroom Lamp",
+            "spritesheet": "mushroom_lamp.png",
+            "type": "surface item",
+            "description": "Definitely not made for consumption.",
+            "price": 200,
+            "count": 2,
+            "_id": "68ab8dcb394859f13facd9d1"
+        },
+        {
+            "id": "minimalist_table",
+            "name": "Minimalist Table",
+            "spritesheet": "minimalist_table.png",
+            "type": "floor item",
+            "description": "Good enough for visitors.",
+            "price": 150,
+            "count": 3,
+            "_id": "68ab8dcb394859f13facd9d2"
         }
     ],
     "floor": [

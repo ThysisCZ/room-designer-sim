@@ -109,5 +109,29 @@ shop_assets = [
         "type": "wall",
         "description": "Roses everywhere!",
         "price": 100
+    },
+    {
+        "id": "wooden_desk",
+        "name": "Wooden Desk",
+        "spritesheet": "wooden_desk.png",
+        "type": "floor item",
+        "description": "Useful for everyday tasks.",
+        "price": 150
+    },
+    {
+        "id": "cottagecore_chair",
+        "name": "Cottagecore Chair",
+        "spritesheet": "cottagecore_chair.png",
+        "type": "non top floor item",
+        "description": "Simple wooden chair for garden enthusiasts.",
+        "price": 50
+    },
+    {
+        "id": "mushroom_lamp",
+        "name": "Mushroom Lamp",
+        "spritesheet": "mushroom_lamp.png",
+        "type": "surface item",
+        "description": "Definitely not made for consumption.",
+        "price": 200
     }
 ]
