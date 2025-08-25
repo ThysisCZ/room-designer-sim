@@ -1533,7 +1533,7 @@ class RoomDesignerGame:
                                                 self.all_sprites.add(self.object)
                             elif item_type == 'wall item':
                                 def point_in_polygon(px, py, polygon):
-                                    """Check if point is inside a polygon using ray casting."""
+                                    """Check if point is inside a polygon by using ray casting."""
                                     inside = False
                                     n = len(polygon)
                                     
@@ -1691,7 +1691,7 @@ class RoomDesignerGame:
                                                 object_placed = True
                             else:
                                 def get_floor_surface(px, py, cx, cy, w, h):
-                                    """Check if click point is on floor using rhombus inequality."""
+                                    """Check if click point is on floor."""
                                     dx = abs(px - cx)
                                     dy = abs(py - cy)
                                     return (dx / (w / 2) + dy / (h / 2)) <= 1
@@ -1808,10 +1808,10 @@ class RoomDesignerGame:
 
                         def pickup_object():
                             def get_object_surface(px, py, cx, cy, w, h):
-                                """Check if click point is on any object surface using rhombus inequality."""
+                                """Check if click point is on any object surface."""
                                 dx = abs(px - cx)
                                 dy = abs(py - cy)
-                                return (dx / (w / 2 + 4) + dy / (h + 3)) <= 1
+                                return (dx / (w / 2) + dy / h) <= 1
                             
                             # Prepare clickable objects
                             for x in reversed(range(self.grid_width)):
@@ -1833,8 +1833,26 @@ class RoomDesignerGame:
                                             tile_width = self.iso_utils.tile_width
                                             tile_height = self.iso_utils.tile_height
 
-                                            center_x = screen_x
-                                            y_offset = 20
+                                            objects = tile_abl.load_tiles()
+
+                                            # Adjust offset based on item type
+                                            for object in objects:
+                                                if object.get('grid_x') == x and object.get('grid_y') == y and object.get('grid_z') == z:
+                                                    obj_id = object.get('id')
+
+                                                    for asset in shop_assets:
+                                                        if asset.get('id') == obj_id:
+                                                            if asset.get('type') == 'wall item' and object.get('col') == 0:
+                                                                x_offset = 14
+                                                                y_offset = 0
+                                                            elif asset.get('type') == 'wall item' and object.get('col') == 1:
+                                                                x_offset = -6
+                                                                y_offset = 0
+                                                            else:
+                                                                x_offset = 2
+                                                                y_offset = 20
+
+                                            center_x = screen_x + x_offset
                                             center_y = screen_y + y_offset
 
                                             # Handle object click

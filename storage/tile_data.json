@@ -9,42 +9,6 @@
         "_id": "68a64fc2326123a469073b94"
     },
     {
-        "grid_x": 8,
-        "grid_y": 1,
-        "grid_z": 2,
-        "col": 0,
-        "row": 0,
-        "id": "wooden_window",
-        "_id": "68a64fc2326123a469073b96"
-    },
-    {
-        "grid_x": 4,
-        "grid_y": 1,
-        "grid_z": 2,
-        "col": 0,
-        "row": 0,
-        "id": "wooden_window",
-        "_id": "68a64fc2326123a469073b97"
-    },
-    {
-        "grid_x": 1,
-        "grid_y": 4,
-        "grid_z": 2,
-        "col": 1,
-        "row": 0,
-        "id": "wooden_window",
-        "_id": "68a64fc2326123a469073b98"
-    },
-    {
-        "grid_x": 7,
-        "grid_y": 6,
-        "grid_z": 0,
-        "col": 2,
-        "row": 0,
-        "id": "minimalist_chair",
-        "_id": "68a7498f8ebdcea2d6ff1970"
-    },
-    {
         "grid_x": 6,
         "grid_y": 7,
         "grid_z": 0,
@@ -88,24 +52,6 @@
         "row": 0,
         "id": "minimalist_table",
         "_id": "68a74f4e8ebdcea2d6ff1da0"
-    },
-    {
-        "grid_x": 1,
-        "grid_y": 1,
-        "grid_z": 1,
-        "col": 0,
-        "row": 0,
-        "id": "orchid",
-        "_id": "68a74f4e8ebdcea2d6ff1da1"
-    },
-    {
-        "grid_x": 1,
-        "grid_y": 8,
-        "grid_z": 2,
-        "col": 1,
-        "row": 0,
-        "id": "wooden_window",
-        "_id": "68a79373cd4bd37aa63c9537"
     },
     {
         "grid_x": 6,
@@ -162,12 +108,111 @@
         "_id": "68ab8dcb394859f13facd9c1"
     },
     {
+        "grid_x": 2,
+        "grid_y": 1,
+        "grid_z": 0,
+        "col": 2,
+        "row": 0,
+        "id": "flower_basket",
+        "_id": "68ac53ec9bef1655ee8d9cd1"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 7,
+        "grid_z": 1,
+        "col": 2,
+        "row": 0,
+        "id": "straw_hat",
+        "_id": "68ac72a89bef1655ee8da2b7"
+    },
+    {
+        "grid_x": 7,
+        "grid_y": 6,
+        "grid_z": 0,
+        "col": 2,
+        "row": 0,
+        "id": "minimalist_chair",
+        "_id": "68ac797fc11decf98d2d0462"
+    },
+    {
         "grid_x": 1,
         "grid_y": 5,
         "grid_z": 1,
         "col": 0,
         "row": 0,
         "id": "mushroom_lamp",
-        "_id": "68ab8f01394859f13facdb08"
+        "_id": "68ac84ffc11decf98d2d15ef"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 1,
+        "grid_z": 1,
+        "col": 0,
+        "row": 0,
+        "id": "orchid",
+        "_id": "68ac84ffc11decf98d2d15f0"
+    },
+    {
+        "grid_x": 4,
+        "grid_y": 1,
+        "grid_z": 2,
+        "col": 0,
+        "row": 0,
+        "id": "cottagecore_window",
+        "_id": "68ac85fec11decf98d2d1773"
+    },
+    {
+        "grid_x": 8,
+        "grid_y": 1,
+        "grid_z": 2,
+        "col": 0,
+        "row": 0,
+        "id": "cottagecore_window",
+        "_id": "68ac86ddc11decf98d2d1a77"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 4,
+        "grid_z": 2,
+        "col": 1,
+        "row": 0,
+        "id": "cottagecore_window",
+        "_id": "68aca5b5c11decf98d2d1f0d"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 8,
+        "grid_z": 2,
+        "col": 1,
+        "row": 0,
+        "id": "cottagecore_window",
+        "_id": "68aca5b5c11decf98d2d1f0e"
+    },
+    {
+        "grid_x": 3,
+        "grid_y": 1,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "anthurium",
+        "_id": "68aca840c11decf98d2d20b5"
+    },
+    {
+        "grid_x": 4,
+        "grid_y": 1,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "geranium",
+        "_id": "68aca840c11decf98d2d20b6"
+    },
+    {
+        "grid_x": 5,
+        "grid_y": 1,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "african_violet",
+        "_id": "68aca840c11decf98d2d20b7"
     }
 ]

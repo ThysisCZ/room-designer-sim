@@ -1,13 +1,13 @@
 {
     "item": [
         {
-            "id": "wooden_window",
-            "name": "Wooden Window",
-            "spritesheet": "wooden_window.png",
+            "id": "minimalist_window",
+            "name": "Minimalist Window",
+            "spritesheet": "minimalist_window.png",
             "type": "wall item",
             "description": "Made out of an oak tree.",
             "price": 150,
-            "count": 4,
+            "count": 8,
             "_id": "68a4b0176903d73e172d2d56"
         },
         {
@@ -15,7 +15,7 @@
             "name": "Orchid",
             "spritesheet": "orchid.png",
             "type": "surface item",
-            "description": "Plant from the Orchidaceae family.",
+            "description": "This variety is called Phalaenopsis Vienna.",
             "price": 100,
             "count": 3,
             "_id": "68a4b0176903d73e172d2d57"
@@ -61,14 +61,34 @@
             "_id": "68a8917e9f24309fbb694665"
         },
         {
+            "id": "minimalist_table",
+            "name": "Minimalist Table",
+            "spritesheet": "minimalist_table.png",
+            "type": "floor item",
+            "description": "Good enough for visitors.",
+            "price": 150,
+            "count": 3,
+            "_id": "68ac5d109bef1655ee8d9e41"
+        },
+        {
+            "id": "wooden_desk",
+            "name": "Wooden Desk",
+            "spritesheet": "wooden_desk.png",
+            "type": "floor item",
+            "description": "Useful for everyday tasks.",
+            "price": 150,
+            "count": 3,
+            "_id": "68ac5d109bef1655ee8d9e42"
+        },
+        {
             "id": "cottagecore_chair",
             "name": "Cottagecore Chair",
             "spritesheet": "cottagecore_chair.png",
             "type": "non top floor item",
             "description": "Simple wooden chair for garden enthusiasts.",
             "price": 50,
-            "count": 2,
-            "_id": "68aaf0dad906d373cf09934b"
+            "count": 3,
+            "_id": "68ac5d109bef1655ee8d9e43"
         },
         {
             "id": "mushroom_lamp",
@@ -78,17 +98,87 @@
             "description": "Definitely not made for consumption.",
             "price": 200,
             "count": 2,
-            "_id": "68ab8dcb394859f13facd9d1"
+            "_id": "68ac5d109bef1655ee8d9e44"
         },
         {
-            "id": "minimalist_table",
-            "name": "Minimalist Table",
-            "spritesheet": "minimalist_table.png",
-            "type": "floor item",
-            "description": "Good enough for visitors.",
-            "price": 150,
-            "count": 3,
-            "_id": "68ab8dcb394859f13facd9d2"
+            "id": "flower_basket",
+            "name": "Flower Basket",
+            "spritesheet": "flower_basket.png",
+            "type": "surface item",
+            "description": "Used for collecting flowers.",
+            "price": 50,
+            "count": 2,
+            "_id": "68ac5d109bef1655ee8d9e45"
+        },
+        {
+            "id": "landscape_photograph",
+            "name": "Landscape Photograph",
+            "spritesheet": "landscape_photograph.png",
+            "type": "wall item",
+            "description": "Photo of a random landscape taken in the 20th century.",
+            "price": 50,
+            "count": 2,
+            "_id": "68ac67829bef1655ee8d9fb7"
+        },
+        {
+            "id": "sunflower_photograph",
+            "name": "Sunflower Photograph",
+            "spritesheet": "sunflower_photograph.png",
+            "type": "wall item",
+            "description": "Photo of a random sunflower taken in the 20th century.",
+            "price": 50,
+            "count": 2,
+            "_id": "68ac67829bef1655ee8d9fb8"
+        },
+        {
+            "id": "straw_hat",
+            "name": "Straw Hat",
+            "spritesheet": "straw_hat.png",
+            "type": "surface item",
+            "description": "Lightweight nad natural hat.",
+            "price": 25,
+            "count": 2,
+            "_id": "68ac68099bef1655ee8da13e"
+        },
+        {
+            "id": "cottagecore_window",
+            "name": "Cottagecore Window",
+            "spritesheet": "cottagecore_window.png",
+            "type": "wall item",
+            "description": "Wooden window with curtains.",
+            "price": 100,
+            "count": 2,
+            "_id": "68ac77b6c11decf98d2cffb6"
+        },
+        {
+            "id": "anthurium",
+            "name": "Anthurium",
+            "spritesheet": "anthurium.png",
+            "type": "surface item",
+            "description": "This species is called Anthurium andraeanum.",
+            "price": 100,
+            "count": 1,
+            "_id": "68aca840c11decf98d2d20cf"
+        },
+        {
+            "id": "geranium",
+            "name": "Geranium",
+            "spritesheet": "geranium.png",
+            "type": "surface item",
+            "description": "This variety is called Geranium clarkei 'Kashmir Pink'.",
+            "price": 100,
+            "count": 1,
+            "_id": "68aca840c11decf98d2d20d0"
+        },
+        {
+            "id": "african_violet",
+            "name": "African Violet",
+            "spritesheet": "african_violet.png",
+            "type": "surface item",
+            "description": "This variety is called Myakka Trail.",
+            "price": 100,
+            "count": 1,
+            "_id": "68aca840c11decf98d2d20d1"
         }
     ],
     "floor": [
@@ -118,6 +208,51 @@
             "description": "Stable floor crafted by a lumberjack.",
             "price": 100,
             "_id": "68a8d67c1995408d63dc1494"
+        },
+        {
+            "id": "green_pastel_floor",
+            "name": "Green Pastel Floor",
+            "spritesheet": "green_pastel_floor.png",
+            "type": "floor",
+            "description": "Clean floor with nice green pastel color.",
+            "price": 100,
+            "_id": "68acd518c11decf98d2d2477"
+        },
+        {
+            "id": "blue_pastel_floor",
+            "name": "Blue Pastel Floor",
+            "spritesheet": "blue_pastel_floor.png",
+            "type": "floor",
+            "description": "Clean floor with nice blue pastel color.",
+            "price": 100,
+            "_id": "68acd518c11decf98d2d2478"
+        },
+        {
+            "id": "violet_pastel_floor",
+            "name": "Violet Pastel Floor",
+            "spritesheet": "violet_pastel_floor.png",
+            "type": "floor",
+            "description": "Clean floor with nice violet pastel color.",
+            "price": 100,
+            "_id": "68acd518c11decf98d2d2479"
+        },
+        {
+            "id": "pink_pastel_floor",
+            "name": "Pink Pastel Floor",
+            "spritesheet": "pink_pastel_floor.png",
+            "type": "floor",
+            "description": "Clean floor with nice pink pastel color.",
+            "price": 100,
+            "_id": "68acd518c11decf98d2d247a"
+        },
+        {
+            "id": "yellow_pastel_floor",
+            "name": "Yellow Pastel Floor",
+            "spritesheet": "yellow_pastel_floor.png",
+            "type": "floor",
+            "description": "Clean floor with nice yellow pastel color.",
+            "price": 100,
+            "_id": "68acd518c11decf98d2d247b"
         }
     ],
     "wall": [
@@ -165,6 +300,51 @@
             "description": "Roses everywhere!",
             "price": 100,
             "_id": "68a8ed3d1995408d63dc1885"
+        },
+        {
+            "id": "green_pastel_wall",
+            "name": "Green Pastel Wall",
+            "spritesheet": "green_pastel_wall.png",
+            "type": "wall",
+            "description": "Clean wall with nice green pastel color.",
+            "price": 100,
+            "_id": "68acd518c11decf98d2d246f"
+        },
+        {
+            "id": "blue_pastel_wall",
+            "name": "Blue Pastel Wall",
+            "spritesheet": "blue_pastel_wall.png",
+            "type": "wall",
+            "description": "Clean wall with nice blue pastel color.",
+            "price": 100,
+            "_id": "68acd518c11decf98d2d2470"
+        },
+        {
+            "id": "violet_pastel_wall",
+            "name": "Violet Pastel Wall",
+            "spritesheet": "violet_pastel_wall.png",
+            "type": "wall",
+            "description": "Clean wall with nice violet pastel color.",
+            "price": 100,
+            "_id": "68acd518c11decf98d2d2471"
+        },
+        {
+            "id": "pink_pastel_wall",
+            "name": "Pink Pastel Wall",
+            "spritesheet": "pink_pastel_wall.png",
+            "type": "wall",
+            "description": "Clean wall with nice pink pastel color.",
+            "price": 100,
+            "_id": "68acd518c11decf98d2d2472"
+        },
+        {
+            "id": "yellow_pastel_wall",
+            "name": "Yellow Pastel Wall",
+            "spritesheet": "yellow_pastel_wall.png",
+            "type": "wall",
+            "description": "Clean wall with nice yellow pastel color.",
+            "price": 100,
+            "_id": "68acd518c11decf98d2d2473"
         }
     ]
 }
