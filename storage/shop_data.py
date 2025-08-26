@@ -281,5 +281,93 @@ shop_assets = [
         "type": "wall",
         "description": "Clean wall with nice yellow pastel color.",
         "price": 100
+    },
+    {
+        "id": "polka_dot_floor",
+        "name": "Polka Dot Floor",
+        "spritesheet": "polka_dot_floor.png",
+        "type": "floor",
+        "description": "Evokes joy and playfulness.",
+        "price": 100
+    },
+    {
+        "id": "polka_dot_wall",
+        "name": "Polka Dot Wall",
+        "spritesheet": "polka_dot_wall.png",
+        "type": "wall",
+        "description": "Evokes joy and playfulness.",
+        "price": 100
+    },
+    {
+        "id": "cutecore_couch",
+        "name": "Cutecore Couch",
+        "spritesheet": "cutecore_couch.png",
+        "type": "floor item",
+        "description": "Cute place where you can chill.",
+        "price": 150,
+        "count": 0
+    },
+    {
+        "id": "cutecore_desk",
+        "name": "Cutecore Desk",
+        "spritesheet": "cutecore_desk.png",
+        "type": "floor item",
+        "description": "You can use it for everyday tasks and it's also cute.",
+        "price": 100,
+        "count": 0
+    },
+    {
+        "id": "cutecore_chair",
+        "name": "Cutecore Chair",
+        "spritesheet": "cutecore_chair.png",
+        "type": "floor item",
+        "description": "Simple chair made out of pink plastic.",
+        "price": 50,
+        "count": 0
+    },
+    {
+        "id": "mirror",
+        "name": "Mirror",
+        "spritesheet": "mirror.png",
+        "type": "wall item",
+        "description": "Cats are usually weirded out by it.",
+        "price": 100,
+        "count": 0
+    },
+    {
+        "id": "anime_poster",
+        "name": "Anime Poster",
+        "spritesheet": "anime_poster.png",
+        "type": "wall item",
+        "description": "Poster of a catgirl.",
+        "price": 50,
+        "count": 0
+    },
+    {
+        "id": "bear_plushie",
+        "name": "Bear Plushie",
+        "spritesheet": "bear_plushie.png",
+        "type": "surface item",
+        "description": "Cute bear friend.",
+        "price": 200,
+        "count": 0
+    },
+    {
+        "id": "bunny_plushie",
+        "name": "Bunny Plushie",
+        "spritesheet": "bunny_plushie.png",
+        "type": "surface item",
+        "description": "Cute bunny friend.",
+        "price": 200,
+        "count": 0
+    },
+    {
+        "id": "strawberry_plushie",
+        "name": "Strawberry Plushie",
+        "spritesheet": "strawberry_plushie.png",
+        "type": "surface item",
+        "description": "Huge soft strawberry.",
+        "price": 200,
+        "count": 0
     }
 ]

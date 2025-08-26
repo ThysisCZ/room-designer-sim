@@ -197,9 +197,7 @@ class IsometricUtils:
     def get_render_order(self, entities):
         """Sort entities by their render order (back to front)"""
         def sort_key(entity):
-            # Sort by grid_y first (back to front), then by grid_x, then by z if available
-            z = getattr(entity, 'z', 0)
-            return (entity.grid_y + entity.grid_x, -z)
+            return (entity.grid_x + entity.grid_y)
         
         return sorted(entities, key=sort_key)
     

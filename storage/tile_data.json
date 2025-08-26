@@ -63,15 +63,6 @@
         "_id": "68a87e03e6dd6ce8263bbcc1"
     },
     {
-        "grid_x": 6,
-        "grid_y": 1,
-        "grid_z": 0,
-        "col": 1,
-        "row": 0,
-        "id": "minimalist_couch",
-        "_id": "68a8917e9f24309fbb69465a"
-    },
-    {
         "grid_x": 1,
         "grid_y": 7,
         "grid_z": 0,
@@ -214,5 +205,112 @@
         "row": 0,
         "id": "african_violet",
         "_id": "68aca840c11decf98d2d20b7"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 6,
+        "grid_z": 2,
+        "col": 1,
+        "row": 0,
+        "id": "sunflower_photograph",
+        "_id": "68ad75baf0e62c2be811283f"
+    },
+    {
+        "grid_x": 6,
+        "grid_y": 1,
+        "grid_z": 0,
+        "col": 1,
+        "row": 0,
+        "id": "minimalist_couch",
+        "_id": "68adc94ff0e62c2be81145e3"
+    },
+    {
+        "grid_x": 9,
+        "grid_y": 1,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "cutecore_desk",
+        "_id": "68adc94ff0e62c2be81145e4"
+    },
+    {
+        "grid_x": 8,
+        "grid_y": 1,
+        "grid_z": 0,
+        "col": 1,
+        "row": 0,
+        "id": "cutecore_couch",
+        "_id": "68adc94ff0e62c2be81145e5"
+    },
+    {
+        "grid_x": 9,
+        "grid_y": 2,
+        "grid_z": 0,
+        "col": 3,
+        "row": 0,
+        "id": "cutecore_chair",
+        "_id": "68adc94ff0e62c2be81145e6"
+    },
+    {
+        "grid_x": 9,
+        "grid_y": 1,
+        "grid_z": 1,
+        "col": 0,
+        "row": 0,
+        "id": "mirror",
+        "_id": "68adc94ff0e62c2be81145e7"
+    },
+    {
+        "grid_x": 10,
+        "grid_y": 1,
+        "grid_z": 2,
+        "col": 0,
+        "row": 0,
+        "id": "anime_poster",
+        "_id": "68adc94ff0e62c2be81145e8"
+    },
+    {
+        "grid_x": 10,
+        "grid_y": 1,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "cutecore_desk",
+        "_id": "68adcc97f0e62c2be8114e11"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 11,
+        "grid_z": 0,
+        "col": 3,
+        "row": 0,
+        "id": "bunny_plushie",
+        "_id": "68adcc97f0e62c2be8114e12"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 10,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "bear_plushie",
+        "_id": "68adcc97f0e62c2be8114e13"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 9,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "strawberry_plushie",
+        "_id": "68adcc97f0e62c2be8114e14"
+    },
+    {
+        "grid_x": 10,
+        "grid_y": 1,
+        "grid_z": 1,
+        "col": 0,
+        "row": 0,
+        "id": "strawberry_plushie"
     }
 ]

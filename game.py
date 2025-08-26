@@ -54,7 +54,7 @@ class RoomDesignerGame:
         tile_height = int(tile_width * 0.5)
         self.iso_utils = IsometricUtils(tile_width=tile_width, tile_height=tile_height)
         self.camera_offset_x = self.WIDTH // 2 # Center room horizontally
-        self.camera_offset_y = self.HEIGHT * 0.37 # Center room vertically
+        self.camera_offset_y = self.HEIGHT * 0.35 # Center room vertically
         
         self.game_state = GameState.MENU
 
@@ -1027,7 +1027,7 @@ class RoomDesignerGame:
                 if self.timer % 25 == 0:
                     generate_enemy()
             elif self.enemy_count > 30:
-                if self.timer % 15 == 0:
+                if self.timer % 13 == 0:
                     generate_enemy()
 
             # Draw the player and hitbox
@@ -1300,10 +1300,15 @@ class RoomDesignerGame:
                         self.show_buy_button = False
                         self.show_sell_button = False
 
-                        # Reset selection to avoid conflicts
+                        # Reset item selection to avoid conflicts
                         self.inventory_ui.selected_item = None
                         self.selected_item_data = None
                         self.shop_ui.selected_asset = None
+
+                        if self.object:
+                            self.objects.remove(self.object)
+                            self.all_sprites.remove(self.object)
+                            self.object = None
                         
                         if self.show_minigames:
                             self.sounds['ui_click'].play()
@@ -1313,19 +1318,17 @@ class RoomDesignerGame:
                             self.show_minigames = True
                     
                     elif self.shop_button.handle_event(event):
-                        # Cancel inventory selection to enable shop selection
+                        self.show_inventory = False
+                        self.show_minigames = False
+                        self.show_sell_button = False
+
                         self.inventory_ui.selected_item = None
                         self.selected_item_data = None
                         
-                        # Remove ghost object
                         if self.object:
                             self.objects.remove(self.object)
                             self.all_sprites.remove(self.object)
                             self.object = None
-
-                        self.show_inventory = False
-                        self.show_minigames = False
-                        self.show_sell_button = False
 
                         if self.show_shop:
                             self.sounds['ui_click'].play()
@@ -2400,7 +2403,7 @@ class RoomDesignerGame:
         self.screen.blit(balance_text, balance_rect)
         
         render_list = []
-        
+
         # Collect all tiles and objects for proper depth sorting
         for x in range(self.grid_width):
             for y in range(self.grid_height):
@@ -2408,19 +2411,19 @@ class RoomDesignerGame:
                 screen_x, screen_y = self.iso_utils.grid_to_screen(x, y)
                 screen_x += self.camera_offset_x
                 screen_y += self.camera_offset_y
-                
-                # Floor tile - render for empty spaces and spaces with objects
+
+                # Floors - render for empty spaces and spaces with objects
                 if self.game_map[x, y, 0] == self.EMPTY_SPACE or self.game_map[x, y, 0] == self.TOP_SURFACE \
                 or self.game_map[x, y, 0] == self.NON_TOP_SURFACE:
                     floor_rect = self.sprites['floor'].get_rect()
                     floor_rect.x = screen_x - self.iso_utils.half_tile_width
-                    y_offset = 15
+                    y_offset = 30
                     floor_rect.y = screen_y - self.iso_utils.half_tile_height + y_offset
-                    render_list.append((x + y, 'floor', floor_rect))
-                
+                    render_offset = 2
+                    render_list.append((x + y - render_offset, 'floor', floor_rect))
+
                 # Walls - render each layer
                 if self.game_map[x, y, 0] == self.WALL_TILE:
-                    # Render each vertical layer of the wall
                     for z in range(self.grid_depth):
                         if self.game_map[x, y, z] == self.WALL_TILE:
                             wall_rect = self.sprites['wall'].get_rect()
@@ -2428,33 +2431,33 @@ class RoomDesignerGame:
                             tile_spacing = 1.5
                             y_offset = 3
                             wall_rect.y = screen_y - self.iso_utils.half_tile_height - (z * self.iso_utils.tile_height
-                                         * tile_spacing + self.iso_utils.tile_height - y_offset)
+                                         * tile_spacing + self.iso_utils.half_tile_height - y_offset)
                             render_list.append((x + y + z, 'wall', wall_rect))
-        
+
         all_entities = list(self.all_sprites)
 
         if self.object:
             all_entities.append(self.object)
 
         sorted_entities = self.iso_utils.get_render_order(all_entities)
-        
+
         for sprite in sorted_entities:
             adjusted_rect = sprite.rect.copy()
             screen_x, screen_y = self.iso_utils.grid_to_screen(sprite.grid_x, sprite.grid_y)
             adjusted_rect.x = screen_x - self.iso_utils.half_tile_width + self.camera_offset_x
-            
+
             y_offset = 10
-            base_y = screen_y - self.iso_utils.half_tile_height + self.camera_offset_y - y_offset
+            base_y = screen_y - self.iso_utils.half_tile_height + self.camera_offset_y + y_offset
             tile_spacing = 1.5
             z_offset = sprite.grid_z * self.iso_utils.tile_height * tile_spacing + self.iso_utils.half_tile_height
             adjusted_rect.y = base_y - z_offset
-            
+
             render_depth = sprite.grid_x + sprite.grid_y + sprite.grid_z
             render_list.append((render_depth, 'sprite', sprite, adjusted_rect))
-        
+
         # Sort and render everything
         render_list.sort(key=lambda item: item[0])
-        
+
         for item in render_list:
             if item[1] == 'sprite':
                 sprite, rect = item[2], item[3]
@@ -2508,9 +2511,14 @@ class RoomDesignerGame:
         
         self.clear_sprites()
         
-        # Reset inventory and selection state
+        # Reset item selection state
+        self.inventory_ui.selected_item = None
         self.selected_item_data = None
-        self.selected_tab = 0
+
+        if self.object:
+            self.objects.remove(self.object)
+            self.all_sprites.remove(self.object)
+            self.object = None
 
         # Load existing selections
         selected_assets = selection_abl.load_selected_assets()
