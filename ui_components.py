@@ -206,7 +206,7 @@ class InventoryUI:
                     screen.blit(icon, (x + 2 * icon_margin, y + 1.25 * icon_margin))
 
                     # Yellow border
-                    if self.selected_floor == floor or (idx == 0 and self.selected_floor is None):
+                    if self.selected_floor == floor or idx == 0 and self.selected_floor.get('id') == 'stone_floor':
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
             # Draw wall icons
             else:
@@ -250,7 +250,7 @@ class InventoryUI:
                     screen.blit(icon, (x + 2 * icon_margin, y + icon_margin))
 
                     # Yellow border
-                    if self.selected_wall == wall or (idx == 0 and self.selected_floor is None):
+                    if self.selected_wall == wall or idx == 0 and self.selected_wall.get('id') == 'stone_wall':
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
     
     def handle_click(self, mouse_pos):
