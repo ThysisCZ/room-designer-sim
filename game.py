@@ -300,6 +300,11 @@ class RoomDesignerGame:
                                     fruit_hs=self.fruit_hi_score,
                                     bullet_hs=self.bullet_hi_score
                                 )
+            
+            selection_abl.save_selected_assets(
+                                self.selected_floor_data,
+                                self.selected_wall_data
+                            )
 
             pygame.display.flip()
             time.sleep(2)
@@ -685,6 +690,11 @@ class RoomDesignerGame:
                                             fruit_hs=self.fruit_hi_score,
                                             bullet_hs=self.bullet_hi_score
                                         )
+                    
+                    selection_abl.save_selected_assets(
+                                self.selected_floor_data,
+                                self.selected_wall_data
+                            )
 
                     pygame.display.flip()
                     time.sleep(2)
@@ -1112,6 +1122,11 @@ class RoomDesignerGame:
                                             fruit_hs=self.fruit_hi_score,
                                             bullet_hs=self.bullet_hi_score
                                         )
+                
+                selection_abl.save_selected_assets(
+                                self.selected_floor_data,
+                                self.selected_wall_data
+                            )
 
                 pygame.display.flip()
                 time.sleep(2)
@@ -1427,6 +1442,8 @@ class RoomDesignerGame:
                                             fruit_hs=self.fruit_hi_score,
                                             bullet_hs=self.bullet_hi_score
                                         )
+                                    
+                                    self.shop_ui.total_balance = self.total_balance
                             
                             elif selected_tab == self.FLOOR_TAB:
                                 self.sounds['ui_click'].play()
@@ -1453,7 +1470,9 @@ class RoomDesignerGame:
                                             fruit_hs=self.fruit_hi_score,
                                             bullet_hs=self.bullet_hi_score
                                         )
+                                    
                                     self.inventory_ui.selected_tab = self.FLOOR_TAB
+                                    self.shop_ui.total_balance = self.total_balance
                             else:
                                 self.sounds['ui_click'].play()
 
@@ -1479,7 +1498,9 @@ class RoomDesignerGame:
                                             fruit_hs=self.fruit_hi_score,
                                             bullet_hs=self.bullet_hi_score
                                         )
+                                    
                                     self.inventory_ui.selected_tab = self.WALL_TAB
+                                    self.shop_ui.total_balance = self.total_balance
                     
                     # Handle ghost object placement
                     elif self.selected_item_data:
@@ -2528,6 +2549,7 @@ class RoomDesignerGame:
         # Update game state
         self.selected_floor_data = selected_floor
         self.selected_wall_data = selected_wall
+        self.shop_ui.total_balance = self.total_balance
         
         # Reload game state with defaults
         self.reload_inventory()

@@ -44,7 +44,7 @@ class Button:
 
 class InventoryUI:
     def __init__(self, items, floors, walls, item_size, tabs, x, y, cols, rows, total_balance,
-                 selected_item=None, selected_floor=None, selected_wall=None, selected_tab=0):
+                 selected_item, selected_floor, selected_wall, selected_tab):
         self.items = items
         self.floors = floors
         self.walls = walls
@@ -206,7 +206,7 @@ class InventoryUI:
                     screen.blit(icon, (x + 2 * icon_margin, y + 1.25 * icon_margin))
 
                     # Yellow border
-                    if self.selected_floor == floor or idx == 0 and self.selected_floor.get('id') == 'stone_floor':
+                    if self.selected_floor.get('id') == floor.get('id'):
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
             # Draw wall icons
             else:
@@ -250,7 +250,7 @@ class InventoryUI:
                     screen.blit(icon, (x + 2 * icon_margin, y + icon_margin))
 
                     # Yellow border
-                    if self.selected_wall == wall or idx == 0 and self.selected_wall.get('id') == 'stone_wall':
+                    if self.selected_wall.get('id') == wall.get('id'):
                         pygame.draw.rect(screen, (255, 255, 0), cell_rect, 5)
     
     def handle_click(self, mouse_pos):
