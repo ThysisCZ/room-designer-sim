@@ -1,15 +1,6 @@
 [
     {
         "grid_x": 6,
-        "grid_y": 6,
-        "grid_z": 0,
-        "col": 0,
-        "row": 0,
-        "id": "minimalist_table",
-        "_id": "68a64fc2326123a469073b94"
-    },
-    {
-        "grid_x": 6,
         "grid_y": 7,
         "grid_z": 0,
         "col": 3,
@@ -25,24 +16,6 @@
         "row": 0,
         "id": "minimalist_chair",
         "_id": "68a7498f8ebdcea2d6ff1972"
-    },
-    {
-        "grid_x": 6,
-        "grid_y": 5,
-        "grid_z": 0,
-        "col": 1,
-        "row": 0,
-        "id": "minimalist_chair",
-        "_id": "68a7498f8ebdcea2d6ff1973"
-    },
-    {
-        "grid_x": 6,
-        "grid_y": 6,
-        "grid_z": 1,
-        "col": 0,
-        "row": 0,
-        "id": "coffee",
-        "_id": "68a7498f8ebdcea2d6ff1974"
     },
     {
         "grid_x": 1,
@@ -106,15 +79,6 @@
         "row": 0,
         "id": "flower_basket",
         "_id": "68ac53ec9bef1655ee8d9cd1"
-    },
-    {
-        "grid_x": 1,
-        "grid_y": 7,
-        "grid_z": 1,
-        "col": 2,
-        "row": 0,
-        "id": "straw_hat",
-        "_id": "68ac72a89bef1655ee8da2b7"
     },
     {
         "grid_x": 7,
@@ -311,6 +275,123 @@
         "grid_z": 1,
         "col": 0,
         "row": 0,
-        "id": "strawberry_plushie"
+        "id": "strawberry_plushie",
+        "_id": "68ae1342f0e62c2be81276ca"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 4,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "modern_desk",
+        "_id": "68af3aea39eae8de724b25c7"
+    },
+    {
+        "grid_x": 6,
+        "grid_y": 5,
+        "grid_z": 0,
+        "col": 1,
+        "row": 0,
+        "id": "minimalist_chair",
+        "_id": "68af3aea39eae8de724b25c9"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 3,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "modern_desk",
+        "_id": "68af3aea39eae8de724b25ca"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 2,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "modern_desk",
+        "_id": "68af3aea39eae8de724b25cb"
+    },
+    {
+        "grid_x": 2,
+        "grid_y": 3,
+        "grid_z": 0,
+        "col": 2,
+        "row": 0,
+        "id": "gaming_chair",
+        "_id": "68af3aea39eae8de724b25cc"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 7,
+        "grid_z": 1,
+        "col": 0,
+        "row": 0,
+        "id": "straw_hat",
+        "_id": "68af416239eae8de724b2950"
+    },
+    {
+        "grid_x": 1,
+        "grid_y": 3,
+        "grid_z": 1,
+        "col": 0,
+        "row": 0,
+        "id": "gaming_laptop",
+        "_id": "68af416239eae8de724b2951"
+    },
+    {
+        "grid_x": 11,
+        "grid_y": 11,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "modern_desk",
+        "_id": "68af416239eae8de724b2953"
+    },
+    {
+        "grid_x": 10,
+        "grid_y": 8,
+        "grid_z": 0,
+        "col": 1,
+        "row": 0,
+        "id": "modern_chair",
+        "_id": "68af416239eae8de724b2954"
+    },
+    {
+        "grid_x": 10,
+        "grid_y": 11,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "modern_desk",
+        "_id": "68af44f039eae8de724b3446"
+    },
+    {
+        "grid_x": 6,
+        "grid_y": 6,
+        "grid_z": 0,
+        "col": 0,
+        "row": 0,
+        "id": "minimalist_table",
+        "_id": "68af505939eae8de724b42bd"
+    },
+    {
+        "grid_x": 6,
+        "grid_y": 6,
+        "grid_z": 1,
+        "col": 0,
+        "row": 0,
+        "id": "coffee",
+        "_id": "68af505939eae8de724b42be"
+    },
+    {
+        "grid_x": 10,
+        "grid_y": 11,
+        "grid_z": 1,
+        "col": 3,
+        "row": 0,
+        "id": "tv"
     }
 ]

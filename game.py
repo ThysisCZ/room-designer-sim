@@ -2407,32 +2407,32 @@ class RoomDesignerGame:
         # Collect all tiles and objects for proper depth sorting
         for x in range(self.grid_width):
             for y in range(self.grid_height):
-                # Calculate base position for the tile
-                screen_x, screen_y = self.iso_utils.grid_to_screen(x, y)
-                screen_x += self.camera_offset_x
-                screen_y += self.camera_offset_y
+                for z in range(self.grid_depth):
+                    
+                    # Calculate base position for the tile
+                    screen_x, screen_y = self.iso_utils.grid_to_screen(x, y)
+                    screen_x += self.camera_offset_x
+                    screen_y += self.camera_offset_y
 
-                # Floors - render for empty spaces and spaces with objects
-                if self.game_map[x, y, 0] == self.EMPTY_SPACE or self.game_map[x, y, 0] == self.TOP_SURFACE \
-                or self.game_map[x, y, 0] == self.NON_TOP_SURFACE:
-                    floor_rect = self.sprites['floor'].get_rect()
-                    floor_rect.x = screen_x - self.iso_utils.half_tile_width
-                    y_offset = 30
-                    floor_rect.y = screen_y - self.iso_utils.half_tile_height + y_offset
-                    render_offset = 2
-                    render_list.append((x + y - render_offset, 'floor', floor_rect))
+                    # Floors - render for empty spaces and spaces with objects
+                    if self.game_map[x, y, 0] == self.EMPTY_SPACE or self.game_map[x, y, 0] == self.TOP_SURFACE \
+                    or self.game_map[x, y, 0] == self.NON_TOP_SURFACE:
+                        floor_rect = self.sprites['floor'].get_rect()
+                        floor_rect.x = screen_x - self.iso_utils.half_tile_width
+                        y_offset = 30
+                        floor_rect.y = screen_y - self.iso_utils.half_tile_height + y_offset
+                        render_offset = 2
+                        render_list.append((x + y - render_offset, 'floor', floor_rect))
 
-                # Walls - render each layer
-                if self.game_map[x, y, 0] == self.WALL_TILE:
-                    for z in range(self.grid_depth):
-                        if self.game_map[x, y, z] == self.WALL_TILE:
-                            wall_rect = self.sprites['wall'].get_rect()
-                            wall_rect.x = screen_x - self.iso_utils.half_tile_width
-                            tile_spacing = 1.5
-                            y_offset = 3
-                            wall_rect.y = screen_y - self.iso_utils.half_tile_height - (z * self.iso_utils.tile_height
-                                         * tile_spacing + self.iso_utils.half_tile_height - y_offset)
-                            render_list.append((x + y + z, 'wall', wall_rect))
+                    # Walls - render each layer
+                    if self.game_map[x, y, z] == self.WALL_TILE:
+                        wall_rect = self.sprites['wall'].get_rect()
+                        wall_rect.x = screen_x - self.iso_utils.half_tile_width
+                        tile_spacing = 1.5
+                        y_offset = 3
+                        wall_rect.y = screen_y - self.iso_utils.half_tile_height - (z * self.iso_utils.tile_height
+                                        * tile_spacing + self.iso_utils.half_tile_height - y_offset)
+                        render_list.append((x + y + z, 'wall', wall_rect))
 
         all_entities = list(self.all_sprites)
 

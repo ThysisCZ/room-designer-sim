@@ -184,7 +184,7 @@
             "id": "cutecore_couch",
             "name": "Cutecore Couch",
             "spritesheet": "cutecore_couch.png",
-            "type": "floor item",
+            "type": "non top floor item",
             "description": "Cute place where you can chill.",
             "price": 150,
             "count": 2,
@@ -204,7 +204,7 @@
             "id": "cutecore_chair",
             "name": "Cutecore Chair",
             "spritesheet": "cutecore_chair.png",
-            "type": "floor item",
+            "type": "non top floor item",
             "description": "Simple chair made out of pink plastic.",
             "price": 50,
             "count": 1,
@@ -259,6 +259,66 @@
             "price": 200,
             "count": 1,
             "_id": "68add478f0e62c2be8117612"
+        },
+        {
+            "id": "gaming_chair",
+            "name": "Gaming Chair",
+            "spritesheet": "gaming_chair.png",
+            "type": "non top floor item",
+            "description": "It's only 399 GMC!",
+            "price": 399,
+            "count": 1,
+            "_id": "68af3aea39eae8de724b2602"
+        },
+        {
+            "id": "gaming_laptop",
+            "name": "Gaming Laptop",
+            "spritesheet": "gaming_laptop.png",
+            "type": "surface item",
+            "description": "Lightweight machine for hardcore gamers.",
+            "price": 400,
+            "count": 3,
+            "_id": "68af3aea39eae8de724b2603"
+        },
+        {
+            "id": "gaming_console",
+            "name": "Gaming Console",
+            "spritesheet": "gaming_console.png",
+            "type": "surface item",
+            "description": "Heavy machine for hardcore gamers.",
+            "price": 400,
+            "count": 2,
+            "_id": "68af3aea39eae8de724b2604"
+        },
+        {
+            "id": "modern_desk",
+            "name": "Modern Desk",
+            "spritesheet": "modern_desk.png",
+            "type": "floor item",
+            "description": "Modern solution for your everyday tasks.",
+            "price": 200,
+            "count": 3,
+            "_id": "68af3aea39eae8de724b2605"
+        },
+        {
+            "id": "modern_chair",
+            "name": "Modern Chair",
+            "spritesheet": "modern_chair.png",
+            "type": "non top floor item",
+            "description": "Simple chair with a nice modern look.",
+            "price": 100,
+            "count": 1,
+            "_id": "68af3aea39eae8de724b2606"
+        },
+        {
+            "id": "tv",
+            "name": "TV",
+            "spritesheet": "tv.png",
+            "type": "surface item",
+            "description": "Learn about recent events or watch something entertaining.",
+            "price": 500,
+            "count": 1,
+            "_id": "68af3aea39eae8de724b2607"
         }
     ],
     "floor": [
@@ -342,6 +402,15 @@
             "description": "Evokes joy and playfulness.",
             "price": 100,
             "_id": "68ad8eb7f0e62c2be8113a7a"
+        },
+        {
+            "id": "dark_wood_floor",
+            "name": "Dark Wood Floor",
+            "spritesheet": "dark_wood_floor.png",
+            "type": "floor",
+            "description": "Embrace the darkness.",
+            "price": 100,
+            "_id": "68ae3c15f0e62c2be8128842"
         }
     ],
     "wall": [
@@ -443,6 +512,60 @@
             "description": "Evokes joy and playfulness.",
             "price": 100,
             "_id": "68ad8eb7f0e62c2be8113a71"
+        },
+        {
+            "id": "dark_wood_wall",
+            "name": "Dark Wood Wall",
+            "spritesheet": "dark_wood_wall.png",
+            "type": "wall",
+            "description": "Embrace the darkness.",
+            "price": 100,
+            "_id": "68ae3c15f0e62c2be8128837"
+        },
+        {
+            "id": "green_neon_wall",
+            "name": "Green Neon Wall",
+            "spritesheet": "green_neon_wall.png",
+            "type": "wall",
+            "description": "Embrace the green light.",
+            "price": 100,
+            "_id": "68ae3c15f0e62c2be8128838"
+        },
+        {
+            "id": "blue_neon_wall",
+            "name": "Blue Neon Wall",
+            "spritesheet": "blue_neon_wall.png",
+            "type": "wall",
+            "description": "Embrace the blue light.",
+            "price": 200,
+            "_id": "68aed90939eae8de724aff48"
+        },
+        {
+            "id": "violet_neon_wall",
+            "name": "Violet Neon Wall",
+            "spritesheet": "violet_neon_wall.png",
+            "type": "wall",
+            "description": "Embrace the violet light.",
+            "price": 200,
+            "_id": "68aed90939eae8de724aff49"
+        },
+        {
+            "id": "pink_neon_wall",
+            "name": "Pink Neon Wall",
+            "spritesheet": "pink_neon_wall.png",
+            "type": "wall",
+            "description": "Embrace the pink light.",
+            "price": 200,
+            "_id": "68aed90939eae8de724aff4a"
+        },
+        {
+            "id": "yellow_neon_wall",
+            "name": "Yellow Neon Wall",
+            "spritesheet": "yellow_neon_wall.png",
+            "type": "wall",
+            "description": "Embrace the yellow light.",
+            "price": 200,
+            "_id": "68aed90939eae8de724aff4b"
         }
     ]
 }

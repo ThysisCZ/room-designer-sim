@@ -302,7 +302,7 @@ shop_assets = [
         "id": "cutecore_couch",
         "name": "Cutecore Couch",
         "spritesheet": "cutecore_couch.png",
-        "type": "floor item",
+        "type": "non top floor item",
         "description": "Cute place where you can chill.",
         "price": 150,
         "count": 0
@@ -313,14 +313,14 @@ shop_assets = [
         "spritesheet": "cutecore_desk.png",
         "type": "floor item",
         "description": "You can use it for everyday tasks and it's also cute.",
-        "price": 100,
+        "price": 150,
         "count": 0
     },
     {
         "id": "cutecore_chair",
         "name": "Cutecore Chair",
         "spritesheet": "cutecore_chair.png",
-        "type": "floor item",
+        "type": "non top floor item",
         "description": "Simple chair made out of pink plastic.",
         "price": 50,
         "count": 0
@@ -368,6 +368,116 @@ shop_assets = [
         "type": "surface item",
         "description": "Huge soft strawberry.",
         "price": 200,
+        "count": 0
+    },
+    {
+        "id": "dark_wood_floor",
+        "name": "Dark Wood Floor",
+        "spritesheet": "dark_wood_floor.png",
+        "type": "floor",
+        "description": "Embrace the darkness.",
+        "price": 100
+    },
+    {
+        "id": "dark_wood_wall",
+        "name": "Dark Wood Wall",
+        "spritesheet": "dark_wood_wall.png",
+        "type": "wall",
+        "description": "Embrace the darkness.",
+        "price": 100
+    },
+    {
+        "id": "green_neon_wall",
+        "name": "Green Neon Wall",
+        "spritesheet": "green_neon_wall.png",
+        "type": "wall",
+        "description": "Embrace the green light.",
+        "price": 200
+    },
+    {
+        "id": "blue_neon_wall",
+        "name": "Blue Neon Wall",
+        "spritesheet": "blue_neon_wall.png",
+        "type": "wall",
+        "description": "Embrace the blue light.",
+        "price": 200
+    },
+    {
+        "id": "violet_neon_wall",
+        "name": "Violet Neon Wall",
+        "spritesheet": "violet_neon_wall.png",
+        "type": "wall",
+        "description": "Embrace the violet light.",
+        "price": 200
+    },
+    {
+        "id": "pink_neon_wall",
+        "name": "Pink Neon Wall",
+        "spritesheet": "pink_neon_wall.png",
+        "type": "wall",
+        "description": "Embrace the pink light.",
+        "price": 200
+    },
+    {
+        "id": "yellow_neon_wall",
+        "name": "Yellow Neon Wall",
+        "spritesheet": "yellow_neon_wall.png",
+        "type": "wall",
+        "description": "Embrace the yellow light.",
+        "price": 200
+    },
+    {
+        "id": "gaming_chair",
+        "name": "Gaming Chair",
+        "spritesheet": "gaming_chair.png",
+        "type": "non top floor item",
+        "description": "It's only 399 GMC!",
+        "price": 399,
+        "count": 0
+    },
+    {
+        "id": "gaming_laptop",
+        "name": "Gaming Laptop",
+        "spritesheet": "gaming_laptop.png",
+        "type": "surface item",
+        "description": "Lightweight machine for hardcore gamers.",
+        "price": 400,
+        "count": 0
+    },
+    {
+        "id": "gaming_console",
+        "name": "Gaming Console",
+        "spritesheet": "gaming_console.png",
+        "type": "surface item",
+        "description": "Heavy machine for hardcore gamers.",
+        "price": 400,
+        "count": 0
+    },
+    {
+        "id": "modern_desk",
+        "name": "Modern Desk",
+        "spritesheet": "modern_desk.png",
+        "type": "floor item",
+        "description": "Modern solution for your everyday tasks.",
+        "price": 200,
+        "count": 0
+    },
+    {
+        "id": "modern_chair",
+        "name": "Modern Chair",
+        "spritesheet": "modern_chair.png",
+        "type": "non top floor item",
+        "description": "Simple chair with a nice modern look.",
+        "price": 100,
+        "count": 0
+    },
+    {
+        "id": "tv",
+        "name": "TV",
+        "spritesheet": "tv.png",
+        "type": "surface item",
+        "description": "Learn about recent events or watch something entertaining.",
+        "price": 500,
         "count": 0
     }
 ]
