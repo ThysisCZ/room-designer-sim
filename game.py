@@ -330,6 +330,14 @@ class RoomDesignerGame:
                         next_dir = 'RIGHT'
                     # Quit
                     if event.key == pygame.K_ESCAPE:
+                        self.total_balance += self.coin_count
+                        self.save_stats_data(
+                                    balance=self.total_balance,
+                                    snake_hs=self.snake_hi_score,
+                                    fruit_hs=self.fruit_hi_score,
+                                    bullet_hs=self.bullet_hi_score
+                                )
+                        
                         selection_abl.save_selected_assets(
                                 self.selected_floor_data,
                                 self.selected_wall_data
@@ -560,6 +568,14 @@ class RoomDesignerGame:
                 if event.type == pygame.KEYDOWN:
                     # Quit
                     if event.key == pygame.K_ESCAPE:
+                        self.total_balance += self.coin_count
+                        self.save_stats_data(
+                                    balance=self.total_balance,
+                                    snake_hs=self.snake_hi_score,
+                                    fruit_hs=self.fruit_hi_score,
+                                    bullet_hs=self.bullet_hi_score
+                                )
+                        
                         selection_abl.save_selected_assets(
                                 self.selected_floor_data,
                                 self.selected_wall_data
@@ -900,6 +916,14 @@ class RoomDesignerGame:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
+                        self.total_balance += self.coin_count
+                        self.save_stats_data(
+                                    balance=self.total_balance,
+                                    snake_hs=self.snake_hi_score,
+                                    fruit_hs=self.fruit_hi_score,
+                                    bullet_hs=self.bullet_hi_score
+                                )
+                        
                         selection_abl.save_selected_assets(
                                 self.selected_floor_data,
                                 self.selected_wall_data
@@ -1305,9 +1329,9 @@ class RoomDesignerGame:
                             if selected_tab == self.ITEM_TAB:
                                 self.show_sell_button = self.inventory_ui.selected_item is not None
                             elif selected_tab == self.FLOOR_TAB:
-                                self.show_sell_button = self.inventory_ui.selected_floor != 0
+                                self.show_sell_button = self.selected_floor_data['id'] != 'stone_floor'
                             else:
-                                self.show_sell_button = self.inventory_ui.selected_wall != 0
+                                self.show_sell_button = self.selected_wall_data['id'] != 'stone_wall'
                     
                     elif self.minigame_button.handle_event(event):
                         self.show_inventory = False
@@ -1392,20 +1416,20 @@ class RoomDesignerGame:
                                 self.selected_floor_data = self.inventory_ui.selected_floor
 
                                 self.sprites["floor"] = create_isometric_sprites(
-                                    self.iso_utils, self.FLOOR_TAB, self.inventory_ui.selected_floor
+                                    self.iso_utils, self.FLOOR_TAB, self.selected_floor_data
                                 )[0]["floor"]
 
-                                self.show_sell_button = self.inventory_ui.selected_floor['id'] != 'stone_floor'
+                                self.show_sell_button = self.selected_floor_data['id'] != 'stone_floor'
 
                             # Wall selection
                             else:
                                 self.selected_wall_data = self.inventory_ui.selected_wall
 
                                 self.sprites["wall"] = create_isometric_sprites(
-                                    self.iso_utils, self.WALL_TAB, self.inventory_ui.selected_wall
+                                    self.iso_utils, self.WALL_TAB, self.selected_wall_data
                                 )[0]["wall"]
                                 
-                                self.show_sell_button = self.inventory_ui.selected_wall['id'] != 'stone_wall'
+                                self.show_sell_button = self.selected_wall_data['id'] != 'stone_wall'
 
                         # Close inventory
                         elif not inner_click and not self.sell_button.handle_event(event):
@@ -1525,7 +1549,7 @@ class RoomDesignerGame:
 
                             if item_type == 'floor item' or item_type == 'non top floor item':
                                 def get_floor_surface(px, py, cx, cy, w, h):
-                                    """Check if click point is on floor using rhombus inequality."""
+                                    """Check if click point is on floor."""
                                     dx = abs(px - cx)
                                     dy = abs(py - cy)
                                     return (dx / (w / 2) + dy / (h / 2)) <= 1
@@ -1547,10 +1571,16 @@ class RoomDesignerGame:
                                             tile_height = self.iso_utils.tile_height
 
                                             center_x = screen_x
-                                            y_offset = 20
+                                            y_offset = 35
                                             center_y = screen_y + y_offset
 
                                             if get_floor_surface(mx, my, center_x, center_y, tile_width, tile_height):
+                                                # Prevent duplicit sprites
+                                                if self.object:
+                                                    self.objects.remove(self.object)
+                                                    self.all_sprites.remove(self.object)
+                                                    self.object = None
+
                                                 # Create ghost object at clicked position
                                                 self.object = Object(x=x, y=y, z=0, c=0, r=0, iso_utils=self.iso_utils, asset=self.selected_item_data)
                                                 self.objects.add(self.object)
@@ -1737,11 +1767,10 @@ class RoomDesignerGame:
                                             tile_height = self.iso_utils.tile_height
 
                                             center_x = screen_x
-                                            y_offset = 20
-                                            center_y = screen_y + y_offset - tile_height
+                                            center_y = screen_y
 
                                             if get_floor_surface(mx, my, center_x, center_y, tile_width, tile_height):
-                                                # Remove duplicit sprite
+                                                # Prevent duplicit sprites
                                                 if self.object:
                                                     self.objects.remove(self.object)
                                                     self.all_sprites.remove(self.object)
@@ -1762,10 +1791,16 @@ class RoomDesignerGame:
                                             tile_height = self.iso_utils.tile_height
 
                                             center_x = screen_x
-                                            y_offset = 20
+                                            y_offset = 35
                                             center_y = screen_y + y_offset
 
                                             if get_floor_surface(mx, my, center_x, center_y, tile_width, tile_height):
+                                                # Prevent duplicit sprites
+                                                if self.object:
+                                                    self.objects.remove(self.object)
+                                                    self.all_sprites.remove(self.object)
+                                                    self.object = None
+
                                                 # Create ghost object at clicked position
                                                 self.object = Object(x=x, y=y, z=0, c=0, r=0, iso_utils=self.iso_utils, asset=self.selected_item_data)
                                                 self.objects.add(self.object)
@@ -1868,13 +1903,16 @@ class RoomDesignerGame:
                                                         if asset.get('id') == obj_id:
                                                             if asset.get('type') == 'wall item' and object.get('col') == 0:
                                                                 x_offset = 14
-                                                                y_offset = 0
+                                                                y_offset = 20
                                                             elif asset.get('type') == 'wall item' and object.get('col') == 1:
                                                                 x_offset = -6
-                                                                y_offset = 0
+                                                                y_offset = 20
+                                                            elif asset.get('type') == 'surface item':
+                                                                x_offset = 2
+                                                                y_offset = 55
                                                             else:
                                                                 x_offset = 2
-                                                                y_offset = 20
+                                                                y_offset = 35
 
                                             center_x = screen_x + x_offset
                                             center_y = screen_y + y_offset
@@ -2120,28 +2158,20 @@ class RoomDesignerGame:
                 inventory = inventory_abl.load_inventory()
 
                 selected_id = self.selected_item_data.get('id') if self.selected_item_data else None
-                remaining_count = 0
 
                 # Subtract or remove from inventory
                 for existing in inventory['item']:
                     if existing.get('id') == static_object.obj_id:
-                        if existing['count'] > 1:
+                        if existing.get('count') > 1:
                             existing['count'] -= 1
-                            remaining_count = existing['count']
-                        elif existing['count'] == 1:
+                        elif existing.get('count') == 1:
                             inventory['item'].remove(existing)
-                            remaining_count = 0
                         break
-
-                # Save inventory
-                inventory_abl.save_inventory(inventory)
-                self.reload_inventory()
 
                 # Update selection state
                 for item in self.inventory_ui.items:
                     if item.get('id') == selected_id:
-                        item['count'] = remaining_count
-                        if remaining_count == 0:
+                        if item.get('count') == 1:
                             self.selected_item_data = None
                             self.inventory_ui.selected_item = None
                         else:
@@ -2149,6 +2179,10 @@ class RoomDesignerGame:
                             self.selected_item_data = item
                             self.inventory_ui.selected_item = item
                         break
+                
+                # Save inventory
+                inventory_abl.save_inventory(inventory)
+                self.reload_inventory()
 
                 # Remove ghost object
                 if self.object:

@@ -15,7 +15,14 @@ module.exports.saveGameDataService = (userId, gameData) => {
             updated_at: new Date()
         };
 
-        console.log('Attempting to save with updateData:', JSON.stringify(updateData, null, 2));
+        // Avoid logging large payloads; log only counts
+        const invCounts = {
+            item: Array.isArray(updateData.inventory?.item) ? updateData.inventory.item.length : 0,
+            floor: Array.isArray(updateData.inventory?.floor) ? updateData.inventory.floor.length : 0,
+            wall: Array.isArray(updateData.inventory?.wall) ? updateData.inventory.wall.length : 0,
+        };
+        const tilesCount = Array.isArray(updateData.tiles) ? updateData.tiles.length : 0;
+        console.log('Saving game data - counts => items:', invCounts.item, 'floor:', invCounts.floor, 'wall:', invCounts.wall, 'tiles:', tilesCount);
 
         gameDataModel.findOneAndUpdate(
             { user_id: userId },
@@ -23,11 +30,11 @@ module.exports.saveGameDataService = (userId, gameData) => {
             { new: true, upsert: true }
         )
             .then((result) => {
-                console.log('Save successful:', result);
+                console.log('Save successful for user:', userId);
                 resolve(result);
             })
             .catch((error) => {
-                console.error('Save failed with error:', error);
+                console.error('Save failed with error:', error?.message || error);
                 reject(error);
             });
     });
@@ -79,7 +86,7 @@ module.exports.syncGameDataService = (userId, gameData, lastSyncTime) => {
                 }
             })
             .catch((error) => {
-                console.error('Sync error:', error);
+                console.error('Sync error:', error?.message || error);
                 reject(false);
             });
     });

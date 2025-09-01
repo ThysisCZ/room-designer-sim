@@ -6,7 +6,15 @@ async function saveGameDataController(req, res) {
         const gameData = req.body;
 
         console.log('Saving data for user:', userId);
-        console.log('Game data received:', JSON.stringify(gameData, null, 2));
+        if (gameData) {
+            const invCounts = {
+                item: Array.isArray(gameData.inventory?.item) ? gameData.inventory.item.length : 0,
+                floor: Array.isArray(gameData.inventory?.floor) ? gameData.inventory.floor.length : 0,
+                wall: Array.isArray(gameData.inventory?.wall) ? gameData.inventory.wall.length : 0,
+            };
+            const tilesCount = Array.isArray(gameData.tiles) ? gameData.tiles.length : 0;
+            console.log('Payload sizes => items:', invCounts.item, 'floor:', invCounts.floor, 'wall:', invCounts.wall, 'tiles:', tilesCount);
+        }
 
         const result = await gameDataService.saveGameDataService(userId, gameData);
 

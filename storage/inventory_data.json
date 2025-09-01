@@ -1,5 +1,15 @@
 {
-    "item": [],
+    "item": [
+        {
+            "id": "wooden_desk",
+            "name": "Wooden Desk",
+            "spritesheet": "wooden_desk.png",
+            "type": "floor item",
+            "description": "Useful for everyday tasks.",
+            "price": 150,
+            "count": 3
+        }
+    ],
     "floor": [
         {
             "id": "stone_floor",
@@ -9,15 +19,6 @@
             "description": "Boring but stable.",
             "price": 0,
             "_id": "6898857c4f0a5e4f39555670"
-        },
-        {
-            "id": "minimalist_floor",
-            "name": "Minimalist Floor",
-            "spritesheet": "minimalist_floor.png",
-            "type": "floor",
-            "description": "Polished floor without splinters.",
-            "price": 100,
-            "_id": "68af8f523cf468d1cc73731a"
         }
     ],
     "wall": [
