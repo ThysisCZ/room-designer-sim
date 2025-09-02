@@ -1,15 +1,5 @@
 {
-    "item": [
-        {
-            "id": "wooden_desk",
-            "name": "Wooden Desk",
-            "spritesheet": "wooden_desk.png",
-            "type": "floor item",
-            "description": "Useful for everyday tasks.",
-            "price": 150,
-            "count": 3
-        }
-    ],
+    "item": [],
     "floor": [
         {
             "id": "stone_floor",
