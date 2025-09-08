@@ -163,7 +163,7 @@ shop_assets = [
         "name": "Straw Hat",
         "spritesheet": "straw_hat.png",
         "type": "surface item",
-        "description": "Lightweight nad natural hat.",
+        "description": "Lightweight and natural hat.",
         "price": 25
     },
     {
