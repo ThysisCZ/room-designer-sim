@@ -1,1 +1,18 @@
-{"floor": {"id": "stone_floor", "name": "Stone Floor", "spritesheet": "stone_floor.png", "type": "floor", "description": "Boring but stable.", "price": 0}, "wall": {"id": "stone_wall", "name": "Stone Wall", "spritesheet": "stone_wall.png", "type": "wall", "description": "Boring but stable.", "price": 0}}
+{
+    "floor": {
+        "id": "stone_floor",
+        "name": "Stone Floor",
+        "spritesheet": "stone_floor.png",
+        "type": "floor",
+        "description": "Boring but stable",
+        "price": 0
+    },
+    "wall": {
+        "id": "stone_wall",
+        "name": "Stone Wall",
+        "spritesheet": "stone_wall.png",
+        "type": "wall",
+        "description": "Boring but stable.",
+        "price": 0
+    }
+}

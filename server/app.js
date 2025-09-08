@@ -9,7 +9,8 @@ const mongoose = require('mongoose');
 const routes = require('./routes/routes');
 
 const PORT = 8000;
-const URI = "mongodb+srv://Thysis:[REMOVED]@room-designer-cluster.fut1o6k.mongodb.net/?retryWrites=true&w=majority&appName=Room-Designer-Cluster";
+const PASSWORD = process.env.DB_PASS
+const URI = `mongodb+srv://Thysis:${PASSWORD}@room-designer-cluster.fut1o6k.mongodb.net/?retryWrites=true&w=majority&appName=Room-Designer-Cluster`;
 
 //middleware
 app.use(express.json({ limit: '10mb' }));
