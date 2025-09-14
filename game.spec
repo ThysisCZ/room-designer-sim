@@ -9,10 +9,13 @@ a = Analysis(
         ('server/*.js', 'server'),
         ('server/routes/*.js', 'server/routes'),
         ('server/src', 'server/src'),
-        ('server/node_modules', 'server/node_modules'),
         ('server/package.json', 'server'),
+        ('server/.env', 'server'),
         ('ithaca.ttf', '.'),
-        ('storage', 'storage')
+        ('storage', 'storage'),
+        ('setup_server.py', '.'),
+        ('install_dependencies.bat', '.'),
+        ('dependency_checker.py', '.')
     ],
     hiddenimports=[
         'requests',
@@ -20,7 +23,11 @@ a = Analysis(
         'pygame',
         'threading',
         'subprocess',
-        'traceback'
+        'traceback',
+        'tkinter',
+        'webbrowser',
+        'setup_server',
+        'dependency_checker'
     ],
     hookspath=[],
     hooksconfig={},

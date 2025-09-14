@@ -142,10 +142,18 @@ class ServerLauncher:
                 print(f"node_modules not found at: {node_modules_path}")
                 print("Attempting npm install...")
                 try:
-                    subprocess.run(['npm', 'install'], cwd=server_dir, check=True, timeout=60)
-                except subprocess.CalledProcessError as e:
-                    print(f"Failed to run npm install: {e}")
-                    return False
+                    # Try npm.cmd first (Windows)
+                    subprocess.run(['npm.cmd', 'install'], cwd=server_dir, check=True, timeout=60)
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    try:
+                        # Fallback to npm
+                        subprocess.run(['npm', 'install'], cwd=server_dir, check=True, timeout=60)
+                    except subprocess.CalledProcessError as e:
+                        print(f"Failed to run npm install: {e}")
+                        return False
+                    except subprocess.TimeoutExpired:
+                        print("npm install timed out")
+                        return False
                 except subprocess.TimeoutExpired:
                     print("npm install timed out")
                     return False

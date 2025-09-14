@@ -5,31 +5,36 @@ Base path: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame 
 Starting server...
 Starting server...
 Running as executable, base path: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame Projects\Room Designer Simulator
-Server directory: C:\Users\Acer\AppData\Local\Temp\_MEI21122\server
-Server directory contents: ['app.js', 'node_modules', 'package.json', 'routes', 'src']
-node_modules found at: C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\node_modules
+Server directory: C:\Users\Acer\AppData\Local\Temp\_MEI330762\server
+Server directory contents: ['.env', 'app.js', 'package.json', 'routes', 'src']
+node_modules not found at: C:\Users\Acer\AppData\Local\Temp\_MEI330762\server\node_modules
+Attempting npm install...
 Searching for Node.js executable...
 Found Node.js at: C:\Program Files\nodejs\node.exe
-app.js found at: C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\app.js
-Starting Node.js server with command: C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\app.js
-Working directory: C:\Users\Acer\AppData\Local\Temp\_MEI21122\server
-Server process started with PID: 17088
+app.js found at: C:\Users\Acer\AppData\Local\Temp\_MEI330762\server\app.js
+Starting Node.js server with command: C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Local\Temp\_MEI330762\server\app.js
+Working directory: C:\Users\Acer\AppData\Local\Temp\_MEI330762\server
+Server process started with PID: 33224
 Waiting for server to become healthy...
 Using timeout: 45s, initial delay: 3s
-Error reading STDOUT: 'charmap' codec can't encode character '\U0001f4e1' in position 67: character maps to <undefined>
-Server STDERR: Email configuration error: Error: Missing credentials for "PLAIN"
-Server STDERR: at SMTPConnection._formatError (C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\node_modules\nodemailer\lib\smtp-connection\index.js:809:19)
-Server STDERR: at SMTPConnection.login (C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\node_modules\nodemailer\lib\smtp-connection\index.js:454:38)
-Server STDERR: at C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\node_modules\nodemailer\lib\smtp-transport\index.js:375:32
-Server STDERR: at SMTPConnection.<anonymous> (C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\node_modules\nodemailer\lib\smtp-connection\index.js:215:17)
-Server STDERR: at Object.onceWrapper (node:events:633:28)
-Server STDERR: at SMTPConnection.emit (node:events:519:28)
-Server STDERR: at SMTPConnection._actionEHLO (C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\node_modules\nodemailer\lib\smtp-connection\index.js:1371:14)
-Server STDERR: at SMTPConnection._processResponse (C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\node_modules\nodemailer\lib\smtp-connection\index.js:993:20)
-Server STDERR: at SMTPConnection._onData (C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\node_modules\nodemailer\lib\smtp-connection\index.js:774:14)
-Server STDERR: at SMTPConnection._onSocketData (C:\Users\Acer\AppData\Local\Temp\_MEI21122\server\node_modules\nodemailer\lib\smtp-connection\index.js:195:44) {
+Error reading STDOUT: 'charmap' codec can't encode characters in position 67-68: character maps to <undefined>
+Server STDERR: Email configuration error: Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+Server STDERR: 535 5.7.8  https://support.google.com/mail/?p=BadCredentials a640c23a62f3a-b07b32f2334sm835025166b.78 - gsmtp
+Server STDERR: at SMTPConnection._formatError (C:\Users\Acer\AppData\Local\Temp\_MEI330762\server\node_modules\nodemailer\lib\smtp-connection\index.js:809:19)
+Server STDERR: at SMTPConnection._actionAUTHComplete (C:\Users\Acer\AppData\Local\Temp\_MEI330762\server\node_modules\nodemailer\lib\smtp-connection\index.js:1588:34)
+Server STDERR: at SMTPConnection.<anonymous> (C:\Users\Acer\AppData\Local\Temp\_MEI330762\server\node_modules\nodemailer\lib\smtp-connection\index.js:556:26)
+Server STDERR: at SMTPConnection._processResponse (C:\Users\Acer\AppData\Local\Temp\_MEI330762\server\node_modules\nodemailer\lib\smtp-connection\index.js:993:20)
+Server STDERR: at SMTPConnection._onData (C:\Users\Acer\AppData\Local\Temp\_MEI330762\server\node_modules\nodemailer\lib\smtp-connection\index.js:774:14)
+Server STDERR: at SMTPConnection._onSocketData (C:\Users\Acer\AppData\Local\Temp\_MEI330762\server\node_modules\nodemailer\lib\smtp-connection\index.js:195:44)
+Server STDERR: at TLSSocket.emit (node:events:519:28)
+Server STDERR: at addChunk (node:internal/streams/readable:559:12)
+Server STDERR: at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+Server STDERR: at Readable.push (node:internal/streams/readable:390:5) {
 Server STDERR: code: 'EAUTH',
-Server STDERR: command: 'API'
+Server STDERR: response: '535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+Server STDERR: '535 5.7.8  https://support.google.com/mail/?p=BadCredentials a640c23a62f3a-b07b32f2334sm835025166b.78 - gsmtp',
+Server STDERR: responseCode: 535,
+Server STDERR: command: 'AUTH PLAIN'
 Server STDERR: }
 Health check attempt 1 (elapsed: 3.0s)
 Server health check passed after 1 attempts!
@@ -75,7 +80,7 @@ Collecting local game data...
 Running as executable, exe location: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame Projects\Room Designer Simulator
 Using storage path: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame Projects\Room Designer Simulator\storage
 Loading stats from: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame Projects\Room Designer Simulator\storage\stats_data.json
-Loaded stats: {'total_balance': 11218, 'snake_hi_score': 90, 'fruit_hi_score': 740, 'bullet_hi_score': 570}
+Loaded stats: {'total_balance': 3, 'snake_hi_score': 220, 'fruit_hi_score': 1190, 'bullet_hi_score': 1560}
 Loading inventory...
 Loading selected assets...
 Loading tiles...
@@ -83,7 +88,7 @@ Local game data collected: ['inventory', 'selection', 'stats', 'tiles']
 Running as executable, exe location: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame Projects\Room Designer Simulator
 Using storage path: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame Projects\Room Designer Simulator\storage
 Loading sync time from: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame Projects\Room Designer Simulator\storage\last_sync.json
-Last sync time: 2025-09-02T14:42:04.236565
+Last sync time: 2025-09-15T01:15:38.514527
 Making PATCH request to: http://localhost:8000/gamedata/sync/68a45aa838d94da7fc31c124
 Response status code: 200
 Sync action: upload
@@ -117,7 +122,7 @@ Collecting local game data...
 Running as executable, exe location: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame Projects\Room Designer Simulator
 Using storage path: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame Projects\Room Designer Simulator\storage
 Loading stats from: C:\Users\Acer\OneDrive - Unicorn Vysoká škola s.r.o\Dokumenty\Pygame Projects\Room Designer Simulator\storage\stats_data.json
-Loaded stats: {'total_balance': 11218, 'snake_hi_score': 90, 'fruit_hi_score': 740, 'bullet_hi_score': 570}
+Loaded stats: {'total_balance': 3, 'snake_hi_score': 220, 'fruit_hi_score': 1190, 'bullet_hi_score': 1560}
 Loading inventory...
 Loading selected assets...
 Loading tiles...
@@ -137,10 +142,10 @@ Upload completed with success: True
 Starting cleanup...
 Waiting for any ongoing operations to complete...
 Stopping server...
-Stopping server process (PID: 17088)
+Stopping server process (PID: 33224)
 Found 1 child processes
-Terminating child process: 23440
-Terminating parent process: 17088
+Terminating child process: 12608
+Terminating parent process: 33224
 Server stopped successfully
 Server stopped
 Final cleanup...
