@@ -1,3 +1,7 @@
 # Configure Git Large File Storage
 *.exe filter=lfs diff=lfs merge=lfs -text
 *.pkg filter=lfs diff=lfs merge=lfs -text
+
+# Adjust language detection
+*.html linguist-detectable=false
+*.tex linguist-detectable=false
