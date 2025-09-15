@@ -1,6 +1,8 @@
 import pygame
-from .sprite_sheet import SpriteSheet
 import os
+
+from .sprite_sheet import SpriteSheet
+from .path_utils import get_spritesheet_path
 
 class IsometricUtils:
     """Utility class for isometric coordinate conversions and rendering"""
@@ -24,17 +26,12 @@ class IsometricUtils:
         self.object_sheets = {}
     
     def load_sprite_sheets(self, selected, type):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.dirname(current_dir)
-
         if type == self.ITEM_TAB:
-            spritesheets_dir = os.path.join(project_root, "assets/", "spritesheets/", "items")
+            spritesheets_path = get_spritesheet_path('items', selected['spritesheet'])
         elif type == self.FLOOR_TAB:
-            spritesheets_dir = os.path.join(project_root, "assets/", "spritesheets/", "floors")
+            spritesheets_path = get_spritesheet_path('floors', selected['spritesheet'])
         else:
-            spritesheets_dir = os.path.join(project_root, "assets/", "spritesheets/", "walls")
-
-        spritesheets_path = os.path.join(spritesheets_dir, selected["spritesheet"])
+            spritesheets_path = get_spritesheet_path('walls', selected['spritesheet'])
 
         if type == self.ITEM_TAB:
             # For items, store the sprite sheet in the object_sheets dictionary
@@ -151,11 +148,7 @@ class IsometricUtils:
         if object_id in self.object_sheets:
             return
             
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.dirname(current_dir)
-
-        spritesheets_dir = os.path.join(project_root, "assets/", "spritesheets/", "items")
-        spritesheets_path = os.path.join(spritesheets_dir, f"{object_id}.png")
+        spritesheets_path = get_spritesheet_path('items', f'{object_id}.png')
 
         if os.path.exists(spritesheets_path):
             self.object_sheets[object_id] = SpriteSheet(spritesheets_path)

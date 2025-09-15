@@ -2,6 +2,7 @@ from game import RoomDesignerGame
 from screens.auth_screen import AuthScreen
 from storage.cloud_sync import (is_logged_in, get_current_user, sync_to_cloud, upload_to_cloud, wait_for_server_ready)
 from server_launcher import ServerLauncher
+from utils.path_utils import init_path_system
 
 import pygame
 import signal
@@ -168,6 +169,8 @@ def upload_on_game_end():
         return False
 
 if __name__ == "__main__":
+    init_path_system()
+    
     # Enable console output for debugging when running as exe
     if getattr(sys, 'frozen', False):
         # Redirect stdout and stderr to files when running as exe

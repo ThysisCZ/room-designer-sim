@@ -1,7 +1,7 @@
 import pygame
-from pathlib import Path
 
 from utils.sprite_sheet import SpriteSheet
+from utils.path_utils import get_spritesheet_path
 from game_logic import create_graphics, create_sounds
 import storage.inventory_abl as inventory_abl
 
@@ -115,13 +115,8 @@ class InventoryUI:
                     x = self.x + grid_x * self.item_size
                     y = self.y + grid_y * self.item_size
 
-                    # Determine the absolute path to this file
-                    this_file = Path(__file__).resolve()
-                    project_root = this_file.parents[0]
-                    spritesheets_dir = project_root / "assets" / "spritesheets" / "items"
-
                     # Load only the first tile of the spritesheet as an icon
-                    icon_path = spritesheets_dir / item["spritesheet"]
+                    icon_path = get_spritesheet_path('items', item['spritesheet'])
                     icon_sheet = SpriteSheet(str(icon_path))
 
                     # Calculate tile size (10x10 grid)
@@ -172,13 +167,8 @@ class InventoryUI:
                     x = self.x + grid_x * self.item_size
                     y = self.y + grid_y * self.item_size
 
-                    # Determine the absolute path to this file
-                    this_file = Path(__file__).resolve()
-                    project_root = this_file.parents[0]
-                    spritesheets_dir = project_root / "assets" / "spritesheets" / "floors"
-
                     # Load only the first tile of the spritesheet as an icon
-                    icon_path = spritesheets_dir / floor["spritesheet"]
+                    icon_path = get_spritesheet_path('floors', floor['spritesheet'])
                     icon_sheet = SpriteSheet(str(icon_path))
 
                     # Calculate tile size (10x10 grid)
@@ -216,13 +206,8 @@ class InventoryUI:
                     x = self.x + grid_x * self.item_size
                     y = self.y + grid_y * self.item_size
 
-                    # Determine the absolute path to this file
-                    this_file = Path(__file__).resolve()
-                    project_root = this_file.parents[0]
-                    spritesheets_dir = project_root / "assets" / "spritesheets" / "walls"
-
                     # Load only the first tile of the spritesheet as an icon
-                    icon_path = spritesheets_dir / wall["spritesheet"]
+                    icon_path = get_spritesheet_path('walls', wall['spritesheet'])
                     icon_sheet = SpriteSheet(str(icon_path))
 
                     # Calculate tile size (10x10 grid)
@@ -493,13 +478,8 @@ class ShopUI:
                 x = self.x + grid_x * self.thumbnail_size
                 y = self.y + grid_y * self.thumbnail_size
 
-                # Determine the absolute path to this file
-                this_file = Path(__file__).resolve()
-                project_root = this_file.parents[0]
-                spritesheets_dir = project_root / "assets" / "spritesheets" / "assets"
-
                 # Load only the first tile of the spritesheet as an icon
-                icon_path = spritesheets_dir / asset["spritesheet"]
+                icon_path = get_spritesheet_path('assets', asset['spritesheet'])
                 icon_sheet = SpriteSheet(str(icon_path))
 
                 # Calculate tile size (10x10 grid)
