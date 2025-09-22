@@ -44,6 +44,15 @@ def get_user_file():
 def get_stats_file():
     return os.path.join(get_storage_path(), "stats_data.json")
 
+def get_inventory_file():
+    return os.path.join(get_storage_path(), "inventory_data.json")
+
+def get_selection_file():
+    return os.path.join(get_storage_path(), "selection_data.json")
+
+def get_tile_file():
+    return os.path.join(get_storage_path(), "tile_data.json")
+
 def wait_for_server_ready(timeout=30, check_interval=1):
     """Wait for server to be fully ready with proper retry logic"""
     print(f"Waiting for server to be ready (timeout: {timeout}s)...")
@@ -110,29 +119,87 @@ class CloudSyncManager:
             print(f"Error saving user session: {e}")
             traceback.print_exc()
 
-    def clear_user_session(self):
-        """Clear user session and local data"""
-        print("Clearing user session and local data...")
-        self.user_id = None
-        self.username = None
+    def clear_user_data(self):
+        """Clear local data"""
+        print("Clearing local data...")
+
+        default_stats_file = {
+            "total_balance": 0,
+            "snake_hi_score": 0,
+            "fruit_hi_score": 0,
+            "bullet_hi_score": 0
+        }
+
+        default_inventory_file = {
+            "item": [],
+            "floor": [
+                {
+                    "id": "stone_floor",
+                    "name": "Stone Floor",
+                    "spritesheet": "stone_floor.png",
+                    "type": "floor",
+                    "description": "Boring but stable.",
+                    "price": 0,
+                    "_id": "6898857c4f0a5e4f39555670"
+                }
+            ],
+            "wall": [
+                {
+                    "id": "stone_wall",
+                    "name": "Stone Wall",
+                    "spritesheet": "stone_wall.png",
+                    "type": "wall",
+                    "description": "Boring but stable.",
+                    "price": 0,
+                    "_id": "6898857c4f0a5e4f3955566e"
+                }
+            ]
+        }
+
+        default_selection_file = {
+            "floor": {
+                "id": "stone_floor",
+                "name": "Stone Floor",
+                "spritesheet": "stone_floor.png",
+                "type": "floor",
+                "description": "Boring but stable.",
+                "price": 0
+            },
+            "wall": {
+                "id": "stone_wall",
+                "name": "Stone Wall",
+                "spritesheet": "stone_wall.png",
+                "type": "wall",
+                "description": "Boring but stable.",
+                "price": 0
+            }
+        }
+
+        default_tile_file = []
         
-        # Clear all local data files
         files_to_clear = [
-            get_user_file(),
-            get_sync_file(),
             get_stats_file(),
-            os.path.join(get_storage_path(), "inventory_data.json"),
-            os.path.join(get_storage_path(), "selection_data.json"),
-            os.path.join(get_storage_path(), "tile_data.json")
+            get_inventory_file(),
+            get_selection_file(),
+            get_tile_file()
+        ]
+
+        default_files = [
+            default_stats_file,
+            default_inventory_file,
+            default_selection_file,
+            default_tile_file
         ]
         
-        for file in files_to_clear:
-            if os.path.exists(file):
+        # Clear all local data files
+        for current, default in zip(files_to_clear, default_files):
+            if os.path.exists(current):
                 try:
-                    os.remove(file)
-                    print(f"Removed file: {file}")
+                    with open(current, "w") as f:
+                        json.dump(default, f, indent=4)
+                    print(f"Cleared file: {current}")
                 except Exception as e:
-                    print(f"Error removing file {file}: {e}")
+                    print(f"Error clearing file {current}: {e}")
 
     def register_user(self, username: str, email: str, password: str) -> Tuple[bool, str]:
         """Register new user"""
@@ -151,6 +218,7 @@ class CloudSyncManager:
             if response.status_code == 201:
                 data = response.json()
                 user_id = data["data"]["userId"]
+                self.clear_user_data();
                 self.save_user_session(user_id, username)
                 print("Registration successful")
                 return True, "Registration successful!"
@@ -603,9 +671,6 @@ def register_user(username: str, email: str, password: str) -> Tuple[bool, str]:
 
 def login_user(username: str, password: str) -> Tuple[bool, str]:
     return cloud_sync.login_user(username, password)
-
-def logout_user():
-    cloud_sync.clear_user_session()
 
 def is_logged_in() -> bool:
     return cloud_sync.is_logged_in()
