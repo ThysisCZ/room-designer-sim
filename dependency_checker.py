@@ -9,6 +9,7 @@ import os
 import subprocess
 import tkinter as tk
 from tkinter import ttk
+import webbrowser
 
 class DependencyChecker:
     def __init__(self):
@@ -172,8 +173,12 @@ class DependencyChecker:
         # Missing dependencies list
         deps_frame = ttk.LabelFrame(main_frame, text="Missing Components", padding="10")
         deps_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 20))
+
+        # Open page in browser
+        def callback(url):
+            webbrowser.open_new(url)
         
-        for i, dep in enumerate(self.missing_deps):
+        for dep in self.missing_deps:
             dep_frame = ttk.Frame(deps_frame)
             dep_frame.pack(fill=tk.X, pady=5)
             
@@ -188,9 +193,10 @@ class DependencyChecker:
             desc_label.pack(anchor=tk.W, padx=(20, 0))
             
             # Download url
-            download_label = ttk.Label(dep_frame, text=dep['download_url'], 
-                                    font=('Arial', 10, 'bold'))
-            download_label.pack(anchor=tk.W, padx=(20, 0))
+            download_link = ttk.Label(dep_frame, text=dep['download_url'], 
+                                    font=('Arial', 10, 'bold'), foreground='blue', cursor='hand2')
+            download_link.pack(anchor=tk.W, padx=(20, 0))
+            download_link.bind('<Button-1>', lambda e: callback(dep['download_url']))
         
         # Center the window
         root.update_idletasks()
