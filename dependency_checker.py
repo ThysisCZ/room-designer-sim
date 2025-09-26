@@ -7,7 +7,6 @@ Checks for required dependencies and guides users through installation.
 import sys
 import os
 import subprocess
-import webbrowser
 import tkinter as tk
 from tkinter import ttk
 
@@ -153,6 +152,11 @@ class DependencyChecker:
         # Main frame
         main_frame = ttk.Frame(root, padding="20")
         main_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Icon
+        exe_dir = os.path.dirname(sys.executable)
+        icon = os.path.join(exe_dir, 'assets', 'icon.ico')
+        root.iconbitmap(icon)
         
         # Title
         title_label = ttk.Label(main_frame, text="Missing Dependencies", 
@@ -180,44 +184,13 @@ class DependencyChecker:
             
             # Description
             desc_label = ttk.Label(dep_frame, text=dep['description'], 
-                                 wraplength=500)
+                                 font=('Arial', 10, 'bold'), wraplength=500)
             desc_label.pack(anchor=tk.W, padx=(20, 0))
             
-            # Download button
-            if dep['download_url']:
-                def open_url(url=dep['download_url']):
-                    webbrowser.open(url)
-                
-                download_btn = ttk.Button(dep_frame, text="Download", 
-                                        command=open_url)
-                download_btn.pack(anchor=tk.W, padx=(20, 0), pady=(5, 0))
-        
-        # Instructions
-        instructions_text = ("After installing the missing components:\n"
-                           "1. Restart your computer\n"
-                           "2. Run the game again\n"
-                           "3. The game should start normally")
-        instructions_label = ttk.Label(main_frame, text=instructions_text, 
-                                     font=('Arial', 9), foreground='blue')
-        instructions_label.pack(pady=(0, 20))
-        
-        # Buttons
-        button_frame = ttk.Frame(main_frame)
-        button_frame.pack(fill=tk.X)
-        
-        def retry_check():
-            root.destroy()
-            return self.run_all_checks()
-        
-        def exit_game():
-            root.destroy()
-            sys.exit(0)
-        
-        retry_btn = ttk.Button(button_frame, text="Check Again", command=retry_check)
-        retry_btn.pack(side=tk.LEFT, padx=(0, 10))
-        
-        exit_btn = ttk.Button(button_frame, text="Exit Game", command=exit_game)
-        exit_btn.pack(side=tk.LEFT)
+            # Download url
+            download_label = ttk.Label(dep_frame, text=dep['download_url'], 
+                                    font=('Arial', 10, 'bold'))
+            download_label.pack(anchor=tk.W, padx=(20, 0))
         
         # Center the window
         root.update_idletasks()

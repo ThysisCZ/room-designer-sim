@@ -9,15 +9,6 @@
             "description": "Boring but stable.",
             "price": 0,
             "_id": "6898857c4f0a5e4f39555670"
-        },
-        {
-            "id": "minimalist_floor",
-            "name": "Minimalist Floor",
-            "spritesheet": "minimalist_floor.png",
-            "type": "floor",
-            "description": "Polished floor without splinters.",
-            "price": 100,
-            "_id": "68c6d4f0edb11a1984a496b0"
         }
     ],
     "wall": [

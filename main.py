@@ -1,15 +1,80 @@
+#!/usr/bin/env python3
+"""
+Room Designer Simulator - Main Entry Point
+Includes dependency checking before game initialization.
+"""
+
+import sys
+import os
+import signal
+import time
+import traceback
+
+# Check dependencies before any other imports
+def check_dependencies_first():
+    """Check dependencies before importing anything else"""
+    try:
+        # Import the dependency checker
+        from dependency_checker import check_dependencies
+        
+        # Run the check
+        if not check_dependencies():
+            print("Dependencies check failed. Exiting.")
+            return False
+        
+        print("All dependencies satisfied, continuing with game startup...")
+        return True
+        
+    except ImportError as e:
+        print(f"Could not import dependency checker: {e}")
+        # If we can't even import the dependency checker, try basic check
+        return basic_dependency_check()
+    except Exception as e:
+        print(f"Error during dependency check: {e}")
+        traceback.print_exc()
+        return False
+
+def basic_dependency_check():
+    """Basic fallback dependency check"""
+    import subprocess
+    try:
+        # Just check Node.js quickly
+        result = subprocess.run(['node', '--version'], 
+                              capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            print(f"Node.js found: {result.stdout.strip()}")
+            return True
+        else:
+            show_basic_error()
+            return False
+    except:
+        show_basic_error()
+        return False
+
+def show_basic_error():
+    """Show basic error message if dependency checker fails"""
+    try:
+        import ctypes
+        ctypes.windll.user32.MessageBoxW(
+            0,
+            "Node.js is required to run Room Designer Simulator.\n\n"
+            "Please download and install Node.js from:\nhttps://nodejs.org/\n\n"
+            "Then restart the game.",
+            "Missing Dependency - Room Designer Simulator",
+            0x30  # MB_ICONEXCLAMATION
+        )
+    except:
+        print("ERROR: Node.js is required but not found.")
+        print("Download from: https://nodejs.org/")
+        input("Press ENTER to exit...")
+
+# Now we can safely import other modules
 from game import RoomDesignerGame
 from screens.auth_screen import AuthScreen
 from storage.cloud_sync import (is_logged_in, get_current_user, sync_to_cloud, upload_to_cloud, wait_for_server_ready)
 from server_launcher import ServerLauncher
 from utils.path_utils import init_path_system
-
 import pygame
-import signal
-import sys
-import os
-import time
-import traceback
 
 def game_startup():
     """Gets called when game starts"""
@@ -79,6 +144,19 @@ class GameManager:
             print("Starting server...")
             if not self.server.start_server():
                 print("Failed to start server.")
+                # Show error message if server fails to start
+                try:
+                    import ctypes
+                    ctypes.windll.user32.MessageBoxW(
+                        0,
+                        "Failed to start the game server.\n\n"
+                        "This usually means Node.js is not properly installed.\n"
+                        "Please ensure Node.js is installed and try again.",
+                        "Server Start Failed - Room Designer Simulator",
+                        0x10  # MB_ICONERROR
+                    )
+                except:
+                    print("Server failed to start. Please check that Node.js is installed.")
                 return None
             print("Server started successfully")
             
@@ -169,9 +247,10 @@ def upload_on_game_end():
         return False
 
 if __name__ == "__main__":
+    # Initialize path system
     init_path_system()
     
-    # Enable console output for debugging when running as exe
+    # Set up logging
     if getattr(sys, 'frozen', False):
         # Redirect stdout and stderr to files when running as exe
         log_dir = os.path.join(os.path.dirname(sys.executable), 'logs')
@@ -185,10 +264,23 @@ if __name__ == "__main__":
         
         print(f"Game started as executable. Logs will be written to {log_dir}")
     
+    # Check dependencies first
+    print("Checking dependencies...")
+    if not check_dependencies_first():
+        print("Dependency check failed. Game cannot start.")
+        # Clean exit
+        if getattr(sys, 'frozen', False):
+            # Keep console open briefly so user can see any messages
+            time.sleep(2)
+        sys.exit(1)
+    
+    print("Dependencies OK, proceeding with game initialization...")
+    
     # Register signal handlers
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
+    # Start the game
     game_manager = None
     try:
         print("Initializing game manager...")
@@ -202,7 +294,7 @@ if __name__ == "__main__":
                 
                 # Enhanced upload retry logic with better server readiness checks
                 upload_success = False
-                max_retries = 5  # Increased from 3
+                max_retries = 5 
                 
                 for attempt in range(max_retries):
                     print(f"Upload attempt {attempt + 1}/{max_retries}")
